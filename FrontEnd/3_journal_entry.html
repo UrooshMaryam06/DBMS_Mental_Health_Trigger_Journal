@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — Log Entry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f6f5f0;--surface:#fff;--border:#e2dfd6;--border-l:#ede9e0;
+    --text-1:#1a1714;--text-2:#6b6560;--text-3:#9e9891;
+    --accent:#2d6a4f;--accent-l:#d8f3dc;--accent-d:#1b4332;
+    --sidebar:#1b4332;--sidebar-act:rgba(216,243,220,.18);
+    --danger:#be123c;--danger-l:#ffe4e6;
+    --radius:14px;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+
+  /* Sidebar same as dashboard */
+  .sidebar{width:230px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.12)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#95d5b2}
+  .sb-title{font-size:14px;font-weight:600;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#95d5b2}
+  .nav-item:hover i,.nav-item.active i{color:#95d5b2}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.4)}
+  .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.1)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#95d5b2,#52b788);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1b4332}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.4)}
+
+  .main{margin-left:230px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-left{display:flex;align-items:center;gap:12px}
+  .back-btn{width:32px;height:32px;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s}
+  .back-btn:hover{background:#edeae3}
+  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2)}
+  .save-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+  .save-btn:hover{background:var(--accent-d)}
+
+  .content{padding:28px;max-width:760px;margin:0 auto}
+
+  /* Wizard steps */
+  .steps{display:flex;align-items:center;gap:0;margin-bottom:28px}
+  .step{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--text-3);flex:1}
+  .step-num{width:28px;height:28px;border-radius:50%;background:var(--bg);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;transition:all .3s}
+  .step-line{flex:1;height:1.5px;background:var(--border);margin:0 -4px}
+  .step.active .step-num{background:var(--accent);border-color:var(--accent);color:#fff}
+  .step.active{color:var(--text-1)}
+  .step.done .step-num{background:var(--accent-l);border-color:var(--accent);color:var(--accent-d)}
+  .step.done .step-line,.step.active~.step .step-line{background:var(--border)}
+  .step.done{color:var(--accent-d)}
+
+  /* Form sections */
+  .section{background:var(--surface);border-radius:var(--radius);border:0.5px solid var(--border);padding:22px 24px;margin-bottom:14px;display:none}
+  .section.active{display:block}
+  .section-title{font-size:15px;font-weight:600;color:var(--text-1);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .section-title i{color:var(--accent)}
+  .section-sub{font-size:13px;color:var(--text-2);margin-bottom:20px}
+
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  label{display:block;font-size:12px;font-weight:600;color:var(--text-2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+  input[type=text],input[type=date],input[type=time],select,textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,.1)}
+  textarea{resize:vertical;min-height:110px;line-height:1.6}
+  input::placeholder,textarea::placeholder{color:var(--text-3)}
+  select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239e9891'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px}
+
+  /* Mood slider */
+  .mood-section{margin-bottom:18px}
+  .mood-display{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .mood-big{font-size:40px;font-weight:700;color:var(--text-1);line-height:1}
+  .mood-label{font-size:13px;color:var(--text-2)}
+  .mood-emoji{font-size:28px;line-height:1}
+  input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:6px;background:linear-gradient(to right,var(--accent) 0%,var(--accent-l) 0%);outline:none;cursor:pointer;border:none;padding:0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer}
+  .mood-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-top:4px}
+
+  /* Tags */
+  .trigger-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .trigger-tag{border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text-2);transition:all .2s;display:flex;align-items:center;gap:6px}
+  .trigger-tag i{font-size:14px}
+  .trigger-tag:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+  .trigger-tag.sel{border-color:var(--accent);background:var(--accent-l);color:var(--accent-d)}
+
+  /* Coping */
+  .coping-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .coping-card{border:1.5px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;background:var(--surface);transition:all .2s;text-align:center}
+  .coping-card i{font-size:22px;color:var(--text-2);display:block;margin-bottom:4px}
+  .coping-card span{font-size:12px;color:var(--text-2);font-weight:500;line-height:1.3;display:block}
+  .coping-card:hover{border-color:var(--accent);background:var(--accent-l)}
+  .coping-card.sel{border-color:var(--accent);background:var(--accent-l)}
+  .coping-card.sel i,.coping-card.sel span{color:var(--accent-d)}
+
+  /* Crisis toggle */
+  .crisis-toggle{display:flex;align-items:flex-start;gap:14px;background:var(--danger-l);border:1.5px solid #fda4af;border-radius:12px;padding:14px 16px;cursor:pointer;transition:all .2s}
+  .crisis-toggle.active{background:#ffe4e6;border-color:var(--danger)}
+  .toggle-box{width:20px;height:20px;border-radius:5px;border:2px solid #fda4af;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s}
+  .toggle-box.checked{background:var(--danger);border-color:var(--danger)}
+  .toggle-box i{font-size:12px;color:#fff;display:none}
+  .toggle-box.checked i{display:block}
+  .crisis-text strong{font-size:13px;color:var(--danger);font-weight:600}
+  .crisis-text p{font-size:12px;color:#9f1239;margin-top:2px;line-height:1.5}
+
+  /* Nav buttons */
+  .form-nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+  .prev-btn{background:transparent;border:1.5px solid var(--border);border-radius:10px;padding:9px 20px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;color:var(--text-2);transition:all .15s}
+  .prev-btn:hover{background:var(--bg)}
+  .next-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 22px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+  .next-btn:hover{background:var(--accent-d)}
+
+  /* Success */
+  .success-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:center;justify-content:center}
+  .success-overlay.show{display:flex}
+  .success-box{background:var(--surface);border-radius:20px;padding:40px;max-width:400px;width:90%;text-align:center}
+  .s-icon{width:64px;height:64px;border-radius:50%;background:var(--accent-l);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+  .s-icon i{font-size:30px;color:var(--accent)}
+  .s-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-1);margin-bottom:6px}
+  .s-sub{font-size:14px;color:var(--text-2);line-height:1.5;margin-bottom:20px}
+  .s-actions{display:flex;gap:10px;justify-content:center}
+  .s-btn{padding:10px 20px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .15s}
+  .s-btn.primary{background:var(--accent);color:#fff;border:none}
+  .s-btn.primary:hover{background:var(--accent-d)}
+  .s-btn.secondary{background:transparent;border:1.5px solid var(--border);color:var(--text-1)}
+  .s-btn.secondary:hover{background:var(--bg)}
+  .spin{animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+      <div><div class="sb-title">MH Journal</div><div class="sb-sub">Patient Portal</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-section">Main</div>
+      <a href="2_patient_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a href="#" class="nav-item active"><i class="ti ti-notebook"></i>Journal<span class="nav-badge">7</span></a>
+      <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+      <div class="nav-section">Account</div>
+      <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
+      <a href="#" class="nav-item"><i class="ti ti-bell"></i>Notifications</a>
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">SA</div>
+        <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <a href="2_patient_dashboard.html" class="back-btn"><i class="ti ti-arrow-left"></i></a>
+        <div>
+          <div class="tb-title">Log Trigger Entry</div>
+          <div class="tb-sub">Step <span id="stepNum">1</span> of 3 — <span id="stepName">Basic Details</span></div>
+        </div>
+      </div>
+      <button class="save-btn" id="topSaveBtn" style="display:none" onclick="submitForm()"><i class="ti ti-check"></i>Save Entry</button>
+    </div>
+
+    <div class="content">
+      <!-- Steps indicator -->
+      <div class="steps">
+        <div class="step active" id="step-ind-1">
+          <div class="step-num">1</div>
+          <span>Basic Details</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-2">
+          <div class="step-num">2</div>
+          <span>Mood & Triggers</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step-ind-3">
+          <div class="step-num">3</div>
+          <span>Coping & Notes</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Basic Details -->
+      <div class="section active" id="sec-1">
+        <div class="section-title"><i class="ti ti-calendar-event"></i>When did this happen?</div>
+        <div class="section-sub">Record the date, time, and location of this trigger event.</div>
+        <div class="field-row">
+          <div class="field"><label for="entryDate">Date</label><input type="date" id="entryDate"/></div>
+          <div class="field"><label for="entryTime">Time</label><input type="time" id="entryTime"/></div>
+        </div>
+        <div class="field">
+          <label for="entryLocation">Location / Context</label>
+          <select id="entryLocation">
+            <option value="">Select a location…</option>
+            <option>At home</option>
+            <option>At work / office</option>
+            <option>In transit / commute</option>
+            <option>At school / university</option>
+            <option>Social gathering</option>
+            <option>Public place</option>
+            <option>Online / virtual</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Crisis Entry?</label>
+          <div class="crisis-toggle" id="crisisToggle" onclick="toggleCrisis()">
+            <div class="toggle-box" id="crisisBox"><i class="ti ti-check"></i></div>
+            <div class="crisis-text">
+              <strong>Mark as Crisis Entry</strong>
+              <p>Check this if you experienced a mental health crisis, panic attack, or felt unsafe. Your therapist will be notified immediately.</p>
+            </div>
+          </div>
+        </div>
+        <div class="form-nav">
+          <span></span>
+          <button class="next-btn" onclick="goTo(2)">Next: Mood & Triggers <i class="ti ti-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Mood & Triggers -->
+      <div class="section" id="sec-2">
+        <div class="section-title"><i class="ti ti-mood-smile"></i>How were you feeling?</div>
+        <div class="section-sub">Rate your mood and select what triggered this feeling.</div>
+        <div class="mood-section">
+          <div class="mood-display">
+            <div><div class="mood-big" id="moodNum">5</div><div class="mood-label" id="moodLabel">Neutral</div></div>
+            <div class="mood-emoji" id="moodEmoji">😐</div>
+          </div>
+          <input type="range" id="moodSlider" min="1" max="10" value="5" oninput="updateMood(this.value)"/>
+          <div class="mood-scale"><span>1 Very Low</span><span>5 Neutral</span><span>10 Excellent</span></div>
+        </div>
+        <div class="field" style="margin-top:20px">
+          <label>Trigger Categories <span style="color:var(--text-3);text-transform:none;font-weight:400;font-size:12px">(select all that apply)</span></label>
+          <div class="trigger-tags">
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-briefcase"></i>Work Stress</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-users"></i>Family</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-coin"></i>Finance</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-heart-rate"></i>Health</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-social"></i>Relationships</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-school"></i>Academic</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-zzz"></i>Sleep Issues</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-news"></i>News / Media</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-device-mobile"></i>Social Media</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-dots-circle-horizontal"></i>Other</div>
+          </div>
+        </div>
+        <div class="form-nav">
+          <button class="prev-btn" onclick="goTo(1)"><i class="ti ti-arrow-left"></i> Back</button>
+          <button class="next-btn" onclick="goTo(3)">Next: Coping & Notes <i class="ti ti-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Coping & Notes -->
+      <div class="section" id="sec-3">
+        <div class="section-title"><i class="ti ti-writing"></i>Coping & Reflection</div>
+        <div class="section-sub">Describe what happened and how you responded to it.</div>
+        <div class="field">
+          <label>What happened? <span style="color:var(--text-3);text-transform:none;font-weight:400">Describe the trigger and your thoughts</span></label>
+          <textarea id="thoughts" placeholder="Write freely — what were you thinking and feeling? What led up to this?"></textarea>
+        </div>
+        <div class="field">
+          <label>Physical Symptoms <span style="color:var(--text-3);text-transform:none;font-weight:400">(optional)</span></label>
+          <div class="trigger-tags">
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-brain"></i>Headache</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-activity-heartbeat"></i>Racing heart</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-wind"></i>Shallow breathing</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-zzz"></i>Fatigue</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-ripple"></i>Nausea</div>
+            <div class="trigger-tag" onclick="toggleTag(this)"><i class="ti ti-flame"></i>Chest tightness</div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:18px">
+          <label>Coping Strategies Used</label>
+          <div class="coping-grid">
+            <div class="coping-card" onclick="toggleCope(this)"><i class="ti ti-wind"></i><span>Deep breathing</span></div>
+            <div class="coping-card" onclick="toggleCope(this)"><i class="ti ti-run"></i><span>Light exercise</span></div>
+            <div class="coping-card" onclick="toggleCope(this)"><i class="ti ti-notebook"></i><span>Journaling</span></div>
+            <div class="coping-card" onclick="toggleCope(this)"><i class="ti ti-headphones"></i><span>Meditation</span></div>
+            <div class="coping-card" onclick="toggleCope(this)"><i class="ti ti-phone"></i><span>Called a friend</span></div>
+            <div class="coping-card" onclick="toggleCope(this)"><i class="ti ti-dots-circle-horizontal"></i><span>None / Other</span></div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:18px">
+          <label>Additional Notes <span style="color:var(--text-3);text-transform:none;font-weight:400">(optional)</span></label>
+          <textarea placeholder="Anything else you'd like your therapist to know?" style="min-height:80px"></textarea>
+        </div>
+        <div class="form-nav">
+          <button class="prev-btn" onclick="goTo(2)"><i class="ti ti-arrow-left"></i> Back</button>
+          <button class="next-btn" id="finalSave" onclick="submitForm()"><i class="ti ti-check"></i> Save Entry</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Success Modal -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="s-icon"><i class="ti ti-check"></i></div>
+    <div class="s-title">Entry Saved!</div>
+    <div class="s-sub">Your journal entry has been securely saved. Your therapist has been notified about your recent session.</div>
+    <div class="s-actions">
+      <button class="s-btn primary" onclick="location.href='2_patient_dashboard.html'">Go to Dashboard</button>
+      <button class="s-btn secondary" onclick="location.href='3_journal_entry.html'">+ New Entry</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Pre-fill today's date and time
+const now = new Date();
+document.getElementById('entryDate').value = now.toISOString().split('T')[0];
+document.getElementById('entryTime').value = now.toTimeString().slice(0,5);
+
+let currentStep = 1;
+const moodLabels = ['','Very Low','Low','Slightly Low','Below Average','Neutral','Slightly Good','Good','Very Good','Excellent','Outstanding'];
+const moodEmojis = ['','😔','😟','😕','😐','😶','🙂','😊','😄','😁','🤩'];
+
+function goTo(step){
+  document.getElementById('sec-'+currentStep).classList.remove('active');
+  document.getElementById('step-ind-'+currentStep).classList.remove('active');
+  document.getElementById('step-ind-'+currentStep).classList.add('done');
+  if(step<currentStep){document.getElementById('step-ind-'+step).classList.remove('done');}
+  currentStep = step;
+  document.getElementById('sec-'+step).classList.add('active');
+  document.getElementById('step-ind-'+step).classList.add('active');
+  document.getElementById('stepNum').textContent = step;
+  document.getElementById('stepName').textContent = ['','Basic Details','Mood & Triggers','Coping & Notes'][step];
+  document.getElementById('topSaveBtn').style.display = step===3?'flex':'none';
+  window.scrollTo(0,0);
+}
+function updateMood(v){
+  const pct = (v-1)/9*100;
+  document.getElementById('moodSlider').style.background = `linear-gradient(to right, var(--accent) ${pct}%, var(--accent-l) ${pct}%)`;
+  document.getElementById('moodNum').textContent = v;
+  document.getElementById('moodLabel').textContent = moodLabels[v];
+  document.getElementById('moodEmoji').textContent = moodEmojis[v];
+}
+function toggleTag(el){el.classList.toggle('sel')}
+function toggleCope(el){el.classList.toggle('sel')}
+let crisisActive = false;
+function toggleCrisis(){
+  crisisActive = !crisisActive;
+  document.getElementById('crisisBox').classList.toggle('checked',crisisActive);
+  document.getElementById('crisisToggle').classList.toggle('active',crisisActive);
+}
+function submitForm(){
+  const btn = document.getElementById('finalSave');
+  if(btn){btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Saving…';btn.disabled=true;}
+  setTimeout(()=>{ document.getElementById('successOverlay').classList.add('show'); },900);
+}
+updateMood(5);
+</script>
+</body>
+</html>

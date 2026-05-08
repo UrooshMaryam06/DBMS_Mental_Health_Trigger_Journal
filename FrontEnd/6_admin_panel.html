@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;
+    --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+    --accent:#7c3aed;--accent-l:#f5f3ff;--accent-d:#4c1d95;
+    --sidebar:#1e1b2e;--sidebar-act:rgba(167,139,250,.15);
+    --danger:#dc2626;--danger-l:#fef2f2;
+    --warn:#d97706;--warn-l:#fffbeb;
+    --ok:#16a34a;--ok-l:#f0fdf4;
+    --blue:#1d4ed8;--blue-l:#dbeafe;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+
+  /* SIDEBAR */
+  .sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.06)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#fff}
+  .sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav-section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.5);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#c4b5fd}
+  .nav-item:hover i,.nav-item.active i{color:#c4b5fd}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.3);transition:color .15s}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.06)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c4b5fd,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b2e}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.3)}
+
+  /* MAIN */
+  .main{margin-left:240px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:700;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+  .tb-right{display:flex;align-items:center;gap:10px}
+  .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s;position:relative}
+  .icon-btn:hover{background:#e8eef4}
+  .icon-btn i{font-size:18px}
+  .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+  .add-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+  .add-btn:hover{background:var(--accent-d)}
+
+  .content{padding:24px 28px}
+  .greeting{margin-bottom:20px}
+  .greeting h1{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-1);margin-bottom:3px}
+  .greeting p{font-size:13px;color:var(--text-2)}
+
+  /* METRICS */
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .mc{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:16px 18px}
+  .mc-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .mc-icon i{font-size:18px}
+  .mc-label{font-size:12px;color:var(--text-2);margin-bottom:4px}
+  .mc-val{font-size:26px;font-weight:700;line-height:1;color:var(--text-1)}
+  .mc-trend{font-size:11px;margin-top:4px}
+  .trend-up{color:var(--ok)}.trend-down{color:var(--danger)}.trend-n{color:var(--text-3)}
+  .live-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 1.4s infinite;margin-right:4px;vertical-align:middle}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* DB HEALTH ROW */
+  .db-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .db-card{background:var(--surface);border-radius:12px;border:0.5px solid var(--border);padding:14px 16px}
+  .db-label{font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+  .db-val{font-size:20px;font-weight:700;color:var(--text-1);margin-bottom:4px}
+  .db-bar{height:6px;background:#e2e8f0;border-radius:6px;overflow:hidden}
+  .db-fill{height:6px;border-radius:6px;transition:width .5s}
+  .fill-ok{background:#22c55e}.fill-warn{background:var(--warn)}.fill-crit{background:var(--danger)}
+
+  /* USER TABLE */
+  .table-card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);overflow:hidden}
+  .table-head{padding:16px 20px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .table-title{font-size:14px;font-weight:700;color:var(--text-1)}
+  .table-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .search-box{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:9px;padding:7px 12px;background:var(--bg);font-size:13px}
+  .search-box i{font-size:15px;color:var(--text-3)}
+  .search-box input{border:none;background:transparent;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);width:160px}
+  .search-box input::placeholder{color:var(--text-3)}
+  .filter-select{border:1px solid var(--border);border-radius:9px;padding:7px 10px;background:var(--bg);font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text-2);cursor:pointer;outline:none}
+  table{width:100%;border-collapse:collapse}
+  thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;border-bottom:0.5px solid var(--border);background:#f8fafc;cursor:pointer;user-select:none;white-space:nowrap}
+  thead th:hover{color:var(--text-1)}
+  tbody tr{border-bottom:0.5px solid #f1f5f9;transition:background .15s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:#f8fafc}
+  td{padding:12px 16px;font-size:13px;color:var(--text-1);vertical-align:middle}
+  .user-cell{display:flex;align-items:center;gap:10px}
+  .u-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+  .u-name{font-weight:600;font-size:13px}
+  .u-email{font-size:11px;color:var(--text-3)}
+  .role-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block}
+  .rb-patient{background:#dbeafe;color:#1d4ed8}
+  .rb-therapist{background:#f0fdf4;color:#15803d}
+  .rb-admin{background:#f5f3ff;color:#6d28d9}
+  .status-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+  .sb-active{background:#dcfce7;color:#15803d}
+  .sb-suspended{background:#fee2e2;color:#991b1b}
+  .sb-pending{background:#fef9c3;color:#a16207}
+  .act-cell{display:flex;gap:4px;flex-wrap:wrap}
+  .act-btn{border:1px solid var(--border);border-radius:7px;padding:5px 9px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;background:transparent;color:var(--text-2);transition:all .15s;display:inline-flex;align-items:center;gap:4px;font-weight:500}
+  .act-btn:hover{background:var(--bg)}
+  .act-edit:hover{border-color:var(--blue);color:var(--blue)}
+  .act-suspend:hover{border-color:var(--warn);color:var(--warn)}
+  .act-delete:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-l)}
+  .table-foot{padding:12px 20px;border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#f8fafc}
+  .foot-info{font-size:12px;color:var(--text-3)}
+  .pagination{display:flex;gap:4px}
+  .pg-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2);font-family:'DM Sans',sans-serif;transition:all .15s}
+  .pg-btn:hover,.pg-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  /* Logs */
+  .logs-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+  .log-card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:18px 20px}
+  .log-title{font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+  .log-sub{font-size:12px;color:var(--accent);cursor:pointer;font-weight:500}
+  .log-list{display:flex;flex-direction:column;gap:6px}
+  .log-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;background:var(--bg)}
+  .log-ic{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .log-ic i{font-size:13px}
+  .lic-info{background:#dbeafe;} .lic-info i{color:#1d4ed8}
+  .lic-warn{background:var(--warn-l);} .lic-warn i{color:var(--warn)}
+  .lic-err{background:var(--danger-l);} .lic-err i{color:var(--danger)}
+  .lic-ok{background:var(--ok-l);} .lic-ok i{color:var(--ok)}
+  .log-text{font-size:12px;color:var(--text-1);line-height:1.4}
+  .log-time{font-size:11px;color:var(--text-3);margin-top:1px}
+  /* Modal */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:center;justify-content:center}
+  .modal-bg.show{display:flex}
+  .modal{background:var(--surface);border-radius:16px;padding:28px;max-width:420px;width:90%}
+  .modal-title{font-size:17px;font-weight:700;color:var(--text-1);margin-bottom:6px}
+  .modal-sub{font-size:13px;color:var(--text-2);margin-bottom:20px;line-height:1.5}
+  .modal-acts{display:flex;gap:10px;justify-content:flex-end}
+  .m-cancel{background:transparent;border:1px solid var(--border);border-radius:9px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
+  .m-confirm{background:var(--danger);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:background .15s}
+  .m-confirm:hover{background:#991b1b}
+  .spin{animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="ti ti-shield-lock"></i></div>
+      <div><div class="sb-title">MH Journal</div><div class="sb-sub">Admin Control Panel</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-section">Overview</div>
+      <a href="#" class="nav-item active"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <div class="nav-section">Management</div>
+      <a href="#" class="nav-item"><i class="ti ti-users"></i>User Management<span class="nav-badge">3</span></a>
+      <a href="#" class="nav-item"><i class="ti ti-stethoscope"></i>Therapists</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i>All Appointments</a>
+      <a href="#" class="nav-item"><i class="ti ti-notebook"></i>Journal Entries</a>
+      <div class="nav-section">System</div>
+      <a href="#" class="nav-item"><i class="ti ti-terminal-2"></i>System Logs<span class="nav-badge" style="background:var(--warn)">!</span></a>
+      <a href="#" class="nav-item"><i class="ti ti-database"></i>Database Health</a>
+      <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">AD</div>
+        <div><div class="sb-uname">Admin User</div><div class="sb-role">Super Administrator</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="tb-title">Admin Dashboard</div>
+        <div class="tb-sub">Tuesday, Apr 27, 2026 · 3 pending actions</div>
+      </div>
+      <div class="tb-right">
+        <a href="#" class="icon-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></a>
+        <button class="add-btn" onclick="document.getElementById('addUserModal').classList.add('show')"><i class="ti ti-user-plus"></i>Add User</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="greeting">
+        <h1>System Overview 🛡️</h1>
+        <p>All systems operational. 1 warning: disk usage at 73% on DB server 2.</p>
+      </div>
+
+      <!-- METRICS -->
+      <div class="metrics">
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--accent-l)"><i class="ti ti-users" style="color:var(--accent)"></i></div>
+          <div class="mc-label">Total Users</div>
+          <div class="mc-val">247</div>
+          <div class="mc-trend trend-up">▲ 14 this month</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--ok-l)"><i class="ti ti-activity" style="color:var(--ok)"></i></div>
+          <div class="mc-label">Active Sessions</div>
+          <div class="mc-val"><div class="live-dot"></div>38</div>
+          <div class="mc-trend trend-n">Live right now</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--blue-l)"><i class="ti ti-database" style="color:var(--blue)"></i></div>
+          <div class="mc-label">DB Queries / sec</div>
+          <div class="mc-val">142</div>
+          <div class="mc-trend trend-n">Avg last 5 min</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--warn-l)"><i class="ti ti-alert-triangle" style="color:var(--warn)"></i></div>
+          <div class="mc-label">System Warnings</div>
+          <div class="mc-val" style="color:var(--warn)">3</div>
+          <div class="mc-trend trend-down">2 new today</div>
+        </div>
+      </div>
+
+      <!-- DB HEALTH -->
+      <div class="db-row">
+        <div class="db-card">
+          <div class="db-label">CPU Usage</div>
+          <div class="db-val">34%</div>
+          <div class="db-bar"><div class="db-fill fill-ok" style="width:34%"></div></div>
+        </div>
+        <div class="db-card">
+          <div class="db-label">Disk Usage (DB Server 2)</div>
+          <div class="db-val" style="color:var(--warn)">73%</div>
+          <div class="db-bar"><div class="db-fill fill-warn" style="width:73%"></div></div>
+        </div>
+        <div class="db-card">
+          <div class="db-label">Memory Usage</div>
+          <div class="db-val">58%</div>
+          <div class="db-bar"><div class="db-fill fill-ok" style="width:58%"></div></div>
+        </div>
+      </div>
+
+      <!-- USER TABLE -->
+      <div class="table-card">
+        <div class="table-head">
+          <div class="table-title">User Management</div>
+          <div class="table-controls">
+            <div class="search-box"><i class="ti ti-search"></i><input type="text" placeholder="Search users…" id="searchInput" oninput="filterUsers(this.value)"/></div>
+            <select class="filter-select" onchange="filterByRole(this.value)">
+              <option value="">All Roles</option>
+              <option value="patient">Patient</option>
+              <option value="therapist">Therapist</option>
+              <option value="admin">Admin</option>
+            </select>
+            <select class="filter-select" onchange="filterByStatus(this.value)">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th>Last Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userBody">
+            <tr data-role="patient" data-status="active">
+              <td style="font-family:monospace;font-size:12px;color:var(--text-3)">#USR-0041</td>
+              <td><div class="user-cell"><div class="u-avatar" style="background:#dbeafe;color:#1d4ed8">SA</div><div><div class="u-name">Sara Ahmed</div><div class="u-email">sara@mhjournal.com</div></div></div></td>
+              <td><span class="role-badge rb-patient">Patient</span></td>
+              <td><span class="status-badge sb-active">● Active</span></td>
+              <td style="color:var(--text-2)">Jan 15, 2026</td>
+              <td style="color:var(--text-2)">Apr 27, 2026</td>
+              <td><div class="act-cell"><button class="act-btn act-edit" onclick="editUser('Sara Ahmed')"><i class="ti ti-pencil"></i>Edit</button><button class="act-btn act-suspend" onclick="suspendUser(this,'Sara Ahmed')"><i class="ti ti-ban"></i>Suspend</button><button class="act-btn act-delete" onclick="confirmDelete('Sara Ahmed')"><i class="ti ti-trash"></i></button></div></td>
+            </tr>
+            <tr data-role="therapist" data-status="active">
+              <td style="font-family:monospace;font-size:12px;color:var(--text-3)">#USR-0012</td>
+              <td><div class="user-cell"><div class="u-avatar" style="background:#dcfce7;color:#15803d">IK</div><div><div class="u-name">Dr. Imran Khan</div><div class="u-email">imran@mhjournal.com</div></div></div></td>
+              <td><span class="role-badge rb-therapist">Therapist</span></td>
+              <td><span class="status-badge sb-active">● Active</span></td>
+              <td style="color:var(--text-2)">Oct 3, 2025</td>
+              <td style="color:var(--text-2)">Apr 27, 2026</td>
+              <td><div class="act-cell"><button class="act-btn act-edit" onclick="editUser('Dr. Imran Khan')"><i class="ti ti-pencil"></i>Edit</button><button class="act-btn act-suspend" onclick="suspendUser(this,'Dr. Imran Khan')"><i class="ti ti-ban"></i>Suspend</button><button class="act-btn act-delete" onclick="confirmDelete('Dr. Imran Khan')"><i class="ti ti-trash"></i></button></div></td>
+            </tr>
+            <tr data-role="patient" data-status="suspended">
+              <td style="font-family:monospace;font-size:12px;color:var(--text-3)">#USR-0067</td>
+              <td><div class="user-cell"><div class="u-avatar" style="background:#fce7f3;color:#9d174d">FN</div><div><div class="u-name">Fatima Noor</div><div class="u-email">fatima@mhjournal.com</div></div></div></td>
+              <td><span class="role-badge rb-patient">Patient</span></td>
+              <td><span class="status-badge sb-suspended">● Suspended</span></td>
+              <td style="color:var(--text-2)">Feb 20, 2026</td>
+              <td style="color:var(--text-2)">Apr 26, 2026</td>
+              <td><div class="act-cell"><button class="act-btn act-edit" onclick="editUser('Fatima Noor')"><i class="ti ti-pencil"></i>Edit</button><button class="act-btn" style="border-color:var(--ok);color:var(--ok)"><i class="ti ti-user-check"></i>Restore</button><button class="act-btn act-delete" onclick="confirmDelete('Fatima Noor')"><i class="ti ti-trash"></i></button></div></td>
+            </tr>
+            <tr data-role="patient" data-status="active">
+              <td style="font-family:monospace;font-size:12px;color:var(--text-3)">#USR-0089</td>
+              <td><div class="user-cell"><div class="u-avatar" style="background:#fef3c7;color:#b45309">ZR</div><div><div class="u-name">Zainab Raza</div><div class="u-email">zainab@mhjournal.com</div></div></div></td>
+              <td><span class="role-badge rb-patient">Patient</span></td>
+              <td><span class="status-badge sb-active">● Active</span></td>
+              <td style="color:var(--text-2)">Mar 8, 2026</td>
+              <td style="color:var(--text-2)">Apr 25, 2026</td>
+              <td><div class="act-cell"><button class="act-btn act-edit" onclick="editUser('Zainab Raza')"><i class="ti ti-pencil"></i>Edit</button><button class="act-btn act-suspend" onclick="suspendUser(this,'Zainab Raza')"><i class="ti ti-ban"></i>Suspend</button><button class="act-btn act-delete" onclick="confirmDelete('Zainab Raza')"><i class="ti ti-trash"></i></button></div></td>
+            </tr>
+            <tr data-role="admin" data-status="active">
+              <td style="font-family:monospace;font-size:12px;color:var(--text-3)">#USR-0001</td>
+              <td><div class="user-cell"><div class="u-avatar" style="background:var(--accent-l);color:var(--accent-d)">AD</div><div><div class="u-name">Admin User</div><div class="u-email">admin@mhjournal.com</div></div></div></td>
+              <td><span class="role-badge rb-admin">Admin</span></td>
+              <td><span class="status-badge sb-active">● Active</span></td>
+              <td style="color:var(--text-2)">Sep 1, 2025</td>
+              <td style="color:var(--text-2)">Apr 27, 2026</td>
+              <td><div class="act-cell"><button class="act-btn act-edit" onclick="editUser('Admin User')"><i class="ti ti-pencil"></i>Edit</button><span style="font-size:11px;color:var(--text-3);padding:0 6px">Protected</span></div></td>
+            </tr>
+            <tr data-role="therapist" data-status="pending">
+              <td style="font-family:monospace;font-size:12px;color:var(--text-3)">#USR-0103</td>
+              <td><div class="user-cell"><div class="u-avatar" style="background:#e0e7ff;color:#3730a3">NJ</div><div><div class="u-name">Dr. Nadia Jamil</div><div class="u-email">nadia@mhjournal.com</div></div></div></td>
+              <td><span class="role-badge rb-therapist">Therapist</span></td>
+              <td><span class="status-badge sb-pending">● Pending</span></td>
+              <td style="color:var(--text-2)">Apr 26, 2026</td>
+              <td style="color:var(--text-3)">—</td>
+              <td><div class="act-cell"><button class="act-btn" style="border-color:var(--ok);color:var(--ok)"><i class="ti ti-check"></i>Approve</button><button class="act-btn act-delete" onclick="confirmDelete('Dr. Nadia Jamil')"><i class="ti ti-x"></i>Reject</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="table-foot">
+          <div class="foot-info">Showing 6 of 247 users</div>
+          <div class="pagination">
+            <button class="pg-btn">‹</button>
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">2</button>
+            <button class="pg-btn">3</button>
+            <button class="pg-btn">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGS ROW -->
+      <div class="logs-row">
+        <div class="log-card">
+          <div class="log-title">Recent System Logs <span class="log-sub">View all →</span></div>
+          <div class="log-list">
+            <div class="log-item">
+              <div class="log-ic lic-err"><i class="ti ti-alert-triangle"></i></div>
+              <div><div class="log-text">Disk usage exceeded 70% on DB Server 2</div><div class="log-time">Apr 27, 2026 · 07:43 AM</div></div>
+            </div>
+            <div class="log-item">
+              <div class="log-ic lic-warn"><i class="ti ti-user-off"></i></div>
+              <div><div class="log-text">User #USR-0067 suspended after 3 failed login attempts</div><div class="log-time">Apr 26, 2026 · 11:22 PM</div></div>
+            </div>
+            <div class="log-item">
+              <div class="log-ic lic-ok"><i class="ti ti-database"></i></div>
+              <div><div class="log-text">Database backup completed successfully (14.2 GB)</div><div class="log-time">Apr 26, 2026 · 2:00 AM</div></div>
+            </div>
+            <div class="log-item">
+              <div class="log-ic lic-info"><i class="ti ti-user-plus"></i></div>
+              <div><div class="log-text">New therapist registration: Dr. Nadia Jamil — pending approval</div><div class="log-time">Apr 26, 2026 · 9:10 AM</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="log-card">
+          <div class="log-title">Database Health <span class="log-sub">Run diagnostics →</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:9px">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">Primary DB (PostgreSQL)</div><div style="font-size:11px;color:var(--text-2)">mhjournal-prod-01 · 9.2 GB used</div></div>
+              <span class="status-badge sb-active">● Online</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:9px">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">DB Server 2 (Replica)</div><div style="font-size:11px;color:var(--warn)">Disk at 73% — action recommended</div></div>
+              <span class="status-badge" style="background:var(--warn-l);color:var(--warn)">⚠ Warning</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:9px">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">Redis Cache</div><div style="font-size:11px;color:var(--text-2)">Hit rate: 94.2% · 1.1 GB used</div></div>
+              <span class="status-badge sb-active">● Healthy</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:9px">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">Last Full Backup</div><div style="font-size:11px;color:var(--text-2)">Apr 26, 2:00 AM · 14.2 GB · 8 min 41 sec</div></div>
+              <span class="status-badge sb-active">● Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-bg" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title">Delete User Account?</div>
+    <div class="modal-sub">You are about to permanently delete <strong id="deleteUserName"></strong>'s account. This action cannot be undone and will remove all their data including journal entries and appointments.</div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="document.getElementById('deleteModal').classList.remove('show')">Cancel</button>
+      <button class="m-confirm" id="deleteConfirmBtn" onclick="executeDelete()"><i class="ti ti-trash"></i> Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal-bg" id="addUserModal">
+  <div class="modal">
+    <div class="modal-title">Add New User</div>
+    <div class="modal-sub">Manually create a user account and assign their role.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+      <input type="text" placeholder="Full name" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/>
+      <input type="email" placeholder="Email address" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/>
+      <select style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;appearance:none;background:#fff">
+        <option>Select role…</option><option>Patient</option><option>Therapist</option><option>Admin</option>
+      </select>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="document.getElementById('addUserModal').classList.remove('show')">Cancel</button>
+      <button class="m-confirm" style="background:var(--accent)" onclick="document.getElementById('addUserModal').classList.remove('show')"><i class="ti ti-user-plus"></i> Create User</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let deleteTarget='';
+function confirmDelete(name){deleteTarget=name;document.getElementById('deleteUserName').textContent=name;document.getElementById('deleteModal').classList.add('show');}
+function executeDelete(){
+  const btn=document.getElementById('deleteConfirmBtn');
+  btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Deleting…';btn.disabled=true;
+  setTimeout(()=>{document.getElementById('deleteModal').classList.remove('show');btn.innerHTML='<i class="ti ti-trash"></i> Delete Permanently';btn.disabled=false;},1000);
+}
+function editUser(name){alert('Edit profile for: '+name+'\n(In a real app, this opens an edit form.)');}
+function suspendUser(btn,name){
+  btn.innerHTML='<i class="ti ti-loader-2 spin"></i>';
+  setTimeout(()=>{btn.innerHTML='<i class="ti ti-user-check"></i> Restore';btn.style.borderColor='var(--ok)';btn.style.color='var(--ok)';btn.onclick=function(){alert('User '+name+' restored.')};},700);
+}
+function filterUsers(q){
+  const rows=document.querySelectorAll('#userBody tr');
+  rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'});
+}
+function filterByRole(role){
+  const rows=document.querySelectorAll('#userBody tr');
+  rows.forEach(r=>{r.style.display=(!role||r.dataset.role===role)?'':'none'});
+}
+function filterByStatus(status){
+  const rows=document.querySelectorAll('#userBody tr');
+  rows.forEach(r=>{r.style.display=(!status||r.dataset.status===status)?'':'none'});
+}
+</script>
+</body>
+</html>

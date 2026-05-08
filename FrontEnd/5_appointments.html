@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — Appointments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f6f5f0;--surface:#fff;--border:#e2dfd6;
+    --text-1:#1a1714;--text-2:#6b6560;--text-3:#9e9891;
+    --accent:#2d6a4f;--accent-l:#d8f3dc;--accent-d:#1b4332;
+    --sidebar:#1b4332;--sidebar-act:rgba(216,243,220,.18);
+    --danger:#be123c;--danger-l:#ffe4e6;
+    --blue:#1d4ed8;--blue-l:#dbeafe;
+    --radius:14px;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:230px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.12)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#95d5b2}
+  .sb-title{font-size:14px;font-weight:600;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#95d5b2}
+  .nav-item:hover i,.nav-item.active i{color:#95d5b2}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.4)}
+  .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.1)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#95d5b2,#52b788);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1b4332}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.4)}
+
+  .main{margin-left:230px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2)}
+  .new-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+  .new-btn:hover{background:var(--accent-d)}
+
+  /* View toggle */
+  .view-toggle{display:flex;gap:4px;background:#f3f1ec;border-radius:9px;padding:3px}
+  .vt-btn{padding:6px 14px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--text-2);transition:all .2s}
+  .vt-btn.active{background:#fff;color:var(--text-1);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+  .content{padding:24px 28px}
+  .two-col{display:grid;grid-template-columns:1fr 1.1fr;gap:20px;align-items:start}
+
+  /* Calendar */
+  .cal-card{background:var(--surface);border-radius:var(--radius);border:0.5px solid var(--border);padding:20px 22px}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .cal-month{font-size:15px;font-weight:600;color:var(--text-1)}
+  .cal-nav{display:flex;gap:6px}
+  .cal-nav-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text-2);display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .15s}
+  .cal-nav-btn:hover{background:var(--bg)}
+  .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:8px}
+  .cal-dow span{font-size:11px;font-weight:700;color:var(--text-3);padding:4px 0;letter-spacing:.04em}
+  .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .cal-day{width:100%;aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;position:relative;transition:all .15s}
+  .cal-day:hover{background:var(--bg)}
+  .cal-day.today{background:var(--accent-l);color:var(--accent-d);font-weight:700}
+  .cal-day.has-appt::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--accent)}
+  .cal-day.has-appt.today::after{background:var(--accent-d)}
+  .cal-day.selected{background:var(--accent);color:#fff}
+  .cal-day.selected::after{background:#fff}
+  .cal-day.other-month{color:var(--text-3);opacity:.5}
+  .cal-day.disabled{opacity:.3;cursor:not-allowed}
+
+  /* Upcoming list */
+  .right-col{display:flex;flex-direction:column;gap:14px}
+  .section-label{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+  .appt-list{display:flex;flex-direction:column;gap:8px}
+  .appt-card{background:var(--surface);border-radius:12px;border:0.5px solid var(--border);padding:14px 16px;display:flex;gap:14px;align-items:flex-start;transition:box-shadow .15s;cursor:pointer}
+  .appt-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+  .appt-card.today-card{border-left:3px solid var(--accent)}
+  .appt-time-blk{text-align:center;min-width:48px;flex-shrink:0;background:var(--bg);border-radius:9px;padding:8px 6px}
+  .appt-time-t{font-size:14px;font-weight:700;color:var(--text-1)}
+  .appt-time-d{font-size:10px;font-weight:600;color:var(--text-3);margin-top:1px}
+  .appt-body{flex:1}
+  .appt-name{font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:3px}
+  .appt-meta{font-size:12px;color:var(--text-2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .appt-meta i{font-size:13px}
+  .appt-type-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+  .badge-video{background:var(--blue-l);color:var(--blue)}
+  .badge-inperson{background:var(--accent-l);color:var(--accent-d)}
+  .appt-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+  .appt-join{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s}
+  .appt-join:hover{background:var(--accent-d)}
+  .appt-more{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-2)}
+
+  /* Booking form */
+  .book-card{background:var(--surface);border-radius:var(--radius);border:0.5px solid var(--border);padding:20px 22px;margin-top:14px}
+  .book-title{font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .book-title i{color:var(--accent)}
+  .book-sub{font-size:13px;color:var(--text-2);margin-bottom:18px}
+  .field{margin-bottom:12px}
+  label{display:block;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+  input,select,textarea{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,.1)}
+  select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239e9891'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:15px;padding-right:32px}
+  textarea{min-height:70px;resize:none;line-height:1.5}
+  input::placeholder,textarea::placeholder{color:var(--text-3)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .session-types{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .st-card{border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;background:var(--surface)}
+  .st-card:hover,.st-card.sel{border-color:var(--accent);background:var(--accent-l)}
+  .st-card.sel i,.st-card.sel span{color:var(--accent-d)}
+  .st-card i{font-size:18px;color:var(--text-2)}
+  .st-card span{font-size:13px;font-weight:500;color:var(--text-2)}
+  .book-btn{width:100%;height:42px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;margin-top:4px}
+  .book-btn:hover{background:var(--accent-d)}
+  .alert{display:none;padding:10px 12px;border-radius:9px;font-size:12px;align-items:center;gap:8px;margin-bottom:12px;border:1px solid}
+  .alert.success{background:var(--accent-l);border-color:#95d5b2;color:var(--accent-d)}
+  .alert.show{display:flex}
+  .spin{animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+      <div><div class="sb-title">MH Journal</div><div class="sb-sub">Patient Portal</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-section">Main</div>
+      <a href="2_patient_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a href="3_journal_entry.html" class="nav-item"><i class="ti ti-notebook"></i>Journal</a>
+      <a href="#" class="nav-item active"><i class="ti ti-calendar"></i>Appointments</a>
+      <div class="nav-section">Account</div>
+      <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
+      <a href="#" class="nav-item"><i class="ti ti-bell"></i>Notifications</a>
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">SA</div>
+        <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="tb-title">Appointments</div>
+        <div class="tb-sub">Manage sessions with Dr. Imran Khan</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="view-toggle">
+          <button class="vt-btn active" onclick="setView('list',this)"><i class="ti ti-list-details"></i> List</button>
+          <button class="vt-btn" onclick="setView('cal',this)"><i class="ti ti-calendar-month"></i> Calendar</button>
+        </div>
+        <button class="new-btn" onclick="document.getElementById('bookSection').scrollIntoView({behavior:'smooth'})"><i class="ti ti-plus"></i>Book Session</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="two-col">
+        <!-- CALENDAR -->
+        <div>
+          <div class="cal-card">
+            <div class="cal-head">
+              <div class="cal-month" id="calMonth">April 2026</div>
+              <div class="cal-nav">
+                <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+                <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+              </div>
+            </div>
+            <div class="cal-dow">
+              <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+            </div>
+            <div class="cal-days" id="calDays"></div>
+          </div>
+        </div>
+
+        <!-- UPCOMING + BOOK -->
+        <div class="right-col">
+          <div>
+            <div class="section-label">Upcoming Sessions</div>
+            <div class="appt-list">
+              <div class="appt-card today-card">
+                <div class="appt-time-blk"><div class="appt-time-t">2:00</div><div class="appt-time-d">TODAY</div></div>
+                <div class="appt-body">
+                  <div class="appt-name">Dr. Imran Khan</div>
+                  <div class="appt-meta"><i class="ti ti-video"></i>Video Session · 50 min <span class="appt-type-badge badge-video">Video</span></div>
+                </div>
+                <div class="appt-actions">
+                  <button class="appt-join"><i class="ti ti-video"></i>Join</button>
+                  <button class="appt-more"><i class="ti ti-dots-vertical"></i></button>
+                </div>
+              </div>
+              <div class="appt-card">
+                <div class="appt-time-blk"><div class="appt-time-t">10:00</div><div class="appt-time-d">MAY 4</div></div>
+                <div class="appt-body">
+                  <div class="appt-name">Dr. Imran Khan</div>
+                  <div class="appt-meta"><i class="ti ti-video"></i>Video Session · 50 min <span class="appt-type-badge badge-video">Video</span></div>
+                </div>
+                <div class="appt-actions">
+                  <button class="appt-join" style="background:#64748b"><i class="ti ti-clock"></i>Scheduled</button>
+                  <button class="appt-more"><i class="ti ti-dots-vertical"></i></button>
+                </div>
+              </div>
+              <div class="appt-card">
+                <div class="appt-time-blk"><div class="appt-time-t">2:30</div><div class="appt-time-d">MAY 11</div></div>
+                <div class="appt-body">
+                  <div class="appt-name">Dr. Imran Khan</div>
+                  <div class="appt-meta"><i class="ti ti-map-pin"></i>In-Person · Clinic A <span class="appt-type-badge badge-inperson">In-Person</span></div>
+                </div>
+                <div class="appt-actions">
+                  <button class="appt-join" style="background:#64748b"><i class="ti ti-clock"></i>Scheduled</button>
+                  <button class="appt-more"><i class="ti ti-dots-vertical"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOOKING FORM -->
+          <div class="book-card" id="bookSection">
+            <div class="book-title"><i class="ti ti-calendar-plus"></i>Request New Appointment</div>
+            <div class="book-sub">Choose your preferred date, time, and session type.</div>
+            <div id="bookAlert" class="alert success"><i class="ti ti-check"></i>Appointment request sent to Dr. Imran Khan!</div>
+            <div class="field">
+              <label>Session Type</label>
+              <div class="session-types">
+                <div class="st-card sel" onclick="selectType(this)"><i class="ti ti-video"></i><span>Video Call</span></div>
+                <div class="st-card" onclick="selectType(this)"><i class="ti ti-map-pin"></i><span>In-Person</span></div>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label for="bookDate">Preferred Date</label><input type="date" id="bookDate"/></div>
+              <div class="field"><label for="bookTime">Preferred Time</label>
+                <select id="bookTime">
+                  <option>9:00 AM</option><option>9:30 AM</option><option>10:00 AM</option><option>10:30 AM</option>
+                  <option>11:00 AM</option><option>11:30 AM</option><option>2:00 PM</option><option>2:30 PM</option>
+                  <option>3:00 PM</option><option>3:30 PM</option><option>4:00 PM</option><option>4:30 PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="bookDuration">Session Duration</label>
+              <select id="bookDuration"><option>30 minutes</option><option selected>50 minutes</option><option>80 minutes</option></select>
+            </div>
+            <div class="field">
+              <label for="bookNotes">Notes for Therapist <span style="text-transform:none;letter-spacing:0;font-weight:400;font-size:11px">(optional)</span></label>
+              <textarea id="bookNotes" placeholder="Topics you'd like to discuss or any preparation notes…"></textarea>
+            </div>
+            <button class="book-btn" id="bookBtn" onclick="handleBook()"><i class="ti ti-send"></i>Send Request</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// Set default date
+const today = new Date();
+document.getElementById('bookDate').value = new Date(today.getTime()+7*24*60*60*1000).toISOString().split('T')[0];
+
+// Calendar
+const apptDays=[27, 4, 11, 18]; // approximate days with appointments
+let calYear=2026, calMonth=3; // April (0-indexed=3)
+const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderCal(){
+  document.getElementById('calMonth').textContent=monthNames[calMonth]+' '+calYear;
+  const first=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+  let html='';
+  for(let i=0;i<first;i++){html+=`<div class="cal-day other-month">${daysInPrev-first+1+i}</div>`;}
+  for(let d=1;d<=daysInMonth;d++){
+    let cls='cal-day';
+    const isToday=d===27&&calMonth===3&&calYear===2026;
+    const hasAppt=(calMonth===3&&calYear===2026&&[27].includes(d))||(calMonth===4&&calYear===2026&&[4,11,18].includes(d));
+    if(isToday)cls+=' today';
+    if(hasAppt)cls+=' has-appt';
+    html+=`<div class="${cls}" onclick="selectDay(this,${d})">${d}</div>`;
+  }
+  const remaining=(7-((first+daysInMonth)%7))%7;
+  for(let i=1;i<=remaining;i++){html+=`<div class="cal-day other-month">${i}</div>`;}
+  document.getElementById('calDays').innerHTML=html;
+}
+function changeMonth(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCal();}
+function selectDay(el,d){document.querySelectorAll('.cal-day').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');}
+renderCal();
+
+function setView(v,btn){
+  document.querySelectorAll('.vt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function selectType(el){document.querySelectorAll('.st-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');}
+function handleBook(){
+  const btn=document.getElementById('bookBtn');
+  btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Sending…';btn.disabled=true;
+  setTimeout(()=>{
+    document.getElementById('bookAlert').classList.add('show');
+    btn.innerHTML='<i class="ti ti-check"></i> Request Sent';
+    btn.style.background='#64748b';
+  },1000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — My Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f6f5f0;--surface:#fff;--border:#e2dfd6;--border-l:#ede9e0;
+    --text-1:#1a1714;--text-2:#6b6560;--text-3:#9e9891;
+    --accent:#2d6a4f;--accent-l:#d8f3dc;--accent-d:#1b4332;
+    --sidebar:#1b4332;--sidebar-act:rgba(216,243,220,.18);
+    --danger:#be123c;--danger-l:#ffe4e6;
+    --warn:#c2410c;--warn-l:#fff7ed;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:230px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10;overflow-y:auto}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.12)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#95d5b2}
+  .sb-title{font-size:14px;font-weight:600;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#95d5b2}
+  .nav-item:hover i,.nav-item.active i{color:#95d5b2}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.4)}
+  .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.1)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#95d5b2,#52b788);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1b4332}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.4)}
+  .main{margin-left:230px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+  .tb-right{display:flex;align-items:center;gap:10px}
+  .content{padding:26px 28px}
+  .card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:20px 22px}
+  .card-title{font-size:14px;font-weight:600;color:var(--text-1);display:flex;align-items:center;gap:7px;margin-bottom:4px}
+  .card-title i{font-size:16px;color:var(--accent)}
+  .card-sub{font-size:12px;color:var(--text-3);margin-bottom:16px}
+  .period-tabs{display:flex;gap:4px;background:var(--bg);border-radius:9px;padding:3px;width:fit-content}
+  .period-tab{padding:5px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;color:var(--text-3);background:transparent;transition:all .2s}
+  .period-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .insight-card{background:linear-gradient(135deg,var(--accent-l),#f0faf2);border:1px solid #b2e4c0;border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+  .insight-icon{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .insight-icon i{font-size:16px;color:#fff}
+  .insight-label{font-size:11px;font-weight:700;color:var(--accent-d);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+  .insight-text{font-size:13px;color:var(--text-1);line-height:1.55}
+  .insight-text strong{color:var(--accent-d)}
+  .warn-card{background:var(--warn-l);border:1px solid #fed7aa;border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+  .warn-card .insight-icon{background:var(--warn)}
+  .warn-card .insight-label{color:#9a3412}
+  .danger-card{background:var(--danger-l);border:1px solid #fca5a5;border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+  .danger-card .insight-icon{background:var(--danger)}
+  .danger-card .insight-label{color:#9b1239}
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  .stat-mc{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:16px 18px}
+  .stat-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .stat-label{font-size:11px;color:var(--text-3);margin-bottom:4px;font-weight:500}
+  .stat-val{font-size:24px;font-weight:600;line-height:1;color:var(--text-1)}
+  .stat-val sub{font-size:12px;font-weight:400;color:var(--text-3)}
+  .stat-trend{font-size:11px;margin-top:4px}
+  .up{color:#16a34a}.down{color:var(--danger)}
+  .grid-2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .bar-row{display:flex;flex-direction:column;gap:10px}
+  .br-item{display:flex;align-items:center;gap:10px}
+  .br-label{font-size:12px;color:var(--text-1);min-width:100px;font-weight:500}
+  .br-track{flex:1;background:var(--bg);border-radius:20px;height:9px;overflow:hidden}
+  .br-fill{height:9px;border-radius:20px;transition:width .6s ease}
+  .br-val{font-size:12px;font-weight:600;color:var(--text-2);min-width:36px;text-align:right}
+  .heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:10px}
+  .hm-label{font-size:10px;color:var(--text-3);text-align:center;padding:2px;font-weight:600}
+  .hm-cell{aspect-ratio:1;border-radius:5px;cursor:pointer;transition:transform .1s}
+  .hm-cell:hover{transform:scale(1.15)}
+  .hm-0{background:#f0f0ec}
+  .hm-1{background:#b7e4c7}.hm-2{background:#74c69d}.hm-3{background:#40916c}.hm-4{background:#1b4332}
+  .hm-l{background:#fde8d0}.hm-m{background:#fed7aa}.hm-h{background:#fca5a5}.hm-c{outline:2px solid var(--danger);outline-offset:1px}
+  .week-label{font-size:10px;color:var(--text-3);text-align:right;padding:2px 0;font-weight:500}
+  .sleep-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .corr-table{width:100%;border-collapse:collapse;font-size:13px}
+  .corr-table th{padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+  .corr-table td{padding:10px 12px;border-bottom:0.5px solid var(--bg);color:var(--text-1)}
+  .corr-table tr:last-child td{border-bottom:none}
+  .impact-pill{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+  .impact-high{background:#fde8d0;color:#9a3412}
+  .impact-med{background:#fef9c3;color:#a16207}
+  .impact-low{background:var(--accent-l);color:var(--accent-d)}
+  .dir-pos{color:#16a34a}.dir-neg{color:var(--danger)}
+  .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s}
+  .icon-btn:hover{background:#edeae3}
+  .icon-btn i{font-size:18px}
+  .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .content>*{animation:fadeUp .35s ease both}
+  .content>*:nth-child(1){animation-delay:.05s}
+  .content>*:nth-child(2){animation-delay:.10s}
+  .content>*:nth-child(3){animation-delay:.15s}
+  .content>*:nth-child(4){animation-delay:.20s}
+  .content>*:nth-child(5){animation-delay:.25s}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-leaf"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Patient Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="2_patient_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="3_journal_entry.html" class="nav-item"><i class="ti ti-notebook"></i>My Journal<span class="nav-badge">3</span></a>
+    <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar-event"></i>Appointments</a>
+    <a href="patient_analytics.html" class="nav-item active"><i class="ti ti-chart-line"></i>My Analytics</a>
+    <div class="nav-section">Support</div>
+    <a href="patient_messages.html" class="nav-item"><i class="ti ti-message-circle"></i>Messages<span class="nav-badge">2</span></a>
+    <a href="patient_resources.html" class="nav-item"><i class="ti ti-heart"></i>Resources</a>
+    <div class="nav-section">Account</div>
+    <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+    <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-avatar">SA</div>
+      <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="tb-title">My Analytics</div>
+      <div class="tb-sub">Detailed mental health insights — Apr 2026</div>
+    </div>
+    <div class="tb-right">
+      <div class="period-tabs">
+        <button class="period-tab" onclick="setPeriod(this,'week')">Week</button>
+        <button class="period-tab active" onclick="setPeriod(this,'month')">Month</button>
+        <button class="period-tab" onclick="setPeriod(this,'quarter')">Quarter</button>
+      </div>
+      <a href="2_patient_dashboard.html" class="icon-btn" title="Back to Dashboard"><i class="ti ti-layout-dashboard"></i></a>
+      <div class="icon-btn" style="position:relative"><i class="ti ti-bell"></i><div class="notif-dot"></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- STAT OVERVIEW -->
+    <div class="stat-row">
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#d8f3dc"><i class="ti ti-mood-smile" style="color:#1b4332;font-size:18px"></i></div>
+        <div class="stat-label">Avg Mood Score</div>
+        <div class="stat-val">5.8 <sub>/10</sub></div>
+        <div class="stat-trend up">▲ +0.6 vs last month</div>
+      </div>
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#dbeafe"><i class="ti ti-notebook" style="color:#1d4ed8;font-size:18px"></i></div>
+        <div class="stat-label">Entries Logged</div>
+        <div class="stat-val">24 <sub>entries</sub></div>
+        <div class="stat-trend up">▲ 4 more than last month</div>
+      </div>
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#fef3c7"><i class="ti ti-flame" style="color:#b45309;font-size:18px"></i></div>
+        <div class="stat-label">Best Streak</div>
+        <div class="stat-val">12 <sub>days</sub></div>
+        <div class="stat-trend" style="color:var(--text-3)">Current streak active 🔥</div>
+      </div>
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#ffe4e6"><i class="ti ti-alert-triangle" style="color:#be123c;font-size:18px"></i></div>
+        <div class="stat-label">Crisis Events</div>
+        <div class="stat-val" style="color:var(--danger)">1</div>
+        <div class="stat-trend down">Therapist alerted & reviewed</div>
+      </div>
+    </div>
+
+    <!-- MOOD TREND + TRIGGER BREAKDOWN -->
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-line"></i>Mood Trend — April 2026</div>
+        <div class="card-sub">Daily mood scores charted over the past 30 days</div>
+        <div style="position:relative;height:200px"><canvas id="moodTrendChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-donut"></i>Trigger Distribution</div>
+        <div class="card-sub">What's driving your difficult days</div>
+        <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
+          <div style="position:relative;width:110px;height:110px;flex-shrink:0"><canvas id="triggerDonut"></canvas></div>
+          <div class="bar-row" style="flex:1">
+            <div class="br-item"><span class="br-label">Work pressure</span><div class="br-track"><div class="br-fill" style="width:76%;background:#93c5fd"></div></div><span class="br-val">38%</span></div>
+            <div class="br-item"><span class="br-label">Sleep depriv.</span><div class="br-track"><div class="br-fill" style="width:50%;background:#f9a8d4"></div></div><span class="br-val">25%</span></div>
+            <div class="br-item"><span class="br-label">Social anxiety</span><div class="br-track"><div class="br-fill" style="width:40%;background:#fde68a"></div></div><span class="br-val">20%</span></div>
+            <div class="br-item"><span class="br-label">Family tension</span><div class="br-track"><div class="br-fill" style="width:34%;background:#86efac"></div></div><span class="br-val">17%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLEEP + ENERGY CHART -->
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-moon"></i>Sleep vs Mood Correlation</div>
+        <div class="card-sub">Overlay of sleep hours and next-day mood scores</div>
+        <div style="position:relative;height:170px"><canvas id="sleepMoodChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-bolt"></i>Energy Level Trend</div>
+        <div class="card-sub">Self-reported energy levels this month</div>
+        <div style="position:relative;height:170px"><canvas id="energyChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- MOOD HEATMAP -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title"><i class="ti ti-calendar"></i>Mood Heatmap — April 2026</div>
+      <div class="card-sub">A visual overview of your emotional landscape this month. Darker green = better days.</div>
+      <div id="heatmapWrap"></div>
+      <div style="display:flex;gap:14px;margin-top:12px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:11px;color:var(--text-3);font-weight:600">Mood scale:</span>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-2)"><div style="width:12px;height:12px;border-radius:3px;background:#b7e4c7"></div>Good (7-10)</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-2)"><div style="width:12px;height:12px;border-radius:3px;background:#fde8d0"></div>Okay (4-6)</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-2)"><div style="width:12px;height:12px;border-radius:3px;background:#fca5a5"></div>Low (1-3)</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-2)"><div style="width:12px;height:12px;border-radius:3px;border:2px solid var(--danger)"></div>Crisis</div>
+      </div>
+    </div>
+
+    <!-- CORRELATIONS + INSIGHTS -->
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-brain"></i>Correlation Analysis</div>
+        <div class="card-sub">Patterns detected in your data over the last 30 days</div>
+        <table class="corr-table">
+          <thead><tr><th>Factor</th><th>Mood Impact</th><th>Direction</th><th>Confidence</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Sleep &lt; 6 hrs</strong></td><td><span class="impact-pill impact-high">High −20%</span></td><td><span class="dir-neg">▼ Worsens</span></td><td>87%</td></tr>
+            <tr><td><strong>Exercise logged</strong></td><td><span class="impact-pill impact-low">+15% mood</span></td><td><span class="dir-pos">▲ Improves</span></td><td>82%</td></tr>
+            <tr><td><strong>Work deadlines</strong></td><td><span class="impact-pill impact-high">High −18%</span></td><td><span class="dir-neg">▼ Worsens</span></td><td>91%</td></tr>
+            <tr><td><strong>Journaling daily</strong></td><td><span class="impact-pill impact-low">+12% mood</span></td><td><span class="dir-pos">▲ Improves</span></td><td>79%</td></tr>
+            <tr><td><strong>Social events</strong></td><td><span class="impact-pill impact-med">Mixed ±8%</span></td><td><span style="color:var(--text-3)">↔ Variable</span></td><td>64%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-bulb"></i>Personalised Insights</div>
+        <div class="card-sub">Patterns we noticed based on your data</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="warn-card">
+            <div class="insight-icon"><i class="ti ti-moon"></i></div>
+            <div><div class="insight-label">Sleep Alert</div><div class="insight-text">You feel <strong>20% more anxious</strong> on days following less than 6 hours of sleep. This pattern appeared 9 times this month.</div></div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon"><i class="ti ti-trending-up"></i></div>
+            <div><div class="insight-label">Positive Trend</div><div class="insight-text">Your mood scores have <strong>improved 0.6 points on average</strong> compared to March. Your coping strategies are working!</div></div>
+          </div>
+          <div class="danger-card">
+            <div class="insight-icon"><i class="ti ti-alert-triangle"></i></div>
+            <div><div class="insight-label">Trigger Pattern</div><div class="insight-text"><strong>Monday & Tuesday</strong> consistently show your lowest scores. Consider discussing work-week stress strategies with Dr. Khan.</div></div>
+          </div>
+          <div class="insight-card">
+            <div class="insight-icon"><i class="ti ti-heart"></i></div>
+            <div><div class="insight-label">Coping Win</div><div class="insight-text">On days you used <strong>deep breathing</strong>, your anxiety levels dropped by an average of 1.8 points within 2 hours.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEKLY BREAKDOWN CHART -->
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar"></i>Day-of-Week Mood Breakdown</div>
+      <div class="card-sub">Average mood score by day of the week — helps identify your best and hardest days</div>
+      <div style="position:relative;height:160px"><canvas id="dowChart"></canvas></div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<script>
+// Period tabs
+function setPeriod(el, p) {
+  document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Mood Trend Chart
+new Chart(document.getElementById('moodTrendChart'), {
+  type: 'line',
+  data: {
+    labels: Array.from({length:30},(_,i)=>i+1),
+    datasets: [{
+      label: 'Mood', fill: true,
+      data: [6,5,7,4,6,8,5,3,5,7,5,3,6,4,6,7,8,6,5,7,6,5,4,8,7,6,5,7,6,8],
+      borderColor: '#2d6a4f', backgroundColor: 'rgba(45,106,79,.08)',
+      borderWidth: 2, pointRadius: 3, pointBackgroundColor: ctx => {
+        const v = ctx.parsed.y; return v<=3?'#be123c':v<=5?'#c2410c':'#2d6a4f';
+      }, tension: .35
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>'Mood: '+c.parsed.y+'/10'}}},
+    scales:{
+      y:{min:1,max:10,ticks:{color:'#9e9891',font:{size:10},stepSize:3},grid:{color:'rgba(0,0,0,.05)'}},
+      x:{ticks:{color:'#9e9891',font:{size:10},maxTicksLimit:10},grid:{display:false}}
+    }
+  }
+});
+
+// Trigger Donut
+new Chart(document.getElementById('triggerDonut'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Work','Sleep Dep.','Social Anxiety','Family'],
+    datasets: [{data:[38,25,20,17], backgroundColor:['#93c5fd','#f9a8d4','#fde68a','#86efac'], borderWidth:0}]
+  },
+  options: {responsive:true, maintainAspectRatio:false, cutout:'70%', plugins:{legend:{display:false}}}
+});
+
+// Sleep vs Mood
+new Chart(document.getElementById('sleepMoodChart'), {
+  type: 'bar',
+  data: {
+    labels: ['W1','W2','W3','W4'],
+    datasets: [
+      {label:'Sleep hrs', data:[6.2,5.4,7.1,6.8], backgroundColor:'rgba(147,197,253,.6)', borderRadius:5, yAxisID:'y1'},
+      {label:'Avg Mood', data:[5.8,4.9,6.7,6.2], type:'line', borderColor:'#2d6a4f', backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, tension:.3, yAxisID:'y2'}
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:11},color:'#6b6560'}}},
+    scales:{
+      y1:{min:0,max:10,ticks:{color:'#9e9891',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},
+      y2:{min:1,max:10,position:'right',ticks:{color:'#2d6a4f',font:{size:10}},grid:{display:false}}
+    }
+  }
+});
+
+// Energy Chart
+new Chart(document.getElementById('energyChart'), {
+  type: 'line',
+  data: {
+    labels: ['Apr 1','5','10','15','20','25','30'],
+    datasets: [{
+      label:'Energy', fill:true,
+      data:[6,5,7,4,8,6,7],
+      borderColor:'#c2410c', backgroundColor:'rgba(194,65,12,.08)',
+      borderWidth:2, pointRadius:4, tension:.4
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      y:{min:1,max:10,ticks:{color:'#9e9891',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},
+      x:{ticks:{color:'#9e9891',font:{size:10}},grid:{display:false}}
+    }
+  }
+});
+
+// Day of Week
+new Chart(document.getElementById('dowChart'), {
+  type:'bar',
+  data:{
+    labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    datasets:[{
+      label:'Avg Mood',
+      data:[7.1,4.8,4.5,5.9,6.2,7.3,7.8],
+      backgroundColor:['#b7e4c7','#fca5a5','#fca5a5','#fde68a','#93c5fd','#b7e4c7','#b7e4c7'],
+      borderRadius:7, borderWidth:0
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>'Avg Mood: '+c.parsed.y+'/10'}}},
+    scales:{
+      y:{min:0,max:10,ticks:{color:'#9e9891',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},
+      x:{ticks:{color:'#9e9891',font:{size:11}},grid:{display:false}}
+    }
+  }
+});
+
+// Heatmap
+(function() {
+  const scores = [0,0,0,7,5,8,6,3,7,5,8,7,5,3,5,6,8,4,5,6,7,4,6,5,8,7,6,5,4,3];
+  const crisisDays = [8,22];
+  const wrap = document.getElementById('heatmapWrap');
+  const grid = document.createElement('div');
+  grid.className = 'heatmap-grid';
+  ['S','M','T','W','T','F','S'].forEach(d => {
+    const el = document.createElement('div'); el.className = 'hm-label'; el.textContent = d; grid.appendChild(el);
+  });
+  for (let i=0;i<2;i++){const el=document.createElement('div');el.className='hm-cell hm-0';grid.appendChild(el);}
+  for (let d=1;d<=30;d++){
+    const el=document.createElement('div');
+    const s=scores[d]||0;
+    if(s===0)el.className='hm-cell hm-0';
+    else if(s<=3)el.className='hm-cell hm-h';
+    else if(s<=6)el.className='hm-cell hm-l';
+    else el.className='hm-cell hm-1';
+    if(crisisDays.includes(d))el.classList.add('hm-c');
+    el.title=`Apr ${d}: Mood ${s||'—'}/10`;
+    grid.appendChild(el);
+  }
+  wrap.appendChild(grid);
+})();
+</script>
+</body>
+</html>

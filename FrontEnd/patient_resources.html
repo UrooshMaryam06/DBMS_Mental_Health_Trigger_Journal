@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — Resource Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f6f5f0;--surface:#fff;--border:#e2dfd6;
+    --text-1:#1a1714;--text-2:#6b6560;--text-3:#9e9891;
+    --accent:#2d6a4f;--accent-l:#d8f3dc;--accent-d:#1b4332;
+    --sidebar:#1b4332;--sidebar-act:rgba(216,243,220,.18);
+    --danger:#be123c;--danger-l:#ffe4e6;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:230px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10;overflow-y:auto}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.12)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#95d5b2}
+  .sb-title{font-size:14px;font-weight:600;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#95d5b2}
+  .nav-item:hover i,.nav-item.active i{color:#95d5b2}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.4)}
+  .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.1)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#95d5b2,#52b788);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1b4332}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.4)}
+  .main{margin-left:230px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+  .content{padding:26px 28px}
+  .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s;position:relative}
+  .icon-btn:hover{background:#edeae3}
+  .icon-btn i{font-size:18px}
+  .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+
+  /* HERO BANNER */
+  .hero{background:linear-gradient(135deg,var(--accent-d),var(--accent));border-radius:16px;padding:28px 32px;color:#fff;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;overflow:hidden;position:relative}
+  .hero::after{content:'🌿';position:absolute;right:100px;top:10px;font-size:80px;opacity:.15;pointer-events:none}
+  .hero h2{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:5px}
+  .hero p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.6;max-width:480px}
+
+  /* SEARCH + FILTERS */
+  .search-bar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+  .search-wrap{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;transition:border-color .15s}
+  .search-wrap:focus-within{border-color:var(--accent)}
+  .search-wrap i{font-size:16px;color:var(--text-3)}
+  .search-wrap input{border:none;background:transparent;outline:none;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text-1);width:100%}
+  .search-wrap input::placeholder{color:var(--text-3)}
+  .filter-btn{padding:9px 16px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-2);transition:all .2s;display:flex;align-items:center;gap:6px}
+  .filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .filter-btn:hover:not(.active){border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+
+  /* CATEGORY SECTIONS */
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;margin-top:6px}
+  .section-title{font-size:15px;font-weight:600;color:var(--text-1);display:flex;align-items:center;gap:8px}
+  .section-title i{font-size:17px;color:var(--accent)}
+  .section-see-all{font-size:12px;color:var(--accent);font-weight:600;cursor:pointer}
+  .resource-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+
+  /* RESOURCE CARD */
+  .res-card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .2s;display:flex;flex-direction:column}
+  .res-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.08);transform:translateY(-2px)}
+  .res-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0}
+  .res-body{padding:14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .res-cat{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .res-title{font-size:14px;font-weight:600;color:var(--text-1);line-height:1.4}
+  .res-desc{font-size:12px;color:var(--text-2);line-height:1.55;flex:1}
+  .res-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-3);flex-wrap:wrap}
+  .res-meta i{font-size:12px}
+  .res-actions{display:flex;gap:6px;padding:12px 16px;border-top:0.5px solid var(--border);background:#fafaf8}
+  .res-btn{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;text-align:center;border:1.5px solid;transition:all .15s}
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn-primary:hover{background:var(--accent-d)}
+  .btn-ghost{background:transparent;color:var(--accent);border-color:var(--border)}
+  .btn-ghost:hover{background:var(--accent-l);border-color:var(--accent)}
+  .saved-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:3px}
+
+  /* FEATURED CARD */
+  .featured-card{background:linear-gradient(135deg,#fff8f0,#fffbf5);border:1.5px solid #fde8c8;border-radius:16px;padding:18px 20px;display:flex;gap:16px;margin-bottom:28px;align-items:flex-start}
+  .featured-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;display:inline-block;margin-bottom:6px}
+  .featured-thumb{width:80px;height:80px;border-radius:12px;background:#fff3cd;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+
+  /* AUDIO CARD */
+  .audio-card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:16px 18px;display:flex;gap:14px;align-items:center;transition:box-shadow .2s}
+  .audio-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+  .play-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:background .15s,transform .1s}
+  .play-btn:hover{background:var(--accent-d)}
+  .play-btn:active{transform:scale(.92)}
+  .play-btn i{font-size:18px;margin-left:2px}
+  .audio-info{flex:1;min-width:0}
+  .audio-title{font-size:14px;font-weight:600;color:var(--text-1)}
+  .audio-meta{font-size:12px;color:var(--text-3);margin-top:2px}
+  .audio-bar{height:4px;background:var(--bg);border-radius:4px;margin-top:8px;overflow:hidden}
+  .audio-fill{height:4px;border-radius:4px;background:var(--accent);width:0%;transition:width .3s}
+  .audio-dur{font-size:11px;color:var(--text-3);flex-shrink:0}
+  .audio-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .content>*{animation:fadeUp .35s ease both}
+  .content>*:nth-child(1){animation-delay:.04s}
+  .content>*:nth-child(2){animation-delay:.08s}
+  .content>*:nth-child(3){animation-delay:.12s}
+  .content>*:nth-child(4){animation-delay:.16s}
+  .content>*:nth-child(5){animation-delay:.20s}
+  .content>*:nth-child(6){animation-delay:.24s}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-leaf"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Patient Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="2_patient_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="3_journal_entry.html" class="nav-item"><i class="ti ti-notebook"></i>My Journal<span class="nav-badge">3</span></a>
+    <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar-event"></i>Appointments</a>
+    <a href="patient_analytics.html" class="nav-item"><i class="ti ti-chart-line"></i>My Analytics</a>
+    <div class="nav-section">Support</div>
+    <a href="patient_messages.html" class="nav-item"><i class="ti ti-message-circle"></i>Messages<span class="nav-badge">2</span></a>
+    <a href="patient_resources.html" class="nav-item active"><i class="ti ti-heart"></i>Resources</a>
+    <div class="nav-section">Account</div>
+    <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+    <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-avatar">SA</div>
+      <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="tb-title">Resource Library</div>
+      <div class="tb-sub">Curated self-care tools, guides, and exercises for you</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="2_patient_dashboard.html" class="icon-btn"><i class="ti ti-layout-dashboard"></i></a>
+      <div class="icon-btn" style="position:relative"><i class="ti ti-bell"></i><div class="notif-dot"></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div>
+        <h2>Your Wellbeing Toolkit</h2>
+        <p>Evidence-based articles, guided meditations, and exercises — curated by Dr. Khan especially for your journey. Take it one step at a time. 💚</p>
+      </div>
+    </div>
+
+    <!-- SEARCH + FILTER -->
+    <div class="search-bar">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" id="searchInp" placeholder="Search resources, topics, or techniques…" oninput="filterResources(this.value)"/>
+      </div>
+      <button class="filter-btn active" onclick="setFilter(this,'all')">All</button>
+      <button class="filter-btn" onclick="setFilter(this,'anxiety')"><i class="ti ti-wind"></i>Anxiety</button>
+      <button class="filter-btn" onclick="setFilter(this,'meditation')"><i class="ti ti-moon"></i>Meditation</button>
+      <button class="filter-btn" onclick="setFilter(this,'reading')"><i class="ti ti-book"></i>Reading</button>
+      <button class="filter-btn" onclick="setFilter(this,'cbt')"><i class="ti ti-brain"></i>CBT Tools</button>
+      <button class="filter-btn" onclick="setFilter(this,'sleep')"><i class="ti ti-zzz"></i>Sleep</button>
+    </div>
+
+    <!-- FEATURED -->
+    <div class="featured-card">
+      <div class="featured-thumb">🌱</div>
+      <div style="flex:1">
+        <span class="featured-badge">Recommended by Dr. Khan</span>
+        <div style="font-size:16px;font-weight:600;color:var(--text-1);margin-bottom:5px">The 5-4-3-2-1 Grounding Technique for Anxiety</div>
+        <div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:12px">A powerful sensory grounding exercise that interrupts the anxiety spiral and brings you back to the present moment. Dr. Khan has flagged this as highly relevant to your recent journal entries about work stress.</div>
+        <div style="display:flex;gap:8px">
+          <button class="res-btn btn-primary" style="width:fit-content;padding:8px 20px" onclick="showToast('Opening article…')">Read Article</button>
+          <button class="res-btn btn-ghost" style="width:fit-content;padding:8px 16px" onclick="saveResource(this)">Save for Later</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-3);flex-shrink:0;text-align:right"><i class="ti ti-clock" style="font-size:12px"></i> 6 min read</div>
+    </div>
+
+    <!-- ANXIETY EXERCISES -->
+    <div>
+      <div class="section-head">
+        <div class="section-title"><i class="ti ti-wind"></i>Anxiety Exercises</div>
+        <span class="section-see-all">See all 12 →</span>
+      </div>
+      <div class="resource-grid" id="resourceGrid">
+        <div class="res-card" data-cat="anxiety">
+          <div class="res-thumb" style="background:#e8f4ff">🌊</div>
+          <div class="res-body">
+            <div class="res-cat" style="color:#1d4ed8"><i class="ti ti-wind"></i>Anxiety Exercise</div>
+            <div class="res-title">Box Breathing: 4-4-4-4 Method</div>
+            <div class="res-desc">A navy SEAL-developed technique to calm your nervous system in under 2 minutes. Ideal for pre-meeting anxiety spikes.</div>
+            <div class="res-meta"><i class="ti ti-clock"></i>4 min read · <i class="ti ti-star-filled" style="color:#f59e0b"></i>4.9</div>
+          </div>
+          <div class="res-actions">
+            <button class="res-btn btn-primary" onclick="showToast('Opening article…')">Read Article</button>
+            <button class="res-btn btn-ghost" onclick="saveResource(this)">Save</button>
+          </div>
+        </div>
+
+        <div class="res-card" data-cat="cbt">
+          <div class="res-thumb" style="background:#f0fdf4">🧠</div>
+          <div class="res-body">
+            <div class="res-cat" style="color:#15803d"><i class="ti ti-brain"></i>CBT Tool</div>
+            <div class="res-title">Thought Record: Challenging Negative Self-Talk</div>
+            <div class="res-desc">A structured CBT worksheet to identify cognitive distortions and reframe unhelpful thought patterns in real time.</div>
+            <div class="res-meta"><i class="ti ti-clock"></i>8 min · <i class="ti ti-download" style="font-size:12px"></i>Downloadable PDF</div>
+          </div>
+          <div class="res-actions">
+            <button class="res-btn btn-primary" onclick="showToast('Downloading worksheet…')">Download PDF</button>
+            <button class="res-btn btn-ghost" onclick="saveResource(this)">Save</button>
+          </div>
+        </div>
+
+        <div class="res-card" data-cat="anxiety">
+          <div class="res-thumb" style="background:#fef9c3">🧘</div>
+          <div class="res-body">
+            <div class="res-cat" style="color:#b45309"><i class="ti ti-wind"></i>Anxiety Exercise</div>
+            <div class="res-title">Progressive Muscle Relaxation Guide</div>
+            <div class="res-desc">Systematically tense and release muscle groups to dissolve physical tension caused by chronic stress and anxiety.</div>
+            <div class="res-meta"><i class="ti ti-clock"></i>12 min · <i class="ti ti-star-filled" style="color:#f59e0b"></i>4.7</div>
+          </div>
+          <div class="res-actions">
+            <button class="res-btn btn-primary" onclick="showToast('Opening guide…')">Read Guide</button>
+            <button class="res-btn btn-ghost" onclick="saveResource(this)">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEDITATION TRACKS -->
+    <div>
+      <div class="section-head">
+        <div class="section-title"><i class="ti ti-moon"></i>Guided Meditation Tracks</div>
+        <span class="section-see-all">See all 8 →</span>
+      </div>
+      <div class="audio-grid">
+        <div class="audio-card">
+          <button class="play-btn" onclick="playAudio(this,0)" aria-label="Play Morning Calm"><i class="ti ti-player-play-filled"></i></button>
+          <div class="audio-info">
+            <div class="audio-title">Morning Calm: Starting the Day with Intention</div>
+            <div class="audio-meta">Guided Meditation · Narrated by Dr. Amara Nwosu · Anxiety & Stress</div>
+            <div class="audio-bar"><div class="audio-fill" id="af0"></div></div>
+          </div>
+          <div class="audio-dur">8:30</div>
+        </div>
+        <div class="audio-card">
+          <button class="play-btn" onclick="playAudio(this,1)" aria-label="Play Breathe Through It"><i class="ti ti-player-play-filled"></i></button>
+          <div class="audio-info">
+            <div class="audio-title">Breathe Through It: Panic & Overwhelm Relief</div>
+            <div class="audio-meta">Breathwork Exercise · For moments of acute anxiety · Beginner</div>
+            <div class="audio-bar"><div class="audio-fill" id="af1"></div></div>
+          </div>
+          <div class="audio-dur">5:15</div>
+        </div>
+        <div class="audio-card">
+          <button class="play-btn" onclick="playAudio(this,2)" aria-label="Play Sleep Wind-Down"><i class="ti ti-player-play-filled"></i></button>
+          <div class="audio-info">
+            <div class="audio-title">Sleep Wind-Down: Releasing the Day's Worries</div>
+            <div class="audio-meta">Sleep Meditation · Recommended for Sunday nights · 20 min</div>
+            <div class="audio-bar"><div class="audio-fill" id="af2"></div></div>
+          </div>
+          <div class="audio-dur">20:00</div>
+        </div>
+        <div class="audio-card">
+          <button class="play-btn" onclick="playAudio(this,3)" aria-label="Play Body Scan"><i class="ti ti-player-play-filled"></i></button>
+          <div class="audio-info">
+            <div class="audio-title">Body Scan for Stress Release & Presence</div>
+            <div class="audio-meta">Mindfulness · Works well after journaling · Intermediate</div>
+            <div class="audio-bar"><div class="audio-fill" id="af3"></div></div>
+          </div>
+          <div class="audio-dur">12:45</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- READING MATERIALS -->
+    <div>
+      <div class="section-head">
+        <div class="section-title"><i class="ti ti-book"></i>Reading Materials</div>
+        <span class="section-see-all">See all 16 →</span>
+      </div>
+      <div class="resource-grid">
+        <div class="res-card" data-cat="reading">
+          <div class="res-thumb" style="background:#fce7f3">📖</div>
+          <div class="res-body">
+            <div class="res-cat" style="color:#9d174d"><i class="ti ti-book"></i>Article</div>
+            <div class="res-title">Understanding the Anxiety-Sleep Cycle</div>
+            <div class="res-desc">Evidence-based overview of how anxiety disrupts sleep architecture and practical strategies to break the cycle.</div>
+            <div class="res-meta"><i class="ti ti-clock"></i>10 min read · <i class="ti ti-star-filled" style="color:#f59e0b"></i>4.8</div>
+          </div>
+          <div class="res-actions">
+            <button class="res-btn btn-primary" onclick="showToast('Opening article…')">Read Article</button>
+            <button class="res-btn btn-ghost" onclick="saveResource(this)">Save</button>
+          </div>
+        </div>
+
+        <div class="res-card" data-cat="reading cbt">
+          <div class="res-thumb" style="background:#f3f0ff">🔖</div>
+          <div class="res-body">
+            <div class="res-cat" style="color:#7c3aed"><i class="ti ti-book"></i>Deep Read</div>
+            <div class="res-title">What is Cognitive Behavioural Therapy? A Patient Guide</div>
+            <div class="res-desc">A friendly introduction to the CBT model — what it is, why it works, and what to expect from your sessions with Dr. Khan.</div>
+            <div class="res-meta"><i class="ti ti-clock"></i>15 min read</div>
+          </div>
+          <div class="res-actions">
+            <button class="res-btn btn-primary" onclick="showToast('Opening article…')">Read Article</button>
+            <button class="res-btn btn-ghost" onclick="saveResource(this)">Save</button>
+          </div>
+        </div>
+
+        <div class="res-card" data-cat="sleep">
+          <div class="res-thumb" style="background:#e0f2fe">🌙</div>
+          <div class="res-body">
+            <div class="res-cat" style="color:#0369a1"><i class="ti ti-zzz"></i>Sleep Guide</div>
+            <div class="res-title">Sleep Hygiene: 10 Evidence-Based Habits</div>
+            <div class="res-desc">Practical, science-backed routines that can measurably improve your sleep quality and reduce night-time anxiety.</div>
+            <div class="res-meta"><i class="ti ti-clock"></i>7 min read · <i class="ti ti-download" style="font-size:12px"></i>Checklist included</div>
+          </div>
+          <div class="res-actions">
+            <button class="res-btn btn-primary" onclick="showToast('Opening guide…')">Read Guide</button>
+            <button class="res-btn btn-ghost" onclick="saveResource(this)">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--accent-d);color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:transform .35s,opacity .35s;z-index:99;pointer-events:none"></div>
+
+<script>
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
+  clearTimeout(toastT);toastT=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(60px)'},2800);
+}
+function setFilter(el,cat){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.querySelectorAll('.res-card').forEach(c=>{
+    c.closest('.res-card').style.display=(cat==='all'||c.dataset.cat?.includes(cat))?'flex':'none';
+  });
+}
+function filterResources(q){
+  document.querySelectorAll('.res-card').forEach(c=>{
+    c.style.display=c.textContent.toLowerCase().includes(q.toLowerCase())?'flex':'none';
+  });
+}
+function saveResource(btn){
+  btn.textContent=btn.textContent.includes('Save')?'✓ Saved':'Save';
+  btn.style.background=btn.textContent.includes('Saved')?'var(--accent-l)':'';
+  btn.style.color=btn.textContent.includes('Saved')?'var(--accent-d)':'';
+  showToast(btn.textContent.includes('Saved')?'Resource saved to your library!':'Removed from library');
+}
+let audioStates={};
+function playAudio(btn,idx){
+  const fill=document.getElementById('af'+idx);
+  if(audioStates[idx]){
+    clearInterval(audioStates[idx]);audioStates[idx]=null;
+    btn.innerHTML='<i class="ti ti-player-play-filled"></i>';return;
+  }
+  btn.innerHTML='<i class="ti ti-player-pause-filled"></i>';
+  let pct=parseFloat(fill.style.width)||0;
+  audioStates[idx]=setInterval(()=>{pct+=0.3;fill.style.width=pct+'%';if(pct>=100){clearInterval(audioStates[idx]);audioStates[idx]=null;btn.innerHTML='<i class="ti ti-player-play-filled"></i>';fill.style.width='0%'}},100);
+}
+</script>
+</body>
+</html>

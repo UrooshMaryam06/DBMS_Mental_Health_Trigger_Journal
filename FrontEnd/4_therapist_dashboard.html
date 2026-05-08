@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — Therapist Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f4f6f8;--surface:#fff;--border:#e2e7ed;
+    --text-1:#0f172a;--text-2:#64748b;--text-3:#94a3b8;
+    --accent:#4f46e5;--accent-l:#eef2ff;--accent-d:#3730a3;
+    --sidebar:#0f172a;--sidebar-act:rgba(99,102,241,.15);
+    --danger:#dc2626;--danger-l:#fef2f2;
+    --warn:#d97706;--warn-l:#fffbeb;
+    --ok:#16a34a;--ok-l:#f0fdf4;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+
+  /* SIDEBAR */
+  .sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.08)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#fff}
+  .sb-title{font-size:14px;font-weight:600;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.55);font-size:13px;font-weight:500}
+  .nav-item:hover{background:var(--sidebar-act);color:#c7d2fe}
+  .nav-item:hover i{color:#c7d2fe}
+  .nav-item.active{background:var(--sidebar-act);color:#a5b4fc}
+  .nav-item.active i{color:#a5b4fc}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.35);transition:color .15s}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.08)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.35)}
+
+  /* MAIN */
+  .main{margin-left:240px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+  .tb-right{display:flex;align-items:center;gap:10px}
+  .alert-btn{display:flex;align-items:center;gap:6px;background:var(--danger-l);border:1px solid #fca5a5;border-radius:20px;padding:6px 12px;font-size:12px;color:var(--danger);font-weight:600;cursor:pointer}
+  .a-dot{width:7px;height:7px;border-radius:50%;background:var(--danger);animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);position:relative;text-decoration:none;transition:background .15s}
+  .icon-btn:hover{background:#eef0f3}
+  .icon-btn i{font-size:18px}
+  .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+
+  .content{padding:26px 28px}
+  .greeting{margin-bottom:22px}
+  .greeting h1{font-family:'DM Serif Display',serif;font-size:24px;color:var(--text-1);margin-bottom:3px}
+  .greeting p{font-size:14px;color:var(--text-2)}
+
+  /* METRICS */
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+  .mc{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:16px 18px}
+  .mc-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .mc-icon i{font-size:18px}
+  .mc-label{font-size:12px;color:var(--text-2);margin-bottom:4px}
+  .mc-val{font-size:24px;font-weight:600;line-height:1;color:var(--text-1)}
+  .mc-trend{font-size:11px;margin-top:4px;color:var(--text-3)}
+
+  /* PATIENT TABLE */
+  .table-card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);overflow:hidden;margin-bottom:20px}
+  .table-head{padding:16px 20px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .table-title{font-size:14px;font-weight:600;color:var(--text-1)}
+  .table-actions{display:flex;align-items:center;gap:8px}
+  .search-box{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9px;padding:7px 12px;background:var(--bg);font-size:13px;color:var(--text-2)}
+  .search-box i{font-size:15px;color:var(--text-3)}
+  .search-box input{border:none;background:transparent;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);width:140px}
+  .search-box input::placeholder{color:var(--text-3)}
+  .filter-btn{border:1px solid var(--border);border-radius:9px;padding:7px 12px;background:var(--bg);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text-2);font-family:'DM Sans',sans-serif}
+  table{width:100%;border-collapse:collapse}
+  thead{background:#f8fafc}
+  thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;border-bottom:0.5px solid var(--border)}
+  tbody tr{border-bottom:0.5px solid #f1f5f9;transition:background .15s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:#f8fafc}
+  td{padding:13px 16px;font-size:13px;color:var(--text-1);vertical-align:middle}
+  .patient-cell{display:flex;align-items:center;gap:10px}
+  .p-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+  .p-name{font-weight:500;font-size:13px;color:var(--text-1)}
+  .p-since{font-size:11px;color:var(--text-3)}
+  .mood-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+  .mood-h{background:var(--ok-l);color:var(--ok)}
+  .mood-m{background:var(--warn-l);color:var(--warn)}
+  .mood-l{background:var(--danger-l);color:var(--danger)}
+  .risk-cell{display:flex;flex-wrap:wrap;gap:4px}
+  .risk-tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+  .rt-high{background:#fee2e2;color:#991b1b;border:0.5px solid #fca5a5}
+  .rt-med{background:var(--warn-l);color:#92400e;border:0.5px solid #fcd34d}
+  .status-dot{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .dot-green{background:#22c55e}
+  .dot-gray{background:#94a3b8}
+  .act-btn{border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:transparent;color:var(--text-2);transition:all .15s;display:inline-flex;align-items:center;gap:4px;margin-right:4px}
+  .act-btn:hover{background:var(--bg);border-color:var(--accent);color:var(--accent)}
+  .act-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .act-btn.primary:hover{background:var(--accent-d)}
+
+  /* Upcoming appts */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:18px 20px}
+  .card-title{font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+  .card-link{font-size:12px;color:var(--accent);font-weight:500;cursor:pointer}
+  .appt-list{display:flex;flex-direction:column;gap:8px}
+  .appt-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg);border-radius:10px}
+  .appt-time{text-align:center;min-width:48px}
+  .appt-t{font-size:13px;font-weight:700;color:var(--text-1)}
+  .appt-d{font-size:11px;color:var(--text-3)}
+  .appt-info{flex:1}
+  .appt-name{font-size:13px;font-weight:500;color:var(--text-1)}
+  .appt-type{font-size:11px;color:var(--text-2)}
+  .join-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s}
+  .join-btn:hover{background:var(--accent-d)}
+  .notes-list{display:flex;flex-direction:column;gap:8px}
+  .note-item{padding:10px 12px;background:var(--bg);border-radius:10px;border-left:3px solid var(--accent)}
+  .note-item.urgent{border-left-color:var(--danger)}
+  .note-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .note-name{font-size:13px;font-weight:600;color:var(--text-1)}
+  .note-time{font-size:11px;color:var(--text-3)}
+  .note-text{font-size:12px;color:var(--text-2);line-height:1.5}
+  .urgent-badge{font-size:10px;font-weight:700;color:var(--danger);background:var(--danger-l);padding:2px 7px;border-radius:20px}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+      <div><div class="sb-title">MH Journal</div><div class="sb-sub">Therapist Portal</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-section">Main</div>
+      <a href="#" class="nav-item active"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a href="#" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+      <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+      <a href="#" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+      <div class="nav-section">Tools</div>
+      <a href="#" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+      <a href="#" class="nav-item"><i class="ti ti-message-2"></i>Messages</a>
+      <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+      <div class="nav-section">Account</div>
+      <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
+      <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">IK</div>
+        <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="tb-title">Therapist Dashboard</div>
+        <div class="tb-sub">Tuesday, Apr 27, 2026 · 4 sessions today</div>
+      </div>
+      <div class="tb-right">
+        <div class="alert-btn"><div class="a-dot"></div>2 crisis alerts</div>
+        <a href="#" class="icon-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></a>
+        <a href="#" class="icon-btn"><i class="ti ti-message-2"></i></a>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="greeting">
+        <h1>Good morning, Dr. Khan 🩺</h1>
+        <p>You have 4 sessions today. 2 patients flagged for crisis follow-up — please review when possible.</p>
+      </div>
+
+      <div class="metrics">
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--accent-l)"><i class="ti ti-users" style="color:var(--accent)"></i></div>
+          <div class="mc-label">Assigned Patients</div>
+          <div class="mc-val">12</div>
+          <div class="mc-trend">2 new this month</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--ok-l)"><i class="ti ti-calendar-check" style="color:var(--ok)"></i></div>
+          <div class="mc-label">Today's Sessions</div>
+          <div class="mc-val">4</div>
+          <div class="mc-trend">Next at 10:00 AM</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--warn-l)"><i class="ti ti-notebook" style="color:var(--warn)"></i></div>
+          <div class="mc-label">Pending Reviews</div>
+          <div class="mc-val">5</div>
+          <div class="mc-trend">3 from this week</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon" style="background:var(--danger-l)"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i></div>
+          <div class="mc-label">Crisis Alerts</div>
+          <div class="mc-val" style="color:var(--danger)">2</div>
+          <div class="mc-trend" style="color:var(--danger)">Needs attention</div>
+        </div>
+      </div>
+
+      <!-- PATIENT TABLE -->
+      <div class="table-card">
+        <div class="table-head">
+          <div class="table-title">Assigned Patients</div>
+          <div class="table-actions">
+            <div class="search-box"><i class="ti ti-search"></i><input type="text" placeholder="Search patients…" oninput="filterTable(this.value)"/></div>
+            <button class="filter-btn"><i class="ti ti-filter"></i>Filter</button>
+          </div>
+        </div>
+        <table id="patientTable">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Last Mood</th>
+              <th>High-Risk Triggers</th>
+              <th>Status</th>
+              <th>Last Entry</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="patientBody">
+            <tr>
+              <td><div class="patient-cell"><div class="p-avatar" style="background:#e0f2fe;color:#0369a1">SA</div><div><div class="p-name">Sara Ahmed</div><div class="p-since">Week 12 of treatment</div></div></div></td>
+              <td><div class="mood-badge mood-l">😔 3/10</div></td>
+              <td><div class="risk-cell"><span class="risk-tag rt-high">Work Stress</span><span class="risk-tag rt-high">Panic Attacks</span></div></td>
+              <td><div class="status-dot"><div class="dot dot-green"></div>Active</div></td>
+              <td style="color:var(--text-2)">Apr 22</td>
+              <td><button class="act-btn primary"><i class="ti ti-eye"></i>Review</button><button class="act-btn"><i class="ti ti-message-2"></i></button></td>
+            </tr>
+            <tr>
+              <td><div class="patient-cell"><div class="p-avatar" style="background:#dcfce7;color:#15803d">AK</div><div><div class="p-name">Ali Khan</div><div class="p-since">Week 6 of treatment</div></div></div></td>
+              <td><div class="mood-badge mood-m">😐 5/10</div></td>
+              <td><div class="risk-cell"><span class="risk-tag rt-med">Family</span><span class="risk-tag rt-med">Finance</span></div></td>
+              <td><div class="status-dot"><div class="dot dot-green"></div>Active</div></td>
+              <td style="color:var(--text-2)">Apr 24</td>
+              <td><button class="act-btn primary"><i class="ti ti-eye"></i>Review</button><button class="act-btn"><i class="ti ti-message-2"></i></button></td>
+            </tr>
+            <tr>
+              <td><div class="patient-cell"><div class="p-avatar" style="background:#fce7f3;color:#9d174d">FN</div><div><div class="p-name">Fatima Noor</div><div class="p-since">Week 3 of treatment</div></div></div></td>
+              <td><div class="mood-badge mood-l">😟 2/10</div></td>
+              <td><div class="risk-cell"><span class="risk-tag rt-high">Depression</span><span class="risk-tag rt-high">Self-Harm Risk</span></div></td>
+              <td><div class="status-dot"><div class="dot dot-green"></div>Active</div></td>
+              <td style="color:var(--danger);font-weight:600">Today <span style="background:var(--danger-l);color:var(--danger);font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700;margin-left:4px">CRISIS</span></td>
+              <td><button class="act-btn primary"><i class="ti ti-alert-triangle"></i>Urgent</button><button class="act-btn"><i class="ti ti-phone"></i></button></td>
+            </tr>
+            <tr>
+              <td><div class="patient-cell"><div class="p-avatar" style="background:#fef3c7;color:#b45309">ZR</div><div><div class="p-name">Zainab Raza</div><div class="p-since">Week 18 of treatment</div></div></div></td>
+              <td><div class="mood-badge mood-h">😊 7/10</div></td>
+              <td><div class="risk-cell"><span class="risk-tag rt-med">Academic</span></div></td>
+              <td><div class="status-dot"><div class="dot dot-green"></div>Active</div></td>
+              <td style="color:var(--text-2)">Apr 23</td>
+              <td><button class="act-btn primary"><i class="ti ti-eye"></i>Review</button><button class="act-btn"><i class="ti ti-message-2"></i></button></td>
+            </tr>
+            <tr>
+              <td><div class="patient-cell"><div class="p-avatar" style="background:#ede9fe;color:#5b21b6">HM</div><div><div class="p-name">Hassan Malik</div><div class="p-since">Week 8 of treatment</div></div></div></td>
+              <td><div class="mood-badge mood-m">🙂 6/10</div></td>
+              <td><div class="risk-cell"><span class="risk-tag rt-med">Social Anxiety</span><span class="risk-tag rt-med">Sleep</span></div></td>
+              <td><div class="status-dot"><div class="dot dot-gray"></div>Inactive</div></td>
+              <td style="color:var(--text-2)">Apr 18</td>
+              <td><button class="act-btn primary"><i class="ti ti-eye"></i>Review</button><button class="act-btn"><i class="ti ti-message-2"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Bottom row -->
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">Today's Appointments <a href="5_appointments.html" class="card-link">View all →</a></div>
+          <div class="appt-list">
+            <div class="appt-item">
+              <div class="appt-time"><div class="appt-t">10:00</div><div class="appt-d">AM</div></div>
+              <div class="appt-info"><div class="appt-name">Sara Ahmed</div><div class="appt-type">Video · 50 min</div></div>
+              <button class="join-btn"><i class="ti ti-video"></i>Join</button>
+            </div>
+            <div class="appt-item">
+              <div class="appt-time"><div class="appt-t">11:30</div><div class="appt-d">AM</div></div>
+              <div class="appt-info"><div class="appt-name">Ali Khan</div><div class="appt-type">In-person · 50 min</div></div>
+              <button class="join-btn" style="background:#64748b"><i class="ti ti-map-pin"></i>Directions</button>
+            </div>
+            <div class="appt-item">
+              <div class="appt-time"><div class="appt-t">2:00</div><div class="appt-d">PM</div></div>
+              <div class="appt-info"><div class="appt-name">Fatima Noor</div><div class="appt-type">Video · Crisis follow-up</div></div>
+              <button class="join-btn" style="background:var(--danger)"><i class="ti ti-alert-circle"></i>Urgent</button>
+            </div>
+            <div class="appt-item">
+              <div class="appt-time"><div class="appt-t">4:00</div><div class="appt-d">PM</div></div>
+              <div class="appt-info"><div class="appt-name">Zainab Raza</div><div class="appt-type">Video · 50 min</div></div>
+              <button class="join-btn"><i class="ti ti-video"></i>Join</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recent Journal Flags <span class="card-link">Review all →</span></div>
+          <div class="notes-list">
+            <div class="note-item urgent">
+              <div class="note-top"><div class="note-name">Fatima Noor</div><span class="urgent-badge">CRISIS</span></div>
+              <div class="note-text">Reported suicidal ideation, asked for emergency contact. Logged today at 9:14 AM.</div>
+            </div>
+            <div class="note-item urgent">
+              <div class="note-top"><div class="note-name">Sara Ahmed</div><span class="urgent-badge">CRISIS</span></div>
+              <div class="note-text">Panic attack at work, mood score 3. Unable to continue meeting. Logged Apr 22.</div>
+            </div>
+            <div class="note-item">
+              <div class="note-top"><div class="note-name">Ali Khan</div><div class="note-time">Apr 24</div></div>
+              <div class="note-text">Mentioned increased financial stress. Requested coping resource materials.</div>
+            </div>
+            <div class="note-item">
+              <div class="note-top"><div class="note-name">Hassan Malik</div><div class="note-time">Apr 18</div></div>
+              <div class="note-text">Sleep pattern worsening — less than 4 hrs/night. Referred to sleep hygiene guide.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function filterTable(q){
+  const rows=document.querySelectorAll('#patientBody tr');
+  rows.forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'});
+}
+</script>
+</body>
+</html>
