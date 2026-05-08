@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Serenity — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --cream:#faf7f2;--warm-white:#fff9f5;--peach-soft:#fdeee6;
+    --peach:#f4a982;--peach-d:#e07d56;
+    --sage:#b7d4bc;--sage-soft:#e8f4ea;--sage-d:#5a9264;
+    --text-1:#2d2420;--text-2:#6b5c56;--text-3:#a89890;
+    --border:#ede7e0;--sidebar-bg:#2d4a38;
+    --danger:#dc2626;--danger-l:#fef2f2;
+  }
+  body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:240px;background:var(--sidebar-bg);display:flex;flex-direction:column;padding:0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .sb-logo-row{display:flex;align-items:center;gap:10px}
+  .sb-logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#f4a982,#f7c5a0);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#2d4a38}
+  .sb-title{font-size:14px;font-weight:700;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.4)}
+  .sb-nav{padding:14px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+  .nav-section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:600}
+  .nav-item:hover,.nav-item.active{background:rgba(244,169,130,.18);color:#fdeee6}
+  .nav-item:hover i,.nav-item.active i{color:#f4a982}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.35)}
+  .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--peach),#f7c5a0);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2d4a38}
+  .sb-uname{font-size:13px;font-weight:700;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.35)}
+
+  .main{margin-left:240px;flex:1}
+  .topbar{background:var(--warm-white);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:700;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2)}
+  .save-btn{background:linear-gradient(135deg,var(--peach),var(--peach-d));color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 3px 12px rgba(224,125,86,.25);transition:all .15s}
+  .save-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(224,125,86,.35)}
+
+  .content{padding:28px 32px;max-width:720px}
+
+  .settings-section{margin-bottom:24px}
+  .section-label{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding:0 4px}
+  .card{background:var(--warm-white);border-radius:14px;border:1px solid var(--border);overflow:hidden}
+
+  .setting-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+  .setting-item:last-child{border-bottom:none}
+  .si-left{display:flex;align-items:center;gap:12px}
+  .si-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .si-icon i{font-size:17px}
+  .si-title{font-size:14px;font-weight:700;color:var(--text-1)}
+  .si-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+
+  /* TOGGLE */
+  .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+  .toggle input{opacity:0;width:0;height:0}
+  .toggle-track{position:absolute;inset:0;border-radius:24px;background:var(--border);cursor:pointer;transition:background .2s}
+  .toggle input:checked~.toggle-track{background:var(--peach-d)}
+  .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .toggle input:checked~.toggle-track .toggle-thumb{transform:translateX(20px)}
+
+  /* THEME SELECTOR */
+  .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 20px}
+  .theme-card{border:2px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;text-align:center}
+  .theme-card.selected{border-color:var(--peach-d);background:var(--peach-soft)}
+  .theme-preview{width:100%;height:44px;border-radius:8px;margin-bottom:8px}
+  .theme-name{font-size:12px;font-weight:700;color:var(--text-2)}
+  .theme-card.selected .theme-name{color:var(--peach-d)}
+
+  /* SELECT DROPDOWN */
+  .si-select{border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-1);background:var(--cream);outline:none;cursor:pointer;transition:border-color .15s}
+  .si-select:focus{border-color:var(--peach-d)}
+
+  /* EXPORT BUTTONS */
+  .export-btns{display:flex;gap:8px;flex-wrap:wrap;padding:16px 20px}
+  .export-btn{padding:9px 16px;border-radius:10px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;border:none}
+  .export-pdf{background:var(--peach-soft);color:var(--peach-d);border:1.5px solid var(--peach)}
+  .export-pdf:hover{background:var(--peach);color:#fff}
+  .export-csv{background:var(--sage-soft);color:var(--sage-d);border:1.5px solid var(--sage)}
+  .export-csv:hover{background:var(--sage);color:#fff}
+  .export-json{background:#f0f9ff;color:#0369a1;border:1.5px solid #bae6fd}
+  .export-json:hover{background:#bae6fd}
+  .export-sub{font-size:11px;color:var(--text-3);padding:0 20px 14px;line-height:1.5}
+
+  /* DANGER ZONE */
+  .danger-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+  .danger-item:last-child{border-bottom:none}
+  .di-info{}
+  .di-title{font-size:14px;font-weight:700;color:var(--text-1)}
+  .di-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+  .danger-btn{padding:8px 16px;border-radius:9px;font-size:12px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+  .btn-warn{background:var(--danger-l);color:var(--danger);border:1.5px solid #fca5a5}
+  .btn-warn:hover{background:#fee2e2}
+  .btn-neutral{background:var(--cream);color:var(--text-2);border:1.5px solid var(--border)}
+  .btn-neutral:hover{border-color:var(--peach-d);color:var(--peach-d)}
+
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--sidebar-bg);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast i{color:var(--peach)}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo-row">
+        <div class="sb-logo"><i class="ti ti-leaf"></i></div>
+        <div><div class="sb-title">Serenity</div><div class="sb-sub">Patient Portal</div></div>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-section">My Care</div>
+      <a href="2_patient_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a href="3_journal_entry.html" class="nav-item"><i class="ti ti-notebook"></i>Journal</a>
+      <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+      <a href="patient_analytics.html" class="nav-item"><i class="ti ti-chart-bar"></i>My Progress</a>
+      <div class="nav-section">Resources</div>
+      <a href="patient_resources.html" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+      <a href="patient_messages.html" class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">2</span></a>
+      <div class="nav-section">Account</div>
+      <a href="patient_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+      <a href="patient_settings.html" class="nav-item active"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">AJ</div>
+        <div><div class="sb-uname">Alex J.</div><div class="sb-role">Patient</div></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title">Settings</div><div class="tb-sub">Customize your Serenity experience</div></div>
+      <button class="save-btn" onclick="saveSettings()"><i class="ti ti-device-floppy"></i> Save</button>
+    </div>
+
+    <div class="content">
+      <!-- APPEARANCE -->
+      <div class="settings-section">
+        <div class="section-label">Appearance</div>
+        <div class="card">
+          <div class="theme-grid">
+            <div class="theme-card selected" onclick="selectTheme(this,'light')">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#faf7f2,#f4a982)"></div>
+              <div class="theme-name">☀ Light (Serenity)</div>
+            </div>
+            <div class="theme-card" onclick="selectTheme(this,'dark')">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#1a1714,#2d4a38)"></div>
+              <div class="theme-name">🌙 Dark Mode</div>
+            </div>
+            <div class="theme-card" onclick="selectTheme(this,'system')">
+              <div class="theme-preview" style="background:linear-gradient(135deg,#faf7f2 50%,#1a1714 50%)"></div>
+              <div class="theme-name">⚙ System</div>
+            </div>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#e8f4ea"><i class="ti ti-typography" style="color:#5a9264"></i></div>
+              <div><div class="si-title">Font Size</div><div class="si-sub">Adjust text size across the app</div></div>
+            </div>
+            <select class="si-select"><option>Small</option><option selected>Medium</option><option>Large</option></select>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:var(--peach-soft)"><i class="ti ti-eye" style="color:var(--peach-d)"></i></div>
+              <div><div class="si-title">Reduce Motion</div><div class="si-sub">Minimize animations for accessibility</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="settings-section">
+        <div class="section-label">Notifications</div>
+        <div class="card">
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#fef3c7"><i class="ti ti-sun" style="color:#d97706"></i></div>
+              <div><div class="si-title">Daily Affirmation</div><div class="si-sub">Morning wellness nudge at 8:00 AM</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#e0e7ff"><i class="ti ti-notebook" style="color:#4f46e5"></i></div>
+              <div><div class="si-title">Journal Reminder</div><div class="si-sub">Evening prompt to log your mood</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#e8f4ea"><i class="ti ti-calendar" style="color:#5a9264"></i></div>
+              <div><div class="si-title">Session Reminders</div><div class="si-sub">Notification before appointments</div></div>
+            </div>
+            <select class="si-select"><option>15 min before</option><option selected>1 hour before</option><option>1 day before</option></select>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:var(--peach-soft)"><i class="ti ti-message-2" style="color:var(--peach-d)"></i></div>
+              <div><div class="si-title">Message Notifications</div><div class="si-sub">Alerts for new therapist messages</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#fdf2f8"><i class="ti ti-sparkles" style="color:#be185d"></i></div>
+              <div><div class="si-title">Milestone Celebrations</div><div class="si-sub">Celebrate streaks and progress milestones</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIVACY -->
+      <div class="settings-section">
+        <div class="section-label">Privacy & Data Sharing</div>
+        <div class="card">
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#e8f4ea"><i class="ti ti-share" style="color:#5a9264"></i></div>
+              <div><div class="si-title">Share Journal with Therapist</div><div class="si-sub">Your therapist can view submitted entries</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#f0fdf4"><i class="ti ti-chart-bar" style="color:#16a34a"></i></div>
+              <div><div class="si-title">Anonymous Research Participation</div><div class="si-sub">Help improve mental health tools (de-identified)</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#fdf4ff"><i class="ti ti-lock" style="color:#7e22ce"></i></div>
+              <div><div class="si-title">Hide Mood Score from Summary</div><div class="si-sub">Anonymize mood trends on export</div></div>
+            </div>
+            <label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA EXPORT -->
+      <div class="settings-section">
+        <div class="section-label">Data Export</div>
+        <div class="card">
+          <div class="setting-item" style="border-bottom:none;padding-bottom:8px">
+            <div class="si-left">
+              <div class="si-icon" style="background:#fff7ed"><i class="ti ti-download" style="color:#c2410c"></i></div>
+              <div><div class="si-title">Export My Journal History</div><div class="si-sub">Download all your journal entries</div></div>
+            </div>
+          </div>
+          <div class="export-btns">
+            <button class="export-btn export-pdf" onclick="triggerExport('PDF')"><i class="ti ti-file-type-pdf"></i> Export as PDF</button>
+            <button class="export-btn export-csv" onclick="triggerExport('CSV')"><i class="ti ti-file-type-csv"></i> Export as CSV</button>
+            <button class="export-btn export-json" onclick="triggerExport('JSON')"><i class="ti ti-braces"></i> Export as JSON</button>
+          </div>
+          <div class="export-sub">Your data export will include all journal entries, mood scores, and session notes from Jan 2024 onwards. Exports are encrypted and valid for 24 hours after generation.</div>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="settings-section">
+        <div class="section-label" style="color:#dc2626">Danger Zone</div>
+        <div class="card" style="border-color:#fca5a5">
+          <div class="danger-item">
+            <div class="di-info">
+              <div class="di-title">Pause My Account</div>
+              <div class="di-sub">Temporarily disable access. Your data is preserved.</div>
+            </div>
+            <button class="danger-btn btn-neutral">Pause Account</button>
+          </div>
+          <div class="danger-item">
+            <div class="di-info">
+              <div class="di-title">Delete All Journal Data</div>
+              <div class="di-sub">Permanently delete all journal entries. Irreversible.</div>
+            </div>
+            <button class="danger-btn btn-warn" onclick="confirmDelete('journal data')">Delete Journals</button>
+          </div>
+          <div class="danger-item">
+            <div class="di-info">
+              <div class="di-title">Delete My Account</div>
+              <div class="di-sub">Permanently remove your account and all data. This cannot be undone.</div>
+            </div>
+            <button class="danger-btn btn-warn" style="background:#dc2626;color:#fff;border-color:#dc2626" onclick="confirmDelete('account')">Delete Account</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /content -->
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toast-msg">Settings saved!</span></div>
+
+<script>
+  function selectTheme(el, theme) {
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    showToast(`Theme set to ${theme}`);
+  }
+  function saveSettings() { showToast('Settings saved successfully!'); }
+  function triggerExport(format) { showToast(`Generating ${format} export… you'll be notified when ready.`); }
+  function confirmDelete(what) {
+    if (confirm(`Are you sure you want to delete your ${what}? This action cannot be undone.`)) {
+      showToast(`Deletion request submitted for your ${what}.`);
+    }
+  }
+  function showToast(msg) {
+    document.getElementById('toast-msg').textContent = msg;
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>

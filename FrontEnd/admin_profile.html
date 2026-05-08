@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — Admin Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;
+    --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+    --accent:#7c3aed;--accent-l:#f5f3ff;--accent-d:#4c1d95;
+    --sidebar:#1e1b2e;--sidebar-act:rgba(167,139,250,.15);
+    --ok:#16a34a;--ok-l:#f0fdf4;
+    --danger:#dc2626;--danger-l:#fef2f2;
+    --warn:#d97706;--warn-l:#fffbeb;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+
+  .sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.06)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#fff}
+  .sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+  .nav-section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.5);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#c4b5fd}
+  .nav-item:hover i,.nav-item.active i{color:#c4b5fd}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.3)}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.06)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c4b5fd,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b2e}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.3)}
+
+  .main{margin-left:240px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:700;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+  .save-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+  .save-btn:hover{background:var(--accent-d)}
+
+  .content{padding:26px 30px;max-width:1000px}
+
+  /* HERO */
+  .profile-hero{background:linear-gradient(160deg,var(--sidebar) 0%,#12111f 100%);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-bottom:22px;overflow:hidden;position:relative;border:1px solid rgba(167,139,250,.2)}
+  .profile-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a78bfa' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+  .hero-avatar{width:80px;height:80px;border-radius:14px;background:linear-gradient(135deg,#c4b5fd,var(--accent));display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.1);flex-shrink:0;position:relative}
+  .hero-badge{position:absolute;bottom:-4px;right:-4px;background:var(--ok);border:2px solid #fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+  .hero-badge i{font-size:12px;color:#fff}
+  .hero-info{flex:1}
+  .hero-name{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;margin-bottom:4px}
+  .hero-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .hero-tag{display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.55)}
+  .hero-tag i{font-size:14px;color:#c4b5fd}
+  .clearance-badge{background:rgba(124,58,237,.25);border:1px solid rgba(167,139,250,.4);border-radius:12px;padding:14px 20px;min-width:150px}
+  .cb-label{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .cb-level{font-size:22px;font-weight:700;color:#c4b5fd;line-height:1}
+  .cb-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px}
+
+  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border)}
+  .card-header{padding:16px 20px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .card-title{font-size:14px;font-weight:600;color:var(--text-1);display:flex;align-items:center;gap:7px}
+  .card-title i{font-size:16px;color:var(--accent)}
+  .card-body{padding:20px}
+
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .field label{display:block;font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+  .field input,.field select{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:var(--bg);outline:none;transition:all .15s}
+  .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.1);background:var(--surface)}
+  .field input[readonly]{color:var(--text-3);cursor:default}
+
+  /* MFA PANEL */
+  .mfa-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--bg);border-radius:10px;border:0.5px solid var(--border);margin-bottom:10px}
+  .mfa-item:last-child{margin-bottom:0}
+  .mfa-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .mfa-icon i{font-size:16px}
+  .mfa-name{font-size:13px;font-weight:600;color:var(--text-1)}
+  .mfa-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+  .mfa-status{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .status-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .pill-ok{background:var(--ok-l);color:var(--ok)}
+  .pill-warn{background:var(--warn-l);color:var(--warn)}
+  .pill-off{background:#f1f5f9;color:var(--text-3)}
+  .mfa-btn{font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;background:none;border:1.5px solid #c4b5fd;border-radius:7px;padding:4px 10px;font-family:'DM Sans',sans-serif;transition:all .15s}
+  .mfa-btn:hover{background:var(--accent-l)}
+
+  /* ACCESS LOG */
+  .log-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg);border-radius:9px;margin-bottom:8px;border:0.5px solid var(--border);font-size:12px}
+  .log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .log-time{color:var(--text-3);min-width:120px;font-weight:500}
+  .log-action{color:var(--text-1);font-weight:500;flex:1}
+  .log-ip{color:var(--text-3);font-family:monospace;font-size:11px}
+
+  /* PERMISSIONS */
+  .perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .perm-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border-radius:9px;border:0.5px solid var(--border)}
+  .perm-item i{font-size:14px}
+  .perm-label{font-size:12px;font-weight:500;color:var(--text-1)}
+  .perm-granted{color:var(--ok)}
+  .perm-denied{color:var(--danger)}
+
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--sidebar);color:#fff;border:1px solid rgba(167,139,250,.3);padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast i{color:#c4b5fd}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="ti ti-shield-lock"></i></div>
+      <div><div class="sb-title">MH Admin</div><div class="sb-sub">System Control</div></div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-section">Management</div>
+      <a href="6_admin_panel.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a href="6_admin_panel.html" class="nav-item"><i class="ti ti-users"></i>User Management<span class="nav-badge">3</span></a>
+      <a href="admin_therapists.html" class="nav-item"><i class="ti ti-stethoscope"></i>Therapists</a>
+      <a href="#" class="nav-item"><i class="ti ti-calendar"></i>All Appointments</a>
+      <a href="admin_journals.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Entries</a>
+      <div class="nav-section">System</div>
+      <a href="admin_system_logs.html" class="nav-item"><i class="ti ti-terminal-2"></i>System Logs<span class="nav-badge" style="background:var(--warn)">!</span></a>
+      <a href="admin_db_health.html" class="nav-item"><i class="ti ti-database"></i>Database Health</a>
+      <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+      <div class="nav-section">Account</div>
+      <a href="admin_profile.html" class="nav-item active"><i class="ti ti-user-circle"></i>Admin Profile</a>
+      <a href="admin_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">SA</div>
+        <div><div class="sb-uname">System Admin</div><div class="sb-role">Super Administrator</div></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title">Admin Profile</div><div class="tb-sub">Security clearance, MFA status & access permissions</div></div>
+      <button class="save-btn" onclick="saveProfile()"><i class="ti ti-device-floppy"></i> Save Profile</button>
+    </div>
+
+    <div class="content">
+      <!-- HERO -->
+      <div class="profile-hero">
+        <div class="hero-avatar">
+          SA
+          <div class="hero-badge"><i class="ti ti-shield-check"></i></div>
+        </div>
+        <div class="hero-info">
+          <div class="hero-name">System Administrator</div>
+          <div class="hero-meta">
+            <span class="hero-tag"><i class="ti ti-id-badge"></i> Admin ID: ADM-001</span>
+            <span class="hero-tag"><i class="ti ti-calendar"></i> Active since Mar 2023</span>
+            <span class="hero-tag"><i class="ti ti-map-pin"></i> Seattle HQ</span>
+            <span class="hero-tag" style="background:rgba(74,222,128,.1);padding:3px 10px;border-radius:20px;color:#4ade80;border:1px solid rgba(74,222,128,.2)"><i class="ti ti-circle-check"></i> Session Active</span>
+          </div>
+        </div>
+        <div class="clearance-badge">
+          <div class="cb-label">Security Clearance</div>
+          <div class="cb-level">LEVEL 5</div>
+          <div class="cb-sub">Full System Access</div>
+          <div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,.3);font-family:monospace">SUPER_ADMIN · READ_WRITE</div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <!-- PERSONAL INFO -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-user"></i> Administrative Details</div>
+          </div>
+          <div class="card-body">
+            <div class="field-row">
+              <div class="field"><label>First Name</label><input type="text" value="Marcus"/></div>
+              <div class="field"><label>Last Name</label><input type="text" value="Chen"/></div>
+            </div>
+            <div class="field"><label>Admin Email</label><input type="email" value="m.chen@serenityhealth.io"/></div>
+            <div class="field"><label>Department</label><select><option selected>IT & Systems</option><option>Operations</option><option>Compliance</option></select></div>
+            <div class="field-row">
+              <div class="field"><label>Employee ID</label><input type="text" value="EMP-44831" readonly/></div>
+              <div class="field"><label>Role Level</label><input type="text" value="Super Administrator" readonly/></div>
+            </div>
+            <div class="field"><label>Reporting To</label><input type="text" value="Chief Technology Officer" readonly/></div>
+          </div>
+        </div>
+
+        <!-- MFA STATUS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-shield-lock"></i> Multi-Factor Authentication</div>
+          </div>
+          <div class="card-body">
+            <div class="mfa-item">
+              <div class="mfa-icon" style="background:#f0fdf4"><i class="ti ti-device-mobile" style="color:var(--ok)"></i></div>
+              <div>
+                <div class="mfa-name">Authenticator App (TOTP)</div>
+                <div class="mfa-sub">Google Authenticator · Added Jan 12, 2024</div>
+              </div>
+              <div class="mfa-status">
+                <span class="status-pill pill-ok"><i class="ti ti-circle-check"></i> Enabled</span>
+                <button class="mfa-btn" onclick="manageMFA('totp')">Manage</button>
+              </div>
+            </div>
+            <div class="mfa-item">
+              <div class="mfa-icon" style="background:#f0fdf4"><i class="ti ti-mail" style="color:var(--ok)"></i></div>
+              <div>
+                <div class="mfa-name">Email OTP</div>
+                <div class="mfa-sub">m.chen@serenityhealth.io</div>
+              </div>
+              <div class="mfa-status">
+                <span class="status-pill pill-ok"><i class="ti ti-circle-check"></i> Enabled</span>
+                <button class="mfa-btn">Manage</button>
+              </div>
+            </div>
+            <div class="mfa-item">
+              <div class="mfa-icon" style="background:var(--warn-l)"><i class="ti ti-key" style="color:var(--warn)"></i></div>
+              <div>
+                <div class="mfa-name">Hardware Security Key</div>
+                <div class="mfa-sub">YubiKey — Recommended for Level 5</div>
+              </div>
+              <div class="mfa-status">
+                <span class="status-pill pill-warn"><i class="ti ti-alert-triangle"></i> Not Set</span>
+                <button class="mfa-btn" onclick="setupKey()">Set Up</button>
+              </div>
+            </div>
+            <div class="mfa-item">
+              <div class="mfa-icon" style="background:#f1f5f9"><i class="ti ti-phone" style="color:var(--text-3)"></i></div>
+              <div>
+                <div class="mfa-name">SMS Backup Code</div>
+                <div class="mfa-sub">+1 (206) ••• •••• — Backup only</div>
+              </div>
+              <div class="mfa-status">
+                <span class="status-pill pill-off">Backup</span>
+                <button class="mfa-btn">Manage</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERMISSIONS -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-lock-access"></i> System Permissions</div>
+        </div>
+        <div class="card-body">
+          <div class="perm-grid">
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">User Management (Read/Write)</div></div>
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">Therapist License Approval</div></div>
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">Journal Database Access</div></div>
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">System Log Viewer</div></div>
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">Database Backup & Restore</div></div>
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">API Key Management</div></div>
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">Registration Approval Control</div></div>
+            <div class="perm-item"><i class="ti ti-circle-check perm-granted"></i><div class="perm-label">Security Policy Configuration</div></div>
+            <div class="perm-item"><i class="ti ti-circle-dashed perm-denied"></i><div class="perm-label" style="color:var(--text-3)">Patient PHI Decryption (Compliance)</div></div>
+            <div class="perm-item"><i class="ti ti-circle-dashed perm-denied"></i><div class="perm-label" style="color:var(--text-3)">Financial Records (CFO Only)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACCESS LOG -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-history"></i> Recent Access Log</div>
+        </div>
+        <div class="card-body">
+          <div class="log-item"><div class="log-dot" style="background:var(--ok)"></div><div class="log-time">Today 09:14 AM</div><div class="log-action">Login — Dashboard Access</div><div class="log-ip">192.168.1.104</div></div>
+          <div class="log-item"><div class="log-dot" style="background:var(--accent)"></div><div class="log-time">Today 09:18 AM</div><div class="log-action">Viewed User Management Panel</div><div class="log-ip">192.168.1.104</div></div>
+          <div class="log-item"><div class="log-dot" style="background:var(--accent)"></div><div class="log-time">Yesterday 4:52 PM</div><div class="log-action">Approved Therapist License #LPC-WA-81299</div><div class="log-ip">192.168.1.104</div></div>
+          <div class="log-item"><div class="log-dot" style="background:var(--warn)"></div><div class="log-time">May 7 · 11:30 AM</div><div class="log-action">System Backup Triggered (Manual)</div><div class="log-ip">192.168.1.104</div></div>
+          <div class="log-item"><div class="log-dot" style="background:var(--ok)"></div><div class="log-time">May 6 · 2:15 PM</div><div class="log-action">API Key Rotated — SMS Gateway</div><div class="log-ip">192.168.1.104</div></div>
+        </div>
+      </div>
+    </div><!-- /content -->
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-shield-check"></i><span>Admin profile updated.</span></div>
+
+<script>
+  function saveProfile(){const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+  function manageMFA(type){alert(`MFA management for ${type} would open a secure verification modal.`)}
+  function setupKey(){alert('YubiKey setup wizard would launch here.')}
+</script>
+</body>
+</html>

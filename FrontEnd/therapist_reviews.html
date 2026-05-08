@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Serenity — Journal Reviews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f4f6f8;--surface:#fff;--border:#e2e7ed;
+    --text-1:#0f172a;--text-2:#64748b;--text-3:#94a3b8;
+    --accent:#4f46e5;--accent-l:#eef2ff;--accent-d:#3730a3;
+    --sidebar:#0f172a;--sidebar-act:rgba(99,102,241,.15);
+    --danger:#dc2626;--danger-l:#fef2f2;
+    --warn:#d97706;--warn-l:#fffbeb;
+    --ok:#16a34a;--ok-l:#f0fdf4;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);height:100vh;overflow:hidden}
+  .layout{display:flex;height:100vh}
+
+  /* SIDEBAR */
+  .sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.08)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#fff}
+  .sb-title{font-size:14px;font-weight:600;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.55);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#c7d2fe}
+  .nav-item:hover i,.nav-item.active i{color:#c7d2fe}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.35)}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.08)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.35)}
+
+  /* MAIN */
+  .main{margin-left:240px;flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+  .tb-right{display:flex;align-items:center;gap:10px}
+  .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s}
+  .icon-btn:hover{background:#eef0f3}
+  .icon-btn i{font-size:18px}
+
+  /* DUAL PANE */
+  .dual-pane{display:grid;grid-template-columns:340px 1fr;flex:1;overflow:hidden}
+
+  /* LEFT QUEUE */
+  .queue-panel{background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+  .qp-head{padding:16px 18px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .qp-title{font-size:14px;font-weight:600;color:var(--text-1)}
+  .qp-count{font-size:11px;font-weight:700;background:var(--accent-l);color:var(--accent);padding:2px 9px;border-radius:20px}
+  .qp-search{padding:12px 16px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+  .search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:8px 12px}
+  .search-box i{font-size:14px;color:var(--text-3)}
+  .search-box input{border:none;background:transparent;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);width:100%}
+  .search-box input::placeholder{color:var(--text-3)}
+  .queue-list{overflow-y:auto;flex:1}
+  .queue-item{padding:14px 16px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s;display:flex;gap:10px;align-items:flex-start}
+  .queue-item:hover{background:#f8fafc}
+  .queue-item.active{background:var(--accent-l);border-left:3px solid var(--accent)}
+  .queue-item.crisis-item{border-left:3px solid var(--danger)}
+  .q-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+  .q-body{flex:1;min-width:0}
+  .q-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+  .q-name{font-size:13px;font-weight:600;color:var(--text-1)}
+  .q-date{font-size:11px;color:var(--text-3)}
+  .q-mood{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;margin-bottom:3px}
+  .q-preview{font-size:12px;color:var(--text-2);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:1.4}
+  .crisis-badge{font-size:10px;font-weight:700;background:var(--danger-l);color:var(--danger);padding:2px 7px;border-radius:20px;display:inline-block}
+  .mood-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .dot-red{background:#ef4444}
+  .dot-amber{background:#f59e0b}
+  .dot-green{background:#22c55e}
+
+  /* RIGHT DETAIL */
+  .detail-panel{display:flex;flex-direction:column;overflow:hidden}
+  .dp-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;flex:1;color:var(--text-3)}
+  .dp-empty i{font-size:48px}
+  .dp-empty p{font-size:14px;font-weight:500}
+  .dp-content{display:flex;flex-direction:column;flex:1;overflow:hidden}
+  .dp-header{padding:18px 24px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface)}
+  .dp-patient{display:flex;align-items:center;gap:12px}
+  .dp-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .dp-name{font-size:15px;font-weight:600;color:var(--text-1)}
+  .dp-meta{font-size:12px;color:var(--text-2);margin-top:2px}
+  .dp-actions{display:flex;gap:8px}
+  .dp-btn{border:1px solid var(--border);border-radius:9px;padding:7px 14px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;background:var(--bg);color:var(--text-2);display:flex;align-items:center;gap:5px;transition:all .15s}
+  .dp-btn:hover{background:#eef0f3}
+  .dp-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .dp-btn.primary:hover{background:var(--accent-d)}
+
+  .dp-scroll{overflow-y:auto;flex:1;padding:20px 24px;display:flex;gap:20px}
+  .dp-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .dp-right{width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:14px}
+
+  /* Entry details */
+  .entry-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:16px 18px}
+  .entry-card.crisis-card{border-left:3px solid var(--danger)}
+  .ec-label{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  .ec-title{font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:8px}
+  .mood-bar-wrap{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .mood-score-big{font-size:32px;font-weight:700;line-height:1}
+  .mood-bar-track{flex:1;height:8px;background:var(--border);border-radius:8px;overflow:hidden}
+  .mood-bar-fill{height:8px;border-radius:8px}
+  .tags-row{display:flex;flex-wrap:wrap;gap:5px}
+  .tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+  .tag-trigger{background:#dbeafe;color:#1d4ed8}
+  .tag-symptom{background:#fce7f3;color:#9d174d}
+  .tag-coping{background:#dcfce7;color:#15803d}
+  .tag-crisis{background:var(--danger-l);color:var(--danger)}
+  .notes-text{font-size:13px;color:var(--text-2);line-height:1.65;font-style:italic;margin-top:8px;background:#f8fafc;border-radius:8px;padding:12px 14px}
+
+  /* Feedback form */
+  .feedback-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:16px 18px}
+  .fc-title{font-size:14px;font-weight:600;color:var(--text-1);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+  .fc-title i{font-size:16px;color:var(--accent)}
+  .fc-sub{font-size:12px;color:var(--text-2);margin-bottom:14px;line-height:1.5}
+  .fc-field{margin-bottom:12px}
+  .fc-field label{display:block;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+  .fc-field select,.fc-field textarea,.fc-field input{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:var(--bg);outline:none;transition:border-color .15s}
+  .fc-field select:focus,.fc-field textarea:focus,.fc-field input:focus{border-color:var(--accent)}
+  .fc-field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:15px;padding-right:32px}
+  .fc-field textarea{min-height:90px;resize:none;line-height:1.6}
+  .fc-field input::placeholder,.fc-field textarea::placeholder{color:var(--text-3)}
+  .submit-review-btn{width:100%;height:40px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s}
+  .submit-review-btn:hover{background:var(--accent-d)}
+  .success-msg{display:none;background:var(--ok-l);border:1px solid #86efac;border-radius:9px;padding:10px 14px;font-size:13px;color:#15803d;font-weight:500;align-items:center;gap:8px;margin-top:10px}
+  .success-msg.show{display:flex}
+  .spin{animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Therapist Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="#" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+    <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+    <a href="therapist_reviews.html" class="nav-item active"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+    <div class="nav-section">Tools</div>
+    <a href="#" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+    <a href="#" class="nav-item"><i class="ti ti-message-2"></i>Messages</a>
+    <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+    <div class="nav-section">Account</div>
+    <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
+    <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-avatar">IK</div>
+      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title">Journal Reviews</div>
+      <div class="tb-sub">5 entries pending review — select one to begin</div>
+    </div>
+    <div class="tb-right">
+      <div class="icon-btn" title="Notifications" style="position:relative"><i class="ti ti-bell"></i><div style="position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)"></div></div>
+      <a href="4_therapist_dashboard.html" class="icon-btn" title="Dashboard"><i class="ti ti-layout-dashboard"></i></a>
+    </div>
+  </div>
+
+  <div class="dual-pane">
+    <!-- LEFT: REVIEW QUEUE -->
+    <div class="queue-panel">
+      <div class="qp-head">
+        <div class="qp-title">Review Queue</div>
+        <div class="qp-count">5 pending</div>
+      </div>
+      <div class="qp-search">
+        <div class="search-box"><i class="ti ti-search"></i><input type="text" placeholder="Search patient or trigger…" oninput="filterQueue(this.value)"/></div>
+      </div>
+      <div class="queue-list" id="queueList">
+
+        <!-- Item 1 — CRISIS -->
+        <div class="queue-item crisis-item" onclick="loadEntry(0)" id="qi-0">
+          <div class="q-avatar" style="background:#fee2e2;color:#991b1b">FN</div>
+          <div class="q-body">
+            <div class="q-top"><div class="q-name">Fatima Noor</div><div class="q-date">Today, 9:14 AM</div></div>
+            <div class="q-mood"><div class="mood-dot dot-red"></div><span style="color:#dc2626">Mood 2/10 · CRISIS</span><span class="crisis-badge">Urgent</span></div>
+            <div class="q-preview">Reported feeling unsafe, couldn't stop crying</div>
+          </div>
+        </div>
+
+        <!-- Item 2 — CRISIS -->
+        <div class="queue-item crisis-item" onclick="loadEntry(1)" id="qi-1">
+          <div class="q-avatar" style="background:#e0f2fe;color:#0369a1">SA</div>
+          <div class="q-body">
+            <div class="q-top"><div class="q-name">Sara Ahmed</div><div class="q-date">Apr 22</div></div>
+            <div class="q-mood"><div class="mood-dot dot-red"></div><span style="color:#dc2626">Mood 3/10 · CRISIS</span><span class="crisis-badge">Urgent</span></div>
+            <div class="q-preview">Panic attack at work, felt trapped in meeting room</div>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="queue-item" onclick="loadEntry(2)" id="qi-2">
+          <div class="q-avatar" style="background:#fef3c7;color:#b45309">AK</div>
+          <div class="q-body">
+            <div class="q-top"><div class="q-name">Ali Khan</div><div class="q-date">Apr 24</div></div>
+            <div class="q-mood"><div class="mood-dot dot-amber"></div><span style="color:#d97706">Mood 5/10 · Moderate</span></div>
+            <div class="q-preview">Family argument about finances, felt unheard</div>
+          </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="queue-item" onclick="loadEntry(3)" id="qi-3">
+          <div class="q-avatar" style="background:#ede9fe;color:#5b21b6">HM</div>
+          <div class="q-body">
+            <div class="q-top"><div class="q-name">Hassan Malik</div><div class="q-date">Apr 18</div></div>
+            <div class="q-mood"><div class="mood-dot dot-amber"></div><span style="color:#d97706">Mood 4/10 · Moderate</span></div>
+            <div class="q-preview">Sleep pattern worsening, less than 4 hrs per night</div>
+          </div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="queue-item" onclick="loadEntry(4)" id="qi-4">
+          <div class="q-avatar" style="background:#dcfce7;color:#15803d">ZR</div>
+          <div class="q-body">
+            <div class="q-top"><div class="q-name">Zainab Raza</div><div class="q-date">Apr 23</div></div>
+            <div class="q-mood"><div class="mood-dot dot-green"></div><span style="color:#16a34a">Mood 7/10 · Good</span></div>
+            <div class="q-preview">Great day, finished assignment early, feeling proud</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: DETAIL VIEW -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="dp-empty" id="dpEmpty">
+        <i class="ti ti-notebook" style="opacity:.3"></i>
+        <p>Select a patient entry from the queue to review</p>
+      </div>
+      <div class="dp-content" id="dpContent" style="display:none">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const entries = [
+  {
+    name:'Fatima Noor', initials:'FN', avatarBg:'#fee2e2', avatarColor:'#991b1b',
+    date:'Today, May 9 · 9:14 AM', week:'Week 3', crisis:true,
+    mood:2, moodColor:'#dc2626', moodLabel:'Very Low — CRISIS',
+    triggers:['Depression','Social Isolation','Self-Harm Risk'],
+    symptoms:['Racing heart','Shallow breathing','Fatigue','Nausea'],
+    coping:['Called a friend'],
+    notes:'I woke up feeling completely empty today. I couldn\'t stop crying and I don\'t know why. I felt like everything is pointless. I texted my friend but she didn\'t reply and that made it worse. I feel unsafe and I don\'t know what to do.',
+    location:'At home'
+  },
+  {
+    name:'Sara Ahmed', initials:'SA', avatarBg:'#e0f2fe', avatarColor:'#0369a1',
+    date:'Apr 22, 2026 · 2:31 PM', week:'Week 12', crisis:true,
+    mood:3, moodColor:'#dc2626', moodLabel:'Low — Crisis Entry',
+    triggers:['Work Stress','Panic Attacks'],
+    symptoms:['Chest tightness','Racing heart','Shallow breathing'],
+    coping:['Deep breathing'],
+    notes:'I was in a meeting and suddenly I couldn\'t breathe. I had to excuse myself and went to the bathroom. I felt like I was dying. The deadlines are piling up and my manager keeps adding more work. I used the breathing exercise which helped a little.',
+    location:'At work / office'
+  },
+  {
+    name:'Ali Khan', initials:'AK', avatarBg:'#fef3c7', avatarColor:'#b45309',
+    date:'Apr 24, 2026 · 8:00 PM', week:'Week 6', crisis:false,
+    mood:5, moodColor:'#d97706', moodLabel:'Below Average — Neutral',
+    triggers:['Family','Finance'],
+    symptoms:['Headache','Fatigue'],
+    coping:['Deep breathing','Journaling'],
+    notes:'My sister and I got into a big argument about our shared apartment bills. She said I wasn\'t contributing enough but I explained I just lost overtime at work. I felt unheard and frustrated. I journaled about it after and it helped a bit.',
+    location:'At home'
+  },
+  {
+    name:'Hassan Malik', initials:'HM', avatarBg:'#ede9fe', avatarColor:'#5b21b6',
+    date:'Apr 18, 2026 · 11:50 PM', week:'Week 8', crisis:false,
+    mood:4, moodColor:'#d97706', moodLabel:'Below Average',
+    triggers:['Sleep Issues','Social Anxiety'],
+    symptoms:['Fatigue','Headache'],
+    coping:['Meditation'],
+    notes:'I can\'t sleep again. Been lying awake since 9pm. My mind keeps racing about the presentation next week. I tried meditating but kept getting distracted. I\'ve only had maybe 3-4 hours sleep the past 3 nights. I feel physically tired but my brain won\'t stop.',
+    location:'At home'
+  },
+  {
+    name:'Zainab Raza', initials:'ZR', avatarBg:'#dcfce7', avatarColor:'#15803d',
+    date:'Apr 23, 2026 · 5:45 PM', week:'Week 18', crisis:false,
+    mood:7, moodColor:'#16a34a', moodLabel:'Good',
+    triggers:['Academic'],
+    symptoms:[],
+    coping:['Journaling','Light exercise'],
+    notes:'Today was actually a good day! I submitted my assignment two days early and my professor said it was excellent. I went for a walk in the park after. I feel like the strategies we\'ve been working on are starting to pay off. Very proud of myself today.',
+    location:'At school / university'
+  }
+];
+
+let selectedIdx = null;
+
+function loadEntry(idx) {
+  selectedIdx = idx;
+  document.querySelectorAll('.queue-item').forEach((el,i) => el.classList.toggle('active', i === idx));
+  const e = entries[idx];
+  document.getElementById('dpEmpty').style.display = 'none';
+  document.getElementById('dpContent').style.display = 'flex';
+  document.getElementById('dpContent').innerHTML = buildDetail(e, idx);
+}
+
+function buildDetail(e, idx) {
+  const moodBarW = ((e.mood-1)/9*100).toFixed(0) + '%';
+  const moodBarColor = e.mood <= 3 ? '#ef4444' : e.mood <= 6 ? '#f59e0b' : '#22c55e';
+  return `
+    <div class="dp-header">
+      <div class="dp-patient">
+        <div class="dp-avatar" style="background:${e.avatarBg};color:${e.avatarColor}">${e.initials}</div>
+        <div>
+          <div class="dp-name">${e.name} ${e.crisis ? '<span class="crisis-badge">CRISIS</span>' : ''}</div>
+          <div class="dp-meta">${e.week} of treatment · ${e.date} · ${e.location}</div>
+        </div>
+      </div>
+      <div class="dp-actions">
+        <button class="dp-btn" onclick="alert('Calling ${e.name}…')"><i class="ti ti-phone"></i>Call</button>
+        <button class="dp-btn" onclick="alert('Opening message to ${e.name}…')"><i class="ti ti-message-2"></i>Message</button>
+        ${e.crisis ? '<button class="dp-btn primary"><i class="ti ti-alert-triangle"></i>Flag Urgent</button>' : ''}
+      </div>
+    </div>
+    <div class="dp-scroll">
+      <div class="dp-left">
+        <div class="entry-card ${e.crisis ? 'crisis-card' : ''}">
+          <div class="ec-label">Mood Score</div>
+          <div class="mood-bar-wrap">
+            <div class="mood-score-big" style="color:${moodBarColor}">${e.mood}</div>
+            <div style="flex:1">
+              <div class="mood-bar-track"><div class="mood-bar-fill" style="width:${moodBarW};background:${moodBarColor}"></div></div>
+              <div style="font-size:12px;color:var(--text-2);margin-top:3px;font-weight:500">${e.moodLabel}</div>
+            </div>
+            <div style="font-size:22px">${e.mood <= 3 ? '😟' : e.mood <= 6 ? '😐' : '😊'}</div>
+          </div>
+        </div>
+
+        <div class="entry-card">
+          <div class="ec-label">Triggers</div>
+          <div class="tags-row">${e.triggers.map(t => `<span class="tag tag-trigger"><i class="ti ti-tag" style="font-size:10px"></i> ${t}</span>`).join('')}</div>
+        </div>
+
+        ${e.symptoms.length ? `
+        <div class="entry-card">
+          <div class="ec-label">Physical Symptoms Reported</div>
+          <div class="tags-row">${e.symptoms.map(s => `<span class="tag tag-symptom">${s}</span>`).join('')}</div>
+        </div>` : ''}
+
+        <div class="entry-card">
+          <div class="ec-label">Coping Strategies Used</div>
+          <div class="tags-row">${e.coping.length ? e.coping.map(c => `<span class="tag tag-coping"><i class="ti ti-check" style="font-size:10px"></i> ${c}</span>`).join('') : '<span style="font-size:13px;color:var(--text-3)">None recorded</span>'}</div>
+        </div>
+
+        <div class="entry-card">
+          <div class="ec-label">Patient Notes (Raw Trigger Description)</div>
+          <div class="notes-text">"${e.notes}"</div>
+        </div>
+      </div>
+
+      <div class="dp-right">
+        <div class="feedback-card">
+          <div class="fc-title"><i class="ti ti-stethoscope"></i>Clinical Feedback</div>
+          <div class="fc-sub">Leave structured notes and advice that ${e.name.split(' ')[0]} will see in their portal.</div>
+
+          <div class="fc-field">
+            <label>Severity Assessment</label>
+            <select id="fc-severity-${idx}">
+              <option>Select severity…</option>
+              <option ${e.crisis ? 'selected' : ''}>Critical — immediate follow-up required</option>
+              <option>High — schedule additional session</option>
+              <option>Moderate — monitor closely</option>
+              <option>Low — progressing well</option>
+            </select>
+          </div>
+
+          <div class="fc-field">
+            <label>Recommended Action</label>
+            <select id="fc-action-${idx}">
+              <option>Select action…</option>
+              <option>Emergency call within 24hrs</option>
+              <option>Add extra session this week</option>
+              <option>Send coping resource</option>
+              <option>Continue current plan</option>
+              <option>Adjust medication — refer to psychiatrist</option>
+            </select>
+          </div>
+
+          <div class="fc-field">
+            <label>Clinical Notes</label>
+            <textarea id="fc-notes-${idx}" placeholder="Write your clinical observations, recommendations, and any concerns about this entry…"></textarea>
+          </div>
+
+          <div class="fc-field">
+            <label>Coping Strategy to Recommend</label>
+            <input type="text" id="fc-rec-${idx}" placeholder="e.g. 5-4-3-2-1 grounding, box breathing…"/>
+          </div>
+
+          <button class="submit-review-btn" onclick="submitReview(${idx})">
+            <i class="ti ti-send"></i>Submit Clinical Review
+          </button>
+          <div class="success-msg" id="fc-success-${idx}">
+            <i class="ti ti-circle-check"></i>Review submitted and sent to ${e.name.split(' ')[0]}'s portal.
+          </div>
+        </div>
+
+        <div class="entry-card" style="background:#fffbeb;border-color:#fde68a">
+          <div class="ec-label" style="color:#92400e">Therapist Reminders</div>
+          <div style="font-size:12px;color:#78350f;line-height:1.65">
+            ${e.crisis
+              ? '⚠️ <strong>Crisis protocol:</strong> Document all contacts. Ensure safety plan is updated. Consider involving emergency services if risk is high.'
+              : '📋 Document your observations, update the treatment plan if triggers show a new pattern.'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function submitReview(idx) {
+  const btn = document.querySelector('.submit-review-btn');
+  btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Submitting…'; btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('fc-success-'+idx).classList.add('show');
+    btn.innerHTML = '<i class="ti ti-check"></i> Review Submitted';
+    btn.style.background = '#16a34a';
+    // Remove from queue
+    const qi = document.getElementById('qi-'+idx);
+    if (qi) { qi.style.opacity = '.4'; qi.style.pointerEvents = 'none'; }
+  }, 1000);
+}
+
+function filterQueue(q) {
+  document.querySelectorAll('.queue-item').forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(q.toLowerCase()) ? 'flex' : 'none';
+  });
+}
+</script>
+</body>
+</html>

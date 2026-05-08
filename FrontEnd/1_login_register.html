@@ -3,98 +3,97 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MH Journal — Sign In</title>
+<title>Serenity — Sign In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#f8f7f4;--surface:#fff;--border:#e2dfd6;--border-light:#ede9e0;
-    --text-1:#1a1714;--text-2:#6b6560;--text-3:#9e9891;
-    --accent:#2d6a4f;--accent-light:#d8f3dc;--accent-dark:#1b4332;
-    --blue:#264653;--warn:#e76f51;--warn-light:#fde8de;
-    --radius:14px;--shadow:0 2px 20px rgba(0,0,0,.07);
+    --cream:#faf7f2;--warm-white:#fff9f5;--peach-soft:#fdeee6;
+    --peach:#f4a982;--peach-d:#e07d56;
+    --sage:#b7d4bc;--sage-soft:#e8f4ea;--sage-d:#5a9264;
+    --text-main:#4a3f3a;--text-muted:#8c7e7a;--border:#ebdcd5;
+    --sidebar-bg:#2d4a38;
   }
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-  .shell{display:grid;grid-template-columns:1fr 1fr;max-width:900px;width:100%;background:var(--surface);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;border:0.5px solid var(--border)}
+  body{font-family:'Quicksand',sans-serif;background:var(--cream);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .shell{display:grid;grid-template-columns:1fr 1fr;max-width:920px;width:100%;background:var(--warm-white);border-radius:26px;box-shadow:0 4px 40px rgba(0,0,0,.09);overflow:hidden;border:1.5px solid var(--border)}
 
   /* LEFT */
-  .left{background:linear-gradient(160deg,#2d6a4f 0%,#1b4332 60%,#081c15 100%);padding:44px 40px;display:flex;flex-direction:column;gap:40px;position:relative;overflow:hidden}
-  .left::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04)}
-  .left::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.03)}
+  .left{background:linear-gradient(160deg,var(--sidebar-bg) 0%,#1e3528 60%,#162a1e 100%);padding:44px 40px;display:flex;flex-direction:column;gap:36px;position:relative;overflow:hidden}
+  .left::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(244,169,130,.08)}
+  .left::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:rgba(183,212,188,.06)}
   .brand{display:flex;align-items:center;gap:10px;position:relative}
-  .brand-mark{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;border:0.5px solid rgba(255,255,255,.2)}
-  .brand-mark i{font-size:18px;color:#d8f3dc}
-  .brand-text .name{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.01em}
-  .brand-text .sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:1px}
-  .left-body{position:relative}
-  .tagline{font-family:'DM Serif Display',serif;font-size:26px;color:#fff;line-height:1.35;margin-bottom:28px}
-  .tagline em{color:#95d5b2;font-style:normal}
+  .brand-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--peach),#f7c5a0);display:flex;align-items:center;justify-content:center}
+  .brand-mark span{font-size:20px}
+  .brand-text .name{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.01em}
+  .brand-text .sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px}
+  .tagline{font-family:'Lora',serif;font-size:26px;color:#fff;line-height:1.4;margin-bottom:24px}
+  .tagline em{color:var(--peach);font-style:normal}
   .features{display:flex;flex-direction:column;gap:16px}
   .feat{display:flex;align-items:flex-start;gap:12px}
-  .feat-ic{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.08);border:0.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-  .feat-ic i{font-size:15px;color:#95d5b2}
-  .feat p{font-size:13px;color:rgba(255,255,255,.72);line-height:1.55}
-  .feat p strong{color:#fff;font-weight:500}
-  .left-foot{font-size:11px;color:rgba(255,255,255,.28);position:relative}
+  .feat-ic{width:32px;height:32px;border-radius:9px;background:rgba(244,169,130,.15);border:1px solid rgba(244,169,130,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .feat-ic i{font-size:16px;color:var(--peach)}
+  .feat p{font-size:13px;color:rgba(255,255,255,.68);line-height:1.6}
+  .feat p strong{color:#fff;font-weight:600}
+  .left-foot{font-size:11px;color:rgba(255,255,255,.25);position:relative}
 
   /* RIGHT */
   .right{padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
-  .tabs{display:flex;gap:4px;background:#f3f1ec;border-radius:10px;padding:4px;margin-bottom:28px}
-  .tab-btn{flex:1;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;border:none;border-radius:7px;cursor:pointer;background:transparent;color:var(--text-2);transition:all .2s}
-  .tab-btn.active{background:#fff;color:var(--text-1);box-shadow:0 1px 6px rgba(0,0,0,.1)}
-  .form-title{font-size:20px;font-weight:600;color:var(--text-1);letter-spacing:-.02em;margin-bottom:4px}
-  .form-sub{font-size:13px;color:var(--text-2);margin-bottom:22px}
-  .role-row{margin-bottom:20px}
-  .role-label{font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
-  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-  .role-card{border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all .2s;font-family:'DM Sans',sans-serif}
-  .role-card i{font-size:20px;color:var(--text-2);transition:color .2s}
-  .role-card span{font-size:11px;color:var(--text-2);transition:color .2s}
-  .role-card.active{border-color:var(--accent);background:var(--accent-light)}
-  .role-card.active i,.role-card.active span{color:var(--accent-dark)}
+  .tabs{display:flex;gap:4px;background:var(--cream);border-radius:12px;padding:4px;margin-bottom:28px}
+  .tab-btn{flex:1;padding:9px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:700;border:none;border-radius:9px;cursor:pointer;background:transparent;color:var(--text-muted);transition:all .2s}
+  .tab-btn.active{background:var(--warm-white);color:var(--text-main);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .form-title{font-size:21px;font-weight:700;color:var(--text-main);letter-spacing:-.02em;margin-bottom:4px}
+  .form-sub{font-size:13px;color:var(--text-muted);margin-bottom:22px}
+  .role-label{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:18px}
+  .role-card{border:1.5px solid var(--border);border-radius:12px;padding:11px 6px;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all .2s;font-family:'Quicksand',sans-serif}
+  .role-card i{font-size:20px;color:var(--text-muted);transition:color .2s}
+  .role-card span{font-size:11px;font-weight:700;color:var(--text-muted);transition:color .2s}
+  .role-card.active{border-color:var(--peach-d);background:var(--peach-soft)}
+  .role-card.active i,.role-card.active span{color:var(--peach-d)}
   .field{margin-bottom:14px}
-  .field label{display:block;font-size:12px;font-weight:600;color:var(--text-2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
-  .field input,.field select{width:100%;height:40px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s}
-  .field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,.12)}
-  .field input::placeholder{color:var(--text-3)}
+  .field label{display:block;font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+  .field input,.field select{width:100%;height:42px;border:1.5px solid var(--border);border-radius:11px;padding:0 13px;font-size:14px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-main);background:var(--warm-white);outline:none;transition:border-color .15s,box-shadow .15s}
+  .field input:focus,.field select:focus{border-color:var(--peach-d);box-shadow:0 0 0 3px rgba(224,125,86,.12)}
+  .field input::placeholder{color:var(--border);font-weight:500}
   .pw-wrap{position:relative}
-  .pw-wrap input{padding-right:40px}
-  .pw-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--text-3);font-size:18px;padding:0;line-height:1}
+  .pw-wrap input{padding-right:42px}
+  .pw-toggle{position:absolute;right:11px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:0;line-height:1}
   .forgot{text-align:right;margin:-6px 0 14px}
-  .forgot a{font-size:12px;color:var(--accent);text-decoration:none;cursor:pointer;font-weight:500}
-  .forgot a:hover{color:var(--accent-dark)}
-  .submit-btn{width:100%;height:42px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s;letter-spacing:-.01em}
-  .submit-btn:hover{background:var(--accent-dark)}
-  .submit-btn:active{transform:scale(.99)}
+  .forgot a{font-size:12px;color:var(--peach-d);text-decoration:none;cursor:pointer;font-weight:700}
+  .submit-btn{width:100%;height:44px;background:linear-gradient(135deg,var(--peach),var(--peach-d));color:#fff;border:none;border-radius:11px;font-size:14px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s,box-shadow .15s;box-shadow:0 4px 16px rgba(224,125,86,.3)}
+  .submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(224,125,86,.35)}
+  .submit-btn:active{transform:translateY(0)}
   .divider{display:flex;align-items:center;gap:10px;margin:18px 0}
-  .div-line{flex:1;height:1px;background:var(--border-light)}
-  .div-text{font-size:11px;color:var(--text-3)}
+  .div-line{flex:1;height:1px;background:var(--border)}
+  .div-text{font-size:11px;color:var(--text-muted);font-weight:600}
   .demos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px}
-  .demo-btn{border:1px solid var(--border);border-radius:8px;padding:7px 4px;background:transparent;cursor:pointer;font-size:11px;color:var(--text-2);font-family:'DM Sans',sans-serif;transition:background .15s}
-  .demo-btn:hover{background:var(--bg)}
-  .demo-btn i{font-size:14px;display:block;margin-bottom:2px}
-  .switch-link{text-align:center;font-size:13px;color:var(--text-2)}
-  .switch-link a{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:none}
-  .alert{display:none;padding:10px 12px;border-radius:10px;font-size:12px;gap:8px;align-items:center;margin-bottom:14px}
-  .alert.error{background:#fde8de;border:1px solid #f4a47a;color:#c1440e}
-  .alert.success{background:var(--accent-light);border:1px solid #95d5b2;color:var(--accent-dark)}
+  .demo-btn{border:1.5px solid var(--border);border-radius:10px;padding:8px 4px;background:transparent;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-muted);font-family:'Quicksand',sans-serif;transition:background .15s}
+  .demo-btn:hover{background:var(--peach-soft);border-color:var(--peach);color:var(--peach-d)}
+  .demo-btn i{font-size:15px;display:block;margin-bottom:2px}
+  .switch-link{text-align:center;font-size:13px;color:var(--text-muted);font-weight:500}
+  .switch-link a{color:var(--peach-d);font-weight:700;cursor:pointer;text-decoration:none}
+  .alert{display:none;padding:11px 13px;border-radius:11px;font-size:12px;font-weight:600;gap:8px;align-items:center;margin-bottom:14px}
+  .alert.error{background:#fff0ec;border:1.5px solid var(--peach);color:var(--peach-d)}
+  .alert.success{background:var(--sage-soft);border:1.5px solid var(--sage);color:#3d6b4a}
   .alert.show{display:flex}
   .spin{animation:spin .7s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   .name-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
   /* Success screen */
-  .success-wrap{display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;min-height:340px}
+  .success-wrap{display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;min-height:360px}
   .success-wrap.show{display:flex}
-  .s-icon{width:60px;height:60px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center}
-  .s-icon i{font-size:28px;color:var(--accent)}
-  .s-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text-1)}
-  .s-sub{font-size:13px;color:var(--text-2);line-height:1.5}
-  .s-badge{padding:5px 16px;border-radius:20px;font-size:12px;font-weight:600;background:var(--accent-light);color:var(--accent-dark)}
-  .back-link{margin-top:4px;border:1px solid var(--border);border-radius:8px;padding:8px 18px;background:transparent;cursor:pointer;font-size:13px;color:var(--text-1);font-family:'DM Sans',sans-serif;transition:background .15s}
-  .back-link:hover{background:var(--bg)}
+  .s-icon{width:66px;height:66px;border-radius:50%;background:var(--sage-soft);display:flex;align-items:center;justify-content:center}
+  .s-icon i{font-size:30px;color:var(--sage-d)}
+  .s-title{font-family:'Lora',serif;font-size:22px;color:var(--text-main)}
+  .s-sub{font-size:13px;color:var(--text-muted);line-height:1.6;font-weight:500}
+  .s-badge{padding:5px 18px;border-radius:20px;font-size:12px;font-weight:700;background:var(--peach-soft);color:var(--peach-d)}
+  .back-link{margin-top:4px;border:1.5px solid var(--border);border-radius:10px;padding:9px 20px;background:transparent;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-main);font-family:'Quicksand',sans-serif;transition:background .15s}
+  .back-link:hover{background:var(--cream)}
+
+  @media(max-width:680px){.shell{grid-template-columns:1fr}.left{display:none}}
 </style>
 </head>
 <body>
@@ -103,13 +102,13 @@
   <!-- LEFT PANEL -->
   <div class="left">
     <div class="brand">
-      <div class="brand-mark"><i class="ti ti-heart-handshake"></i></div>
+      <div class="brand-mark"><span>🌿</span></div>
       <div class="brand-text">
-        <div class="name">MH Journal</div>
+        <div class="name">Serenity</div>
         <div class="sub">Mental Health Trigger Journal</div>
       </div>
     </div>
-    <div class="left-body">
+    <div>
       <div class="tagline">Track your triggers.<br><em>Understand your patterns.</em><br>Heal with support.</div>
       <div class="features">
         <div class="feat">
@@ -130,7 +129,7 @@
         </div>
       </div>
     </div>
-    <div class="left-foot">© 2026 MH Journal · DBMS Semester Project</div>
+    <div class="left-foot">© 2026 Serenity · MH Journal DBMS Project</div>
   </div>
 
   <!-- RIGHT PANEL -->
@@ -143,16 +142,14 @@
     <!-- LOGIN FORM -->
     <div id="loginSection">
       <div id="loginFormWrap">
-        <div class="form-title">Welcome back</div>
-        <div class="form-sub">Sign in to your account to continue</div>
+        <div class="form-title">Welcome back 🌸</div>
+        <div class="form-sub">Sign in to continue your journey</div>
 
-        <div class="role-row">
-          <div class="role-label">Sign in as</div>
-          <div class="roles">
-            <button class="role-card active" onclick="setRole(this,'patient')"><i class="ti ti-user"></i><span>Patient</span></button>
-            <button class="role-card" onclick="setRole(this,'therapist')"><i class="ti ti-stethoscope"></i><span>Therapist</span></button>
-            <button class="role-card" onclick="setRole(this,'admin')"><i class="ti ti-settings-2"></i><span>Admin</span></button>
-          </div>
+        <div class="role-label">Signing in as</div>
+        <div class="roles">
+          <button class="role-card active" onclick="setRole(this,'patient')"><i class="ti ti-user"></i><span>Patient</span></button>
+          <button class="role-card" onclick="setRole(this,'therapist')"><i class="ti ti-stethoscope"></i><span>Therapist</span></button>
+          <button class="role-card" onclick="setRole(this,'admin')"><i class="ti ti-shield-lock"></i><span>Admin</span></button>
         </div>
 
         <div id="loginAlert" class="alert error" role="alert">
@@ -161,7 +158,7 @@
 
         <div class="field">
           <label for="loginEmail">Email Address</label>
-          <input type="email" id="loginEmail" placeholder="you@mhjournal.com" autocomplete="email"/>
+          <input type="email" id="loginEmail" placeholder="you@serenity.app" autocomplete="email"/>
         </div>
         <div class="field">
           <label for="loginPwd">Password</label>
@@ -173,13 +170,13 @@
         <div class="forgot"><a href="#">Forgot password?</a></div>
         <button class="submit-btn" id="loginBtn" onclick="handleLogin()"><i class="ti ti-login"></i>Sign In</button>
 
-        <div class="divider"><div class="div-line"></div><div class="div-text">demo accounts</div><div class="div-line"></div></div>
+        <div class="divider"><div class="div-line"></div><div class="div-text">try a demo account</div><div class="div-line"></div></div>
         <div class="demos">
-          <button class="demo-btn" onclick="fillDemo('patient')"><i class="ti ti-user"></i>patient demo</button>
-          <button class="demo-btn" onclick="fillDemo('therapist')"><i class="ti ti-stethoscope"></i>therapist demo</button>
-          <button class="demo-btn" onclick="fillDemo('admin')"><i class="ti ti-settings-2"></i>admin demo</button>
+          <button class="demo-btn" onclick="fillDemo('patient')"><i class="ti ti-user"></i>Patient</button>
+          <button class="demo-btn" onclick="fillDemo('therapist')"><i class="ti ti-stethoscope"></i>Therapist</button>
+          <button class="demo-btn" onclick="fillDemo('admin')"><i class="ti ti-shield-lock"></i>Admin</button>
         </div>
-        <div class="switch-link">Don't have an account? <a onclick="switchTab('register', document.querySelectorAll('.tab-btn')[1])">Create account →</a></div>
+        <div class="switch-link">No account? <a onclick="switchTab('register', document.querySelectorAll('.tab-btn')[1])">Create one →</a></div>
       </div>
 
       <div class="success-wrap" id="loginSuccess">
@@ -193,16 +190,14 @@
 
     <!-- REGISTER FORM -->
     <div id="registerSection" style="display:none">
-      <div class="form-title">Create your account</div>
+      <div class="form-title">Create your account 🌱</div>
       <div class="form-sub">Start your mental health journey today</div>
 
-      <div class="role-row">
-        <div class="role-label">Registering as</div>
-        <div class="roles">
-          <button class="role-card active" onclick="setRoleReg(this,'patient')"><i class="ti ti-user"></i><span>Patient</span></button>
-          <button class="role-card" onclick="setRoleReg(this,'therapist')"><i class="ti ti-stethoscope"></i><span>Therapist</span></button>
-          <button class="role-card" onclick="setRoleReg(this,'admin')"><i class="ti ti-settings-2"></i><span>Admin</span></button>
-        </div>
+      <div class="role-label">Registering as</div>
+      <div class="roles">
+        <button class="role-card active" onclick="setRoleReg(this,'patient')"><i class="ti ti-user"></i><span>Patient</span></button>
+        <button class="role-card" onclick="setRoleReg(this,'therapist')"><i class="ti ti-stethoscope"></i><span>Therapist</span></button>
+        <button class="role-card" onclick="setRoleReg(this,'admin')"><i class="ti ti-shield-lock"></i><span>Admin</span></button>
       </div>
 
       <div id="regAlert" class="alert error" role="alert">
@@ -213,116 +208,125 @@
         <div class="field"><label for="regFirst">First Name</label><input type="text" id="regFirst" placeholder="Sara"/></div>
         <div class="field"><label for="regLast">Last Name</label><input type="text" id="regLast" placeholder="Ahmed"/></div>
       </div>
-      <div class="field"><label for="regEmail">Email Address</label><input type="email" id="regEmail" placeholder="you@mhjournal.com" autocomplete="email"/></div>
+      <div class="field"><label for="regEmail">Email Address</label><input type="email" id="regEmail" placeholder="you@serenity.app" autocomplete="email"/></div>
       <div class="field" id="regTherapistField" style="display:none"><label for="regLicense">License / Credential No.</label><input type="text" id="regLicense" placeholder="e.g. PSY-2024-00123"/></div>
       <div class="field">
         <label for="regPwd">Password</label>
         <div class="pw-wrap">
           <input type="password" id="regPwd" placeholder="Min. 8 characters"/>
-          <button class="pw-toggle" onclick="togglePw('regPwd','regEye')" aria-label="Show/hide password"><i id="regEye" class="ti ti-eye"></i></button>
+          <button class="pw-toggle" onclick="togglePw('regPwd','regEye')"><i id="regEye" class="ti ti-eye"></i></button>
         </div>
       </div>
       <div class="field"><label for="regConfirm">Confirm Password</label><input type="password" id="regConfirm" placeholder="Repeat your password"/></div>
       <button class="submit-btn" id="regBtn" onclick="handleRegister()"><i class="ti ti-user-plus"></i>Create Account</button>
-      <div style="margin-top:12px" class="switch-link">Already have an account? <a onclick="switchTab('login', document.querySelectorAll('.tab-btn')[0])">Sign in →</a></div>
+      <div style="margin-top:14px" class="switch-link">Already have an account? <a onclick="switchTab('login', document.querySelectorAll('.tab-btn')[0])">Sign in →</a></div>
     </div>
   </div>
 </div>
 
 <script>
-const demos={
-  patient:{email:'sara@mhjournal.com',password:'demo1234',name:'Sara Ahmed',role:'patient'},
-  therapist:{email:'imran@mhjournal.com',password:'demo1234',name:'Dr. Imran Khan',role:'therapist'},
-  admin:{email:'admin@mhjournal.com',password:'demo1234',name:'Admin User',role:'admin'}
+const demos = {
+  patient:   {email:'sara@serenity.app',  password:'demo1234', name:'Sara Ahmed',     role:'patient'},
+  therapist: {email:'imran@serenity.app', password:'demo1234', name:'Dr. Imran Khan', role:'therapist'},
+  admin:     {email:'admin@serenity.app', password:'demo1234', name:'Admin User',      role:'admin'}
 };
-let loginRole='patient', regRole='patient';
+const roleRedirects = {
+  patient:   '2_patient_dashboard.html',
+  therapist: '4_therapist_dashboard.html',
+  admin:     '6_admin_panel.html'
+};
+let loginRole = 'patient', regRole = 'patient';
 
-function switchTab(tab, btn){
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('loginSection').style.display = tab==='login'?'':'none';
-  document.getElementById('registerSection').style.display = tab==='register'?'':'none';
+  document.getElementById('loginSection').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('registerSection').style.display = tab === 'register' ? '' : 'none';
 }
-function setRole(btn,role){
-  loginRole=role;
-  btn.closest('.roles').querySelectorAll('.role-card').forEach(b=>b.classList.remove('active'));
+function setRole(btn, role) {
+  loginRole = role;
+  btn.closest('.roles').querySelectorAll('.role-card').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
-function setRoleReg(btn,role){
-  regRole=role;
-  btn.closest('.roles').querySelectorAll('.role-card').forEach(b=>b.classList.remove('active'));
+function setRoleReg(btn, role) {
+  regRole = role;
+  btn.closest('.roles').querySelectorAll('.role-card').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('regTherapistField').style.display=role==='therapist'?'':'none';
+  document.getElementById('regTherapistField').style.display = role === 'therapist' ? '' : 'none';
 }
-function togglePw(id,iconId){
-  const inp=document.getElementById(id);
-  const ic=document.getElementById(iconId);
-  if(inp.type==='password'){inp.type='text';ic.className='ti ti-eye-off';}
-  else{inp.type='password';ic.className='ti ti-eye';}
+function togglePw(id, iconId) {
+  const inp = document.getElementById(id);
+  const ic = document.getElementById(iconId);
+  if (inp.type === 'password') { inp.type = 'text'; ic.className = 'ti ti-eye-off'; }
+  else { inp.type = 'password'; ic.className = 'ti ti-eye'; }
 }
-function fillDemo(role){
-  const d=demos[role];
-  document.getElementById('loginEmail').value=d.email;
-  document.getElementById('loginPwd').value=d.password;
-  setRole(document.querySelectorAll('#loginSection .role-card')[['patient','therapist','admin'].indexOf(role)],role);
+function fillDemo(role) {
+  const d = demos[role];
+  document.getElementById('loginEmail').value = d.email;
+  document.getElementById('loginPwd').value = d.password;
+  const idx = ['patient','therapist','admin'].indexOf(role);
+  setRole(document.querySelectorAll('#loginSection .role-card')[idx], role);
   hideAlert('loginAlert');
 }
-function showAlert(id,textId,msg){
-  document.getElementById(textId).textContent=msg;
+function showAlert(id, textId, msg) {
+  document.getElementById(textId).textContent = msg;
   document.getElementById(id).classList.add('show');
 }
-function hideAlert(id){document.getElementById(id).classList.remove('show');}
-function handleLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pwd=document.getElementById('loginPwd').value;
+function hideAlert(id) { document.getElementById(id).classList.remove('show'); }
+
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd = document.getElementById('loginPwd').value;
   hideAlert('loginAlert');
-  if(!email){showAlert('loginAlert','loginAlertText','Please enter your email address.');return;}
-  if(!pwd){showAlert('loginAlert','loginAlertText','Please enter your password.');return;}
-  const btn=document.getElementById('loginBtn');
-  btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Signing in…';btn.disabled=true;
-  setTimeout(()=>{
-    const match=Object.values(demos).find(d=>d.email===email&&d.password===pwd&&d.role===loginRole);
-    if(match){
-      document.getElementById('loginFormWrap').style.display='none';
-      const s=document.getElementById('loginSuccess');s.classList.add('show');
-      document.getElementById('s-title').textContent='Welcome back, '+match.name+'!';
-      document.getElementById('s-sub').textContent='Redirecting to your '+match.role+' dashboard…';
-      document.getElementById('s-badge').textContent=match.role;
+  if (!email) { showAlert('loginAlert','loginAlertText','Please enter your email address.'); return; }
+  if (!pwd)   { showAlert('loginAlert','loginAlertText','Please enter your password.'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Signing in…'; btn.disabled = true;
+  setTimeout(() => {
+    const match = Object.values(demos).find(d => d.email === email && d.password === pwd && d.role === loginRole);
+    if (match) {
+      document.getElementById('loginFormWrap').style.display = 'none';
+      const s = document.getElementById('loginSuccess'); s.classList.add('show');
+      document.getElementById('s-title').textContent = 'Welcome back, ' + match.name + '!';
+      document.getElementById('s-sub').textContent = 'Redirecting to your ' + match.role + ' dashboard…';
+      document.getElementById('s-badge').textContent = match.role;
+      // Role-based redirect after 1.4s
+      setTimeout(() => { window.location.href = roleRedirects[match.role]; }, 1400);
     } else {
-      showAlert('loginAlert','loginAlertText','Invalid credentials. Check your role and try again.');
-      btn.innerHTML='<i class="ti ti-login"></i> Sign In';btn.disabled=false;
+      showAlert('loginAlert', 'loginAlertText', 'Invalid credentials. Check your role selection and try again.');
+      btn.innerHTML = '<i class="ti ti-login"></i> Sign In'; btn.disabled = false;
     }
-  },950);
+  }, 950);
 }
-function resetSuccess(){
+function resetSuccess() {
   document.getElementById('loginSuccess').classList.remove('show');
-  document.getElementById('loginFormWrap').style.display='';
-  document.getElementById('loginBtn').innerHTML='<i class="ti ti-login"></i> Sign In';
-  document.getElementById('loginBtn').disabled=false;
-  document.getElementById('loginEmail').value='';
-  document.getElementById('loginPwd').value='';
+  document.getElementById('loginFormWrap').style.display = '';
+  document.getElementById('loginBtn').innerHTML = '<i class="ti ti-login"></i> Sign In';
+  document.getElementById('loginBtn').disabled = false;
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPwd').value = '';
 }
-function handleRegister(){
-  const first=document.getElementById('regFirst').value.trim();
-  const last=document.getElementById('regLast').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const pwd=document.getElementById('regPwd').value;
-  const confirm=document.getElementById('regConfirm').value;
+function handleRegister() {
+  const first = document.getElementById('regFirst').value.trim();
+  const last  = document.getElementById('regLast').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pwd   = document.getElementById('regPwd').value;
+  const conf  = document.getElementById('regConfirm').value;
   hideAlert('regAlert');
-  if(!first||!last){showAlert('regAlert','regAlertText','Please enter your full name.');return;}
-  if(!email){showAlert('regAlert','regAlertText','Please enter a valid email address.');return;}
-  if(pwd.length<8){showAlert('regAlert','regAlertText','Password must be at least 8 characters.');return;}
-  if(pwd!==confirm){showAlert('regAlert','regAlertText','Passwords do not match.');return;}
-  const btn=document.getElementById('regBtn');
-  btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Creating account…';btn.disabled=true;
-  setTimeout(()=>{
-    document.getElementById('regAlert').className='alert success show';
-    document.getElementById('regAlertText').textContent='Account created! You can now sign in.';
-    btn.innerHTML='<i class="ti ti-check"></i> Account Created';
-    setTimeout(()=>switchTab('login',document.querySelectorAll('.tab-btn')[0]),2000);
-  },1200);
+  if (!first || !last) { showAlert('regAlert','regAlertText','Please enter your full name.'); return; }
+  if (!email)          { showAlert('regAlert','regAlertText','Please enter a valid email address.'); return; }
+  if (pwd.length < 8)  { showAlert('regAlert','regAlertText','Password must be at least 8 characters.'); return; }
+  if (pwd !== conf)    { showAlert('regAlert','regAlertText','Passwords do not match.'); return; }
+  const btn = document.getElementById('regBtn');
+  btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Creating account…'; btn.disabled = true;
+  setTimeout(() => {
+    document.getElementById('regAlert').className = 'alert success show';
+    document.getElementById('regAlertText').textContent = 'Account created! You can now sign in.';
+    btn.innerHTML = '<i class="ti ti-check"></i> Account Created';
+    setTimeout(() => switchTab('login', document.querySelectorAll('.tab-btn')[0]), 2000);
+  }, 1200);
 }
-['loginEmail','loginPwd'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin();}));
+['loginEmail','loginPwd'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); }));
 </script>
 </body>
 </html>

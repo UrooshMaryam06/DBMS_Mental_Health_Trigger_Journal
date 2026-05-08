@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MH Journal — Therapist Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f4f6f8;--surface:#fff;--border:#e2e7ed;
+    --text-1:#0f172a;--text-2:#64748b;--text-3:#94a3b8;
+    --accent:#4f46e5;--accent-l:#eef2ff;--accent-d:#3730a3;
+    --sidebar:#0f172a;--sidebar-act:rgba(99,102,241,.15);
+    --ok:#16a34a;--ok-l:#f0fdf4;
+    --warn:#d97706;--warn-l:#fffbeb;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+  .layout{display:flex;min-height:100vh}
+
+  .sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.08)}
+  .sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+  .sb-logo i{font-size:17px;color:#fff}
+  .sb-title{font-size:14px;font-weight:600;color:#fff}
+  .sb-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);padding:12px 8px 6px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.55);font-size:13px;font-weight:500}
+  .nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#c7d2fe}
+  .nav-item:hover i,.nav-item.active i{color:#c7d2fe}
+  .nav-item i{font-size:17px;color:rgba(255,255,255,.35)}
+  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.08)}
+  .sb-user{display:flex;align-items:center;gap:10px}
+  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b}
+  .sb-uname{font-size:13px;font-weight:500;color:#fff}
+  .sb-role{font-size:11px;color:rgba(255,255,255,.35)}
+
+  .main{margin-left:240px;flex:1}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+  .tb-right{display:flex;gap:10px}
+  .save-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+  .save-btn:hover{background:var(--accent-d)}
+
+  .content{padding:26px 30px;max-width:1000px}
+
+  /* PROFILE HERO */
+  .profile-hero{background:linear-gradient(160deg,var(--sidebar) 0%,#1e1b4b 100%);border-radius:16px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-bottom:22px;overflow:hidden;position:relative}
+  .profile-hero::after{content:'⚕';position:absolute;right:40px;font-size:120px;opacity:.04;top:-10px;pointer-events:none}
+  .hero-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#1e1b4b;border:4px solid rgba(255,255,255,.15);flex-shrink:0;position:relative}
+  .avatar-edit{position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--accent);border:2px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .avatar-edit i{font-size:11px;color:#fff}
+  .hero-info{flex:1}
+  .hero-name{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;margin-bottom:6px}
+  .hero-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .hero-tag{display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.6)}
+  .hero-tag i{font-size:14px;color:#a5b4fc}
+  .capacity-ring{background:rgba(99,102,241,.2);border:1px solid rgba(165,180,252,.3);border-radius:14px;padding:14px 20px;text-align:center;min-width:130px}
+  .cr-label{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .cr-ring{position:relative;width:54px;height:54px;margin:0 auto 6px}
+  .cr-ring svg{transform:rotate(-90deg)}
+  .cr-ring circle{fill:none;stroke-width:5}
+  .cr-bg{stroke:rgba(255,255,255,.1)}
+  .cr-fill{stroke:#a5b4fc;stroke-dasharray:138;stroke-dashoffset:28;stroke-linecap:round;transition:stroke-dashoffset .5s}
+  .cr-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+  .cr-sub{font-size:10px;color:rgba(255,255,255,.5)}
+
+  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border)}
+  .card-header{padding:16px 20px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .card-title{font-size:14px;font-weight:600;color:var(--text-1);display:flex;align-items:center;gap:7px}
+  .card-title i{font-size:16px;color:var(--accent)}
+  .card-body{padding:20px}
+
+  .field{margin-bottom:14px}
+  .field:last-child{margin-bottom:0}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .field label{display:block;font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:var(--bg);outline:none;transition:all .15s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.1);background:var(--surface)}
+  .field textarea{resize:none;line-height:1.6}
+
+  /* SPECIALIZATION TAGS */
+  .tags-wrap{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+  .spec-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid}
+  .spec-tag.cbt{background:#eef2ff;border-color:#c7d2fe;color:var(--accent-d)}
+  .spec-tag.anxiety{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+  .spec-tag.trauma{background:#fdf4ff;border-color:#e9d5ff;color:#7e22ce}
+  .spec-tag.dbt{background:#fff7ed;border-color:#fed7aa;color:#c2410c}
+  .spec-tag.grief{background:#f0f9ff;border-color:#bae6fd;color:#0369a1}
+  .spec-tag.remove{cursor:pointer;opacity:.6;font-size:14px}
+  .add-tag-btn{padding:5px 12px;border-radius:20px;border:1.5px dashed var(--border);background:transparent;font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:all .15s}
+  .add-tag-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* OFFICE HOURS */
+  .hours-grid{display:grid;grid-template-columns:80px 1fr 1fr 60px;gap:8px;align-items:center}
+  .hours-day{font-size:12px;font-weight:600;color:var(--text-2)}
+  .hours-time{border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text-1);outline:none;width:100%;transition:border-color .15s}
+  .hours-time:focus{border-color:var(--accent)}
+  .hours-toggle{display:flex;align-items:center;justify-content:center}
+  .hours-off{font-size:11px;color:var(--text-3);text-align:center}
+  .hours-separator{font-size:12px;color:var(--text-3);text-align:center}
+
+  /* CREDENTIALS */
+  .cred-list{display:flex;flex-direction:column;gap:10px}
+  .cred-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--bg);border-radius:10px;border:0.5px solid var(--border)}
+  .cred-icon{width:32px;height:32px;border-radius:8px;background:var(--accent-l);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cred-icon i{font-size:15px;color:var(--accent)}
+  .cred-title{font-size:13px;font-weight:600;color:var(--text-1)}
+  .cred-meta{font-size:11px;color:var(--text-3);margin-top:2px}
+  .verified-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;background:var(--ok-l);color:var(--ok);padding:2px 8px;border-radius:20px;margin-top:4px}
+
+  /* TOGGLE */
+  .toggle{position:relative;width:40px;height:22px}
+  .toggle input{opacity:0;width:0;height:0}
+  .toggle-track{position:absolute;inset:0;border-radius:22px;background:var(--border);cursor:pointer;transition:background .2s}
+  .toggle input:checked~.toggle-track{background:var(--accent)}
+  .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .toggle input:checked~.toggle-track .toggle-thumb{transform:translateX(18px)}
+
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast i{color:#4ade80}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="ti ti-brain"></i></div>
+      <div><div class="sb-title">Serenity MH</div><div class="sb-sub">Therapist Portal</div></div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-section">Clinical</div>
+      <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+      <a href="#" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+      <a href="therapist_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+      <a href="therapist_reviews.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+      <div class="nav-section">Resources</div>
+      <a href="#" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+      <a href="#" class="nav-item"><i class="ti ti-message-2"></i>Messages</a>
+      <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+      <div class="nav-section">Account</div>
+      <a href="therapist_profile.html" class="nav-item active"><i class="ti ti-user-circle"></i>Profile</a>
+      <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    </div>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">DR</div>
+        <div><div class="sb-uname">Dr. Reyes</div><div class="sb-role">Licensed Therapist</div></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div><div class="tb-title">My Profile</div><div class="tb-sub">Clinical credentials & availability</div></div>
+      <div class="tb-right">
+        <button class="save-btn" onclick="saveProfile()"><i class="ti ti-device-floppy"></i> Save Profile</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="profile-hero">
+        <div class="hero-avatar">
+          DR
+          <div class="avatar-edit"><i class="ti ti-pencil"></i></div>
+        </div>
+        <div class="hero-info">
+          <div class="hero-name">Dr. Sofia Reyes, LPC</div>
+          <div class="hero-meta">
+            <span class="hero-tag"><i class="ti ti-certificate"></i> License #LPC-WA-44821</span>
+            <span class="hero-tag"><i class="ti ti-map-pin"></i> Seattle, WA</span>
+            <span class="hero-tag"><i class="ti ti-star"></i> 4.9 Rating (38 reviews)</span>
+            <span class="hero-tag" style="background:rgba(74,222,128,.1);padding:3px 10px;border-radius:20px;color:#4ade80;border:1px solid rgba(74,222,128,.2)"><i class="ti ti-circle-check"></i> Accepting Patients</span>
+          </div>
+        </div>
+        <div class="capacity-ring">
+          <div class="cr-label">Client Capacity</div>
+          <div class="cr-ring">
+            <svg width="54" height="54" viewBox="0 0 54 54">
+              <circle class="cr-bg" cx="27" cy="27" r="22"/>
+              <circle class="cr-fill" cx="27" cy="27" r="22"/>
+            </svg>
+            <div class="cr-text">12/15</div>
+          </div>
+          <div class="cr-sub">3 slots available</div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <!-- PERSONAL INFO -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-user"></i> Personal & Contact</div>
+          </div>
+          <div class="card-body">
+            <div class="field-row">
+              <div class="field"><label>First Name</label><input type="text" value="Sofia"/></div>
+              <div class="field"><label>Last Name</label><input type="text" value="Reyes"/></div>
+            </div>
+            <div class="field"><label>Professional Email</label><input type="email" value="s.reyes@serenityhealth.io"/></div>
+            <div class="field-row">
+              <div class="field"><label>Phone (Office)</label><input type="tel" value="+1 (206) 555-0822"/></div>
+              <div class="field"><label>Languages</label><input type="text" value="English, Spanish"/></div>
+            </div>
+            <div class="field"><label>Professional Biography</label><textarea rows="4">Dr. Reyes is a Licensed Professional Counselor specializing in Cognitive Behavioral Therapy, trauma recovery, and anxiety disorders. With over 9 years of clinical experience, she uses an evidence-based, culturally sensitive approach to help clients build resilience and lasting mental wellness.</textarea></div>
+          </div>
+        </div>
+
+        <!-- CREDENTIALS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-certificate"></i> Credentials & Licenses</div>
+          </div>
+          <div class="card-body">
+            <div class="cred-list">
+              <div class="cred-item">
+                <div class="cred-icon"><i class="ti ti-certificate"></i></div>
+                <div>
+                  <div class="cred-title">Licensed Professional Counselor (LPC)</div>
+                  <div class="cred-meta">State of Washington · License #LPC-WA-44821</div>
+                  <div class="cred-meta">Expires: Dec 31, 2025</div>
+                  <span class="verified-badge"><i class="ti ti-circle-check"></i> Platform Verified</span>
+                </div>
+              </div>
+              <div class="cred-item">
+                <div class="cred-icon"><i class="ti ti-school"></i></div>
+                <div>
+                  <div class="cred-title">M.S. Clinical Psychology</div>
+                  <div class="cred-meta">University of Washington · 2015</div>
+                  <span class="verified-badge"><i class="ti ti-circle-check"></i> Verified</span>
+                </div>
+              </div>
+              <div class="cred-item">
+                <div class="cred-icon"><i class="ti ti-award"></i></div>
+                <div>
+                  <div class="cred-title">EMDR Certified Therapist</div>
+                  <div class="cred-meta">EMDR International Association · 2018</div>
+                  <span class="verified-badge"><i class="ti ti-circle-check"></i> Verified</span>
+                </div>
+              </div>
+            </div>
+            <button style="width:100%;margin-top:12px;padding:9px;border:1.5px dashed var(--border);border-radius:9px;background:transparent;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px" onclick="addCred()"><i class="ti ti-plus"></i> Add Credential</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPECIALIZATIONS -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-tags"></i> Specialization Tags</div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--text-3);margin-bottom:12px">These tags help match patients with the right therapist. Add up to 8 specializations.</p>
+          <div class="tags-wrap">
+            <span class="spec-tag cbt">CBT <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <span class="spec-tag anxiety">Anxiety Disorders <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <span class="spec-tag trauma">Trauma & PTSD <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <span class="spec-tag dbt">DBT <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <span class="spec-tag grief">Grief & Loss <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <span class="spec-tag cbt" style="background:#fdf2f8;border-color:#fbcfe8;color:#9d174d">EMDR <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <button class="add-tag-btn" onclick="addTag()"><i class="ti ti-plus"></i> Add Specialization</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OFFICE HOURS -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-clock"></i> Office Hours & Availability</div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--text-3);margin-bottom:16px">Set your weekly availability. Patients can only request appointments during these hours.</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="hours-grid" style="font-size:11px;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:0 0 6px;border-bottom:0.5px solid var(--border)">
+              <div>Day</div><div>Start</div><div>End</div><div>Active</div>
+            </div>
+            <div class="hours-grid"><div class="hours-day">Monday</div><input type="time" class="hours-time" value="09:00"/><input type="time" class="hours-time" value="17:00"/><div class="hours-toggle"><label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label></div></div>
+            <div class="hours-grid"><div class="hours-day">Tuesday</div><input type="time" class="hours-time" value="09:00"/><input type="time" class="hours-time" value="17:00"/><div class="hours-toggle"><label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label></div></div>
+            <div class="hours-grid"><div class="hours-day">Wednesday</div><input type="time" class="hours-time" value="10:00"/><input type="time" class="hours-time" value="14:00"/><div class="hours-toggle"><label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label></div></div>
+            <div class="hours-grid"><div class="hours-day">Thursday</div><input type="time" class="hours-time" value="09:00"/><input type="time" class="hours-time" value="17:00"/><div class="hours-toggle"><label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label></div></div>
+            <div class="hours-grid"><div class="hours-day">Friday</div><input type="time" class="hours-time" value="09:00"/><input type="time" class="hours-time" value="13:00"/><div class="hours-toggle"><label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label></div></div>
+            <div class="hours-grid"><div class="hours-day">Saturday</div><input type="time" class="hours-time" value="10:00"/><input type="time" class="hours-time" value="12:00"/><div class="hours-toggle"><label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label></div></div>
+            <div class="hours-grid"><div class="hours-day">Sunday</div><div class="hours-off" colspan="2" style="grid-column:2/4;font-size:12px;color:var(--text-3);font-style:italic">— Off —</div><div class="hours-toggle"><label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<div class="toast" id="toast"><i class="ti ti-circle-check"></i><span>Profile updated successfully!</span></div>
+
+<script>
+  function saveProfile(){const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+  function addTag(){const name=prompt('Enter specialization:');if(name){const wrap=document.querySelector('.tags-wrap');const addBtn=wrap.querySelector('.add-tag-btn');const tag=document.createElement('span');tag.className='spec-tag cbt';tag.innerHTML=name+' <span class="remove" onclick="this.parentElement.remove()">×</span>';wrap.insertBefore(tag,addBtn)}}
+  function addCred(){alert('Add credential upload dialog would open here.')}
+</script>
+</body>
+</html>
