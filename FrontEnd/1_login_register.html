@@ -9,17 +9,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --cream:#faf7f2;--warm-white:#fff9f5;--peach-soft:#fdeee6;
-    --peach:#f4a982;--peach-d:#e07d56;
-    --sage:#b7d4bc;--sage-soft:#e8f4ea;--sage-d:#5a9264;
-    --text-main:#4a3f3a;--text-muted:#8c7e7a;--border:#ebdcd5;
-    --sidebar-bg:#2d4a38;
-  }
+  :root{--cream:#faf7f2;--warm-white:#fff9f5;--peach-soft:#fdeee6;--peach:#f4a982;--peach-d:#e07d56;--sage:#b7d4bc;--sage-soft:#e8f4ea;--sage-d:#5a9264;--text-main:#4a3f3a;--text-muted:#8c7e7a;--border:#ebdcd5;--sidebar-bg:#2d4a38;}
   body{font-family:'Quicksand',sans-serif;background:var(--cream);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
   .shell{display:grid;grid-template-columns:1fr 1fr;max-width:920px;width:100%;background:var(--warm-white);border-radius:26px;box-shadow:0 4px 40px rgba(0,0,0,.09);overflow:hidden;border:1.5px solid var(--border)}
-
-  /* LEFT */
   .left{background:linear-gradient(160deg,var(--sidebar-bg) 0%,#1e3528 60%,#162a1e 100%);padding:44px 40px;display:flex;flex-direction:column;gap:36px;position:relative;overflow:hidden}
   .left::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(244,169,130,.08)}
   .left::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:rgba(183,212,188,.06)}
@@ -37,9 +29,7 @@
   .feat p{font-size:13px;color:rgba(255,255,255,.68);line-height:1.6}
   .feat p strong{color:#fff;font-weight:600}
   .left-foot{font-size:11px;color:rgba(255,255,255,.25);position:relative}
-
-  /* RIGHT */
-  .right{padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
+  .right{padding:44px 40px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto;max-height:100vh}
   .tabs{display:flex;gap:4px;background:var(--cream);border-radius:12px;padding:4px;margin-bottom:28px}
   .tab-btn{flex:1;padding:9px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:700;border:none;border-radius:9px;cursor:pointer;background:transparent;color:var(--text-muted);transition:all .2s}
   .tab-btn.active{background:var(--warm-white);color:var(--text-main);box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -64,7 +54,6 @@
   .forgot a{font-size:12px;color:var(--peach-d);text-decoration:none;cursor:pointer;font-weight:700}
   .submit-btn{width:100%;height:44px;background:linear-gradient(135deg,var(--peach),var(--peach-d));color:#fff;border:none;border-radius:11px;font-size:14px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s,box-shadow .15s;box-shadow:0 4px 16px rgba(224,125,86,.3)}
   .submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(224,125,86,.35)}
-  .submit-btn:active{transform:translateY(0)}
   .divider{display:flex;align-items:center;gap:10px;margin:18px 0}
   .div-line{flex:1;height:1px;background:var(--border)}
   .div-text{font-size:11px;color:var(--text-muted);font-weight:600}
@@ -81,8 +70,6 @@
   .spin{animation:spin .7s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   .name-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-  /* Success screen */
   .success-wrap{display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;min-height:360px}
   .success-wrap.show{display:flex}
   .s-icon{width:66px;height:66px;border-radius:50%;background:var(--sage-soft);display:flex;align-items:center;justify-content:center}
@@ -91,85 +78,55 @@
   .s-sub{font-size:13px;color:var(--text-muted);line-height:1.6;font-weight:500}
   .s-badge{padding:5px 18px;border-radius:20px;font-size:12px;font-weight:700;background:var(--peach-soft);color:var(--peach-d)}
   .back-link{margin-top:4px;border:1.5px solid var(--border);border-radius:10px;padding:9px 20px;background:transparent;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-main);font-family:'Quicksand',sans-serif;transition:background .15s}
-  .back-link:hover{background:var(--cream)}
-
   @media(max-width:680px){.shell{grid-template-columns:1fr}.left{display:none}}
 </style>
 </head>
 <body>
-
 <div class="shell">
-  <!-- LEFT PANEL -->
   <div class="left">
     <div class="brand">
       <div class="brand-mark"><span>🌿</span></div>
-      <div class="brand-text">
-        <div class="name">Serenity</div>
-        <div class="sub">Mental Health Trigger Journal</div>
-      </div>
+      <div class="brand-text"><div class="name">Serenity</div><div class="sub">Mental Health Trigger Journal</div></div>
     </div>
     <div>
       <div class="tagline">Track your triggers.<br><em>Understand your patterns.</em><br>Heal with support.</div>
       <div class="features">
-        <div class="feat">
-          <div class="feat-ic"><i class="ti ti-writing"></i></div>
-          <p><strong>Journal your triggers</strong> with mood scores, locations, and coping strategies</p>
-        </div>
-        <div class="feat">
-          <div class="feat-ic"><i class="ti ti-chart-line"></i></div>
-          <p><strong>Visual mood trends</strong> help you and your therapist spot patterns over time</p>
-        </div>
-        <div class="feat">
-          <div class="feat-ic"><i class="ti ti-user-heart"></i></div>
-          <p><strong>Stay connected</strong> with your therapist and get weekly AI-powered insights</p>
-        </div>
-        <div class="feat">
-          <div class="feat-ic"><i class="ti ti-shield-check"></i></div>
-          <p><strong>Crisis support</strong> instantly notifies your therapist when you need help</p>
-        </div>
+        <div class="feat"><div class="feat-ic"><i class="ti ti-writing"></i></div><p><strong>Journal your triggers</strong> with mood scores, locations, and coping strategies</p></div>
+        <div class="feat"><div class="feat-ic"><i class="ti ti-chart-line"></i></div><p><strong>Visual mood trends</strong> help you and your therapist spot patterns over time</p></div>
+        <div class="feat"><div class="feat-ic"><i class="ti ti-user-heart"></i></div><p><strong>Stay connected</strong> with your therapist and get weekly AI-powered insights</p></div>
+        <div class="feat"><div class="feat-ic"><i class="ti ti-shield-check"></i></div><p><strong>Crisis support</strong> instantly notifies your therapist when you need help</p></div>
       </div>
     </div>
     <div class="left-foot">© 2026 Serenity · MH Journal DBMS Project</div>
   </div>
 
-  <!-- RIGHT PANEL -->
   <div class="right">
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('login',this)">Sign In</button>
       <button class="tab-btn" onclick="switchTab('register',this)">Create Account</button>
     </div>
 
-    <!-- LOGIN FORM -->
+    <!-- LOGIN -->
     <div id="loginSection">
       <div id="loginFormWrap">
         <div class="form-title">Welcome back 🌸</div>
         <div class="form-sub">Sign in to continue your journey</div>
-
         <div class="role-label">Signing in as</div>
         <div class="roles">
           <button class="role-card active" onclick="setRole(this,'patient')"><i class="ti ti-user"></i><span>Patient</span></button>
           <button class="role-card" onclick="setRole(this,'therapist')"><i class="ti ti-stethoscope"></i><span>Therapist</span></button>
           <button class="role-card" onclick="setRole(this,'admin')"><i class="ti ti-shield-lock"></i><span>Admin</span></button>
         </div>
-
-        <div id="loginAlert" class="alert error" role="alert">
-          <i class="ti ti-alert-circle"></i><span id="loginAlertText"></span>
-        </div>
-
-        <div class="field">
-          <label for="loginEmail">Email Address</label>
-          <input type="email" id="loginEmail" placeholder="you@serenity.app" autocomplete="email"/>
-        </div>
-        <div class="field">
-          <label for="loginPwd">Password</label>
+        <div id="loginAlert" class="alert error"><i class="ti ti-alert-circle"></i><span id="loginAlertText"></span></div>
+        <div class="field"><label>Email Address</label><input type="email" id="loginEmail" placeholder="you@serenity.app"/></div>
+        <div class="field"><label>Password</label>
           <div class="pw-wrap">
-            <input type="password" id="loginPwd" placeholder="Enter your password" autocomplete="current-password"/>
-            <button class="pw-toggle" onclick="togglePw('loginPwd','loginEye')" aria-label="Show/hide password"><i id="loginEye" class="ti ti-eye"></i></button>
+            <input type="password" id="loginPwd" placeholder="Enter your password"/>
+            <button class="pw-toggle" onclick="togglePw('loginPwd','loginEye')"><i id="loginEye" class="ti ti-eye"></i></button>
           </div>
         </div>
         <div class="forgot"><a href="#">Forgot password?</a></div>
         <button class="submit-btn" id="loginBtn" onclick="handleLogin()"><i class="ti ti-login"></i>Sign In</button>
-
         <div class="divider"><div class="div-line"></div><div class="div-text">try a demo account</div><div class="div-line"></div></div>
         <div class="demos">
           <button class="demo-btn" onclick="fillDemo('patient')"><i class="ti ti-user"></i>Patient</button>
@@ -178,46 +135,55 @@
         </div>
         <div class="switch-link">No account? <a onclick="switchTab('register', document.querySelectorAll('.tab-btn')[1])">Create one →</a></div>
       </div>
-
       <div class="success-wrap" id="loginSuccess">
         <div class="s-icon"><i class="ti ti-check"></i></div>
         <div class="s-title" id="s-title">Welcome back!</div>
-        <div class="s-sub" id="s-sub">Redirecting to your dashboard…</div>
+        <div class="s-sub" id="s-sub">Redirecting…</div>
         <div class="s-badge" id="s-badge">patient</div>
         <button class="back-link" onclick="resetSuccess()">← Back to sign in</button>
       </div>
     </div>
 
-    <!-- REGISTER FORM -->
+    <!-- REGISTER -->
     <div id="registerSection" style="display:none">
       <div class="form-title">Create your account 🌱</div>
       <div class="form-sub">Start your mental health journey today</div>
-
       <div class="role-label">Registering as</div>
       <div class="roles">
         <button class="role-card active" onclick="setRoleReg(this,'patient')"><i class="ti ti-user"></i><span>Patient</span></button>
         <button class="role-card" onclick="setRoleReg(this,'therapist')"><i class="ti ti-stethoscope"></i><span>Therapist</span></button>
         <button class="role-card" onclick="setRoleReg(this,'admin')"><i class="ti ti-shield-lock"></i><span>Admin</span></button>
       </div>
-
-      <div id="regAlert" class="alert error" role="alert">
-        <i class="ti ti-alert-circle"></i><span id="regAlertText"></span>
-      </div>
-
+      <div id="regAlert" class="alert error"><i class="ti ti-alert-circle"></i><span id="regAlertText"></span></div>
       <div class="name-row">
-        <div class="field"><label for="regFirst">First Name</label><input type="text" id="regFirst" placeholder="Sara"/></div>
-        <div class="field"><label for="regLast">Last Name</label><input type="text" id="regLast" placeholder="Ahmed"/></div>
+        <div class="field"><label>First Name</label><input type="text" id="regFirst" placeholder="Sara"/></div>
+        <div class="field"><label>Last Name</label><input type="text" id="regLast" placeholder="Ahmed"/></div>
       </div>
-      <div class="field"><label for="regEmail">Email Address</label><input type="email" id="regEmail" placeholder="you@serenity.app" autocomplete="email"/></div>
-      <div class="field" id="regTherapistField" style="display:none"><label for="regLicense">License / Credential No.</label><input type="text" id="regLicense" placeholder="e.g. PSY-2024-00123"/></div>
-      <div class="field">
-        <label for="regPwd">Password</label>
+      <div class="field"><label>Email Address</label><input type="email" id="regEmail" placeholder="you@serenity.app"/></div>
+      <!-- DOB + Gender fields -->
+      <div class="name-row">
+        <div class="field">
+          <label>Date of Birth</label>
+          <input type="date" id="regDOB" max="2010-01-01"/>
+        </div>
+        <div class="field">
+          <label>Gender</label>
+          <select id="regGender">
+            <option value="">Select…</option>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" id="regTherapistField" style="display:none"><label>License No.</label><input type="text" id="regLicense" placeholder="PSY-2024-00123"/></div>
+      <div class="field"><label>Password</label>
         <div class="pw-wrap">
           <input type="password" id="regPwd" placeholder="Min. 8 characters"/>
           <button class="pw-toggle" onclick="togglePw('regPwd','regEye')"><i id="regEye" class="ti ti-eye"></i></button>
         </div>
       </div>
-      <div class="field"><label for="regConfirm">Confirm Password</label><input type="password" id="regConfirm" placeholder="Repeat your password"/></div>
+      <div class="field"><label>Confirm Password</label><input type="password" id="regConfirm" placeholder="Repeat your password"/></div>
       <button class="submit-btn" id="regBtn" onclick="handleRegister()"><i class="ti ti-user-plus"></i>Create Account</button>
       <div style="margin-top:14px" class="switch-link">Already have an account? <a onclick="switchTab('login', document.querySelectorAll('.tab-btn')[0])">Sign in →</a></div>
     </div>
@@ -225,223 +191,153 @@
 </div>
 
 <script type="module">
-import { initializeApp }                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ── paste your Firebase config here ──────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyBg1S62gu-Nj3ElkkGCyOr7qmBXzai6jow",
   authDomain: "mh-journal-754db.firebaseapp.com",
   projectId: "mh-journal-754db",
   storageBucket: "mh-journal-754db.firebasestorage.app",
   messagingSenderId: "254544548183",
-  appId: "1:254544548183:web:e9a28ce5e471e5a2b96e12",
-  measurementId: "G-1DGTNMB6XG"
+  appId: "1:254544548183:web:e9a28ce5e471e5a2b96e12"
 };
 const SUPABASE_URL = "https://pjernwhcerujrfczodpq.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU";
-// ─────────────────────────────────────────────────────────────
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-const roleRedirects = {
-  patient:   '2_patient_dashboard.html',
-  therapist: '4_therapist_dashboard.html',
-  admin:     '6_admin_panel.html'
-};
-
+const roleRedirects = { patient:'2_patient_dashboard.html', therapist:'4_therapist_dashboard.html', admin:'6_admin_panel.html' };
 const demos = {
-  patient:   { email:'sara@mhjournal.com',  password:'Demo@1234' },
-  therapist: { email:'imran@mhjournal.com', password:'Demo@1234' },
-  admin:     { email:'admin@mhjournal.com', password:'Demo@1234' }
+  patient:  { email:'sara@mhjournal.com',  password:'Demo@1234' },
+  therapist:{ email:'imran@mhjournal.com', password:'Demo@1234' },
+  admin:    { email:'admin@mhjournal.com', password:'Demo@1234' }
 };
 
-let loginRole = 'patient';
-let regRole   = 'patient';
+let loginRole='patient', regRole='patient';
 
-window.switchTab = function(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+function showAlert(id,textId,msg){document.getElementById(textId).textContent=msg;document.getElementById(id).classList.add('show');}
+function hideAlert(id){document.getElementById(id).classList.remove('show');}
+
+window.switchTab=function(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('loginSection').style.display    = tab === 'login'    ? '' : 'none';
-  document.getElementById('registerSection').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('loginSection').style.display=tab==='login'?'':'none';
+  document.getElementById('registerSection').style.display=tab==='register'?'':'none';
 };
-
-window.setRole = function(btn, role) {
-  loginRole = role;
-  btn.closest('.roles').querySelectorAll('.role-card').forEach(b => b.classList.remove('active'));
+window.setRole=function(btn,role){
+  loginRole=role;
+  btn.closest('.roles').querySelectorAll('.role-card').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 };
-
-window.setRoleReg = function(btn, role) {
-  regRole = role;
-  btn.closest('.roles').querySelectorAll('.role-card').forEach(b => b.classList.remove('active'));
+window.setRoleReg=function(btn,role){
+  regRole=role;
+  btn.closest('.roles').querySelectorAll('.role-card').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('regTherapistField').style.display = role === 'therapist' ? '' : 'none';
+  document.getElementById('regTherapistField').style.display=role==='therapist'?'':'none';
 };
-
-window.togglePw = function(id, iconId) {
-  const inp = document.getElementById(id);
-  const ic  = document.getElementById(iconId);
-  if (inp.type === 'password') { inp.type = 'text';     ic.className = 'ti ti-eye-off'; }
-  else                         { inp.type = 'password'; ic.className = 'ti ti-eye'; }
+window.togglePw=function(id,iconId){
+  const inp=document.getElementById(id);const ic=document.getElementById(iconId);
+  if(inp.type==='password'){inp.type='text';ic.className='ti ti-eye-off';}
+  else{inp.type='password';ic.className='ti ti-eye';}
 };
-
-window.fillDemo = function(role) {
-  const d = demos[role];
-  document.getElementById('loginEmail').value = d.email;
-  document.getElementById('loginPwd').value   = d.password;
-  const idx = ['patient','therapist','admin'].indexOf(role);
-  setRole(document.querySelectorAll('#loginSection .role-card')[idx], role);
+window.fillDemo=function(role){
+  const d=demos[role];
+  document.getElementById('loginEmail').value=d.email;
+  document.getElementById('loginPwd').value=d.password;
+  const idx=['patient','therapist','admin'].indexOf(role);
+  window.setRole(document.querySelectorAll('#loginSection .role-card')[idx],role);
   hideAlert('loginAlert');
 };
-
-function showAlert(id, textId, msg) {
-  document.getElementById(textId).textContent = msg;
-  document.getElementById(id).classList.add('show');
-}
-function hideAlert(id) {
-  document.getElementById(id).classList.remove('show');
-}
-
-window.handleLogin = async function() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pwd   = document.getElementById('loginPwd').value;
-  hideAlert('loginAlert');
-
-  if (!email) { showAlert('loginAlert','loginAlertText','Please enter your email.'); return; }
-  if (!pwd)   { showAlert('loginAlert','loginAlertText','Please enter your password.'); return; }
-
-  const btn = document.getElementById('loginBtn');
-  btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Signing in…';
-  btn.disabled  = true;
-
-  try {
-    // Step 1 — Firebase checks password
-    await signInWithEmailAndPassword(auth, email, pwd);
-
-    // Step 2 — Supabase checks role
-    const res  = await fetch(
-      `${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email)}&select=user_id,full_name,role`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
-    );
-    const data = await res.json();
-
-    if (!data || data.length === 0) {
-      showAlert('loginAlert','loginAlertText','User not found in database. Contact admin.');
-      btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
-      btn.disabled  = false;
-      return;
-    }
-
-    const user = data[0];
-
-    // Step 3 — Check role matches
-    if (user.role !== loginRole) {
-      showAlert('loginAlert','loginAlertText',`This account is registered as a ${user.role}. Please select the correct role.`);
-      btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
-      btn.disabled  = false;
-      return;
-    }
-
-    // Step 4 — Save to localStorage
-    localStorage.setItem('mh_user', JSON.stringify({
-      user_id:   user.user_id,
-      full_name: user.full_name,
-      role:      user.role,
-      email:     email
-    }));
-
-    // Step 5 — Show success screen
-    document.getElementById('loginFormWrap').style.display = 'none';
-    const s = document.getElementById('loginSuccess');
-    s.classList.add('show');
-    document.getElementById('s-title').textContent = 'Welcome back, ' + user.full_name + '!';
-    document.getElementById('s-sub').textContent   = 'Redirecting to your ' + user.role + ' dashboard…';
-    document.getElementById('s-badge').textContent = user.role;
-
-    // Step 6 — Redirect
-    setTimeout(() => { window.location.href = roleRedirects[user.role]; }, 1400);
-
-  } catch (err) {
-    let msg = 'Login failed. Please try again.';
-    if (err.code === 'auth/user-not-found')     msg = 'No account found with this email.';
-    if (err.code === 'auth/wrong-password')     msg = 'Incorrect password. Please try again.';
-    if (err.code === 'auth/invalid-credential') msg = 'Incorrect email or password.';
-    if (err.code === 'auth/too-many-requests')  msg = 'Too many attempts. Try again later.';
-    showAlert('loginAlert','loginAlertText', msg);
-    btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
-    btn.disabled  = false;
-  }
-};
-
-window.resetSuccess = function() {
+window.resetSuccess=function(){
   document.getElementById('loginSuccess').classList.remove('show');
-  document.getElementById('loginFormWrap').style.display = '';
-  const btn = document.getElementById('loginBtn');
-  btn.innerHTML = '<i class="ti ti-login"></i> Sign In';
-  btn.disabled  = false;
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPwd').value   = '';
+  document.getElementById('loginFormWrap').style.display='';
+  const btn=document.getElementById('loginBtn');
+  btn.innerHTML='<i class="ti ti-login"></i> Sign In';btn.disabled=false;
+  document.getElementById('loginEmail').value='';document.getElementById('loginPwd').value='';
 };
 
-window.handleRegister = async function() {
-  const first = document.getElementById('regFirst').value.trim();
-  const last  = document.getElementById('regLast').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const pwd   = document.getElementById('regPwd').value;
-  const conf  = document.getElementById('regConfirm').value;
-  hideAlert('regAlert');
-
-  if (!first || !last) { showAlert('regAlert','regAlertText','Please enter your full name.'); return; }
-  if (!email)          { showAlert('regAlert','regAlertText','Please enter a valid email.'); return; }
-  if (pwd.length < 8)  { showAlert('regAlert','regAlertText','Password must be at least 8 characters.'); return; }
-  if (pwd !== conf)    { showAlert('regAlert','regAlertText','Passwords do not match.'); return; }
-
-  const btn = document.getElementById('regBtn');
-  btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Creating account…';
-  btn.disabled  = true;
-
-  try {
-    // Step 1 — Create in Firebase
-    const cred = await createUserWithEmailAndPassword(auth, email, pwd);
-
-    // Step 2 — Save to Supabase
-    await fetch(`${SUPABASE_URL}/rest/v1/users`, {
-      method:  'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'apikey':        SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer':        'return=minimal'
-      },
-      body: JSON.stringify({
-        firebase_uid:  cred.user.uid,
-        full_name:     first + ' ' + last,
-        email:         email,
-        role:          regRole,
-        date_of_birth: '2000-01-01',
-        is_active:     true
-      })
-    });
-
-    document.getElementById('regAlert').className = 'alert success show';
-    document.getElementById('regAlertText').textContent = 'Account created! Signing you in…';
-    btn.innerHTML = '<i class="ti ti-check"></i> Account Created!';
-    setTimeout(() => switchTab('login', document.querySelectorAll('.tab-btn')[0]), 2000);
-
-  } catch (err) {
-    let msg = 'Registration failed. Please try again.';
-    if (err.code === 'auth/email-already-in-use') msg = 'This email is already registered.';
-    if (err.code === 'auth/weak-password')        msg = 'Password is too weak.';
-    showAlert('regAlert','regAlertText', msg);
-    btn.innerHTML = '<i class="ti ti-user-plus"></i> Create Account';
-    btn.disabled  = false;
+window.handleLogin=async function(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pwd=document.getElementById('loginPwd').value;
+  hideAlert('loginAlert');
+  if(!email){showAlert('loginAlert','loginAlertText','Please enter your email.');return;}
+  if(!pwd){showAlert('loginAlert','loginAlertText','Please enter your password.');return;}
+  const btn=document.getElementById('loginBtn');
+  btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Signing in…';btn.disabled=true;
+  try{
+    await signInWithEmailAndPassword(auth,email,pwd);
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email)}&select=user_id,full_name,role`,
+      {headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
+    const data=await res.json();
+    if(!data||data.length===0){
+      showAlert('loginAlert','loginAlertText','User not found in database. Contact admin.');
+      btn.innerHTML='<i class="ti ti-login"></i> Sign In';btn.disabled=false;return;
+    }
+    const user=data[0];
+    if(user.role!==loginRole){
+      showAlert('loginAlert','loginAlertText',`This account is a ${user.role}. Please select the correct role.`);
+      btn.innerHTML='<i class="ti ti-login"></i> Sign In';btn.disabled=false;return;
+    }
+    localStorage.setItem('mh_user',JSON.stringify({user_id:user.user_id,full_name:user.full_name,role:user.role,email:email}));
+    document.getElementById('loginFormWrap').style.display='none';
+    const s=document.getElementById('loginSuccess');s.classList.add('show');
+    document.getElementById('s-title').textContent='Welcome back, '+user.full_name+'!';
+    document.getElementById('s-sub').textContent='Redirecting to your '+user.role+' dashboard…';
+    document.getElementById('s-badge').textContent=user.role;
+    setTimeout(()=>{window.location.href=roleRedirects[user.role];},1400);
+  }catch(err){
+    let msg='Login failed. Please try again.';
+    if(err.code==='auth/user-not-found') msg='No account found with this email.';
+    if(err.code==='auth/wrong-password') msg='Incorrect password.';
+    if(err.code==='auth/invalid-credential') msg='Incorrect email or password.';
+    if(err.code==='auth/too-many-requests') msg='Too many attempts. Try again later.';
+    showAlert('loginAlert','loginAlertText',msg);
+    btn.innerHTML='<i class="ti ti-login"></i> Sign In';btn.disabled=false;
   }
 };
 
-document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-document.getElementById('loginPwd').addEventListener('keydown',   e => { if (e.key === 'Enter') handleLogin(); });
+window.handleRegister=async function(){
+  const first=document.getElementById('regFirst').value.trim();
+  const last=document.getElementById('regLast').value.trim();
+  const email=document.getElementById('regEmail').value.trim();
+  const dob=document.getElementById('regDOB').value;
+  const gender=document.getElementById('regGender').value;
+  const pwd=document.getElementById('regPwd').value;
+  const conf=document.getElementById('regConfirm').value;
+  hideAlert('regAlert');
+  if(!first||!last){showAlert('regAlert','regAlertText','Please enter your full name.');return;}
+  if(!email){showAlert('regAlert','regAlertText','Please enter a valid email.');return;}
+  if(!dob){showAlert('regAlert','regAlertText','Please enter your date of birth.');return;}
+  if(!gender){showAlert('regAlert','regAlertText','Please select your gender.');return;}
+  if(pwd.length<8){showAlert('regAlert','regAlertText','Password must be at least 8 characters.');return;}
+  if(pwd!==conf){showAlert('regAlert','regAlertText','Passwords do not match.');return;}
+  const btn=document.getElementById('regBtn');
+  btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Creating account…';btn.disabled=true;
+  try{
+    const cred=await createUserWithEmailAndPassword(auth,email,pwd);
+    await fetch(`${SUPABASE_URL}/rest/v1/users`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal'},
+      body:JSON.stringify({firebase_uid:cred.user.uid,full_name:first+' '+last,email:email,role:regRole,date_of_birth:dob,gender:gender,is_active:true})
+    });
+    document.getElementById('regAlert').className='alert success show';
+    document.getElementById('regAlertText').textContent='Account created! You can now sign in.';
+    btn.innerHTML='<i class="ti ti-check"></i> Account Created!';
+    setTimeout(()=>window.switchTab('login',document.querySelectorAll('.tab-btn')[0]),2000);
+  }catch(err){
+    let msg='Registration failed. Please try again.';
+    if(err.code==='auth/email-already-in-use') msg='This email is already registered.';
+    if(err.code==='auth/weak-password') msg='Password is too weak.';
+    showAlert('regAlert','regAlertText',msg);
+    btn.innerHTML='<i class="ti ti-user-plus"></i> Create Account';btn.disabled=false;
+  }
+};
+
+document.getElementById('loginEmail').addEventListener('keydown',e=>{if(e.key==='Enter')window.handleLogin();});
+document.getElementById('loginPwd').addEventListener('keydown',e=>{if(e.key==='Enter')window.handleLogin();});
 </script>
 </body>
 </html>
