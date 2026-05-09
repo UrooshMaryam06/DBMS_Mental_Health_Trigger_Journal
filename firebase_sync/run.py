@@ -1,0 +1,2 @@
+from sync import postgres_to_firebase
+postgres_to_firebase()
