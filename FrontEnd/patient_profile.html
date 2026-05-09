@@ -3,180 +3,368 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  var saved = localStorage.getItem('serenity_theme') || 'light';
+  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var isDark = saved === 'dark' || (saved === 'system' && prefersDark);
+  if(isDark){ document.documentElement.classList.add('dark'); }
+  else { document.documentElement.classList.remove('dark'); }
+})();
+</script>
 <title>Serenity — My Profile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --cream:#faf7f2;--warm-white:#fff9f5;--peach-soft:#fdeee6;
-    --peach:#f4a982;--peach-d:#e07d56;
-    --sage:#b7d4bc;--sage-soft:#e8f4ea;--sage-d:#5a9264;--sage-dd:#3d6b4a;
-    --lavender:#e8e2f7;--lavender-d:#9b8ecf;
-    --text-1:#2d2420;--text-2:#6b5c56;--text-3:#a89890;
-    --border:#ede7e0;--sidebar-bg:#2d4a38;
-  }
-  body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text-1);min-height:100vh}
-  .layout{display:flex;min-height:100vh}
+/* ─────────────────────────────────────
+   LIGHT TOKEN SET
+───────────────────────────────────── */
+:root {
+  --cream:      #faf7f2;
+  --warm-white: #fff9f5;
+  --peach-soft: #fdeee6;
+  --peach:      #f4a982;
+  --peach-d:    #e07d56;
+  --sage:       #b7d4bc;
+  --sage-soft:  #e8f4ea;
+  --sage-d:     #5a9264;
+  --sage-dd:    #3d6b4a;
+  --lavender:   #e8e2f7;
+  --lavender-d: #9b8ecf;
+  --text-1:     #2d2420;
+  --text-2:     #6b5c56;
+  --text-3:     #a89890;
+  --border:     #ede7e0;
+  --sidebar-bg: #2d4a38;
+  --card-bg:    var(--warm-white);
+  --input-bg:   var(--cream);
+  --shadow:     rgba(45,36,32,.07);
+}
 
-  /* SIDEBAR */
-  .sidebar{width:240px;background:var(--sidebar-bg);display:flex;flex-direction:column;padding:0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
-  .sb-brand{padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
-  .sb-logo-row{display:flex;align-items:center;gap:10px}
-  .sb-logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#f4a982,#f7c5a0);display:flex;align-items:center;justify-content:center}
-  .sb-logo i{font-size:17px;color:#2d4a38}
-  .sb-title{font-size:14px;font-weight:700;color:#fff}
-  .sb-sub{font-size:10px;color:rgba(255,255,255,.4)}
-  .sb-nav{padding:14px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
-  .nav-section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 8px 6px}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:600}
-  .nav-item:hover{background:rgba(244,169,130,.18);color:#f4a982}
-  .nav-item:hover i{color:#f4a982}
-  .nav-item.active{background:rgba(244,169,130,.18);color:#fdeee6}
-  .nav-item.active i{color:#f4a982}
-  .nav-item i{font-size:17px;color:rgba(255,255,255,.35);transition:color .15s}
-  .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
-  .sb-foot{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
-  .sb-user{display:flex;align-items:center;gap:10px}
-  .sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--peach),#f7c5a0);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2d4a38}
-  .sb-uname{font-size:13px;font-weight:700;color:#fff}
-  .sb-role{font-size:11px;color:rgba(255,255,255,.35)}
+/* DARK MODE */
 
-  /* MAIN */
-  .main{margin-left:240px;flex:1}
-  .topbar{background:var(--warm-white);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
-  .tb-title{font-size:16px;font-weight:700;color:var(--text-1)}
-  .tb-sub{font-size:12px;color:var(--text-2)}
-  .tb-right{display:flex;align-items:center;gap:10px}
-  .save-btn{background:linear-gradient(135deg,var(--peach),var(--peach-d));color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 3px 12px rgba(224,125,86,.25);transition:all .15s}
-  .save-btn:hover{box-shadow:0 5px 18px rgba(224,125,86,.35);transform:translateY(-1px)}
 
-  .content{padding:28px 32px;max-width:960px}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* PROFILE HERO */
-  .profile-hero{background:linear-gradient(160deg,var(--sidebar-bg),#1e3528);border-radius:18px;padding:28px 32px;display:flex;align-items:center;gap:24px;margin-bottom:24px;position:relative;overflow:hidden}
-  .profile-hero::before{content:'🌿';position:absolute;right:40px;top:10px;font-size:100px;opacity:.08;pointer-events:none}
-  .hero-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--peach),#f7c5a0);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#2d4a38;border:4px solid rgba(255,255,255,.2);flex-shrink:0;position:relative}
-  .avatar-edit{position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--peach-d);border:2px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
-  .avatar-edit i{font-size:11px;color:#fff}
-  .hero-info{flex:1}
-  .hero-name{font-family:'Lora',serif;font-size:24px;color:#fff;margin-bottom:4px}
-  .hero-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .hero-tag{display:flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.6)}
-  .hero-tag i{font-size:14px;color:var(--peach)}
-  .wellness-score{background:rgba(244,169,130,.15);border:1px solid rgba(244,169,130,.3);border-radius:12px;padding:10px 18px;text-align:center}
-  .ws-label{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-  .ws-val{font-size:28px;font-weight:700;color:var(--peach);line-height:1}
-  .ws-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+body { font-family: 'Quicksand', sans-serif; background: var(--cream); color: var(--text-1); min-height: 100vh; transition: background .35s, color .35s; }
+.layout { display: flex; min-height: 100vh; }
 
-  /* SECTION CARDS */
-  .section-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
-  .section-full{margin-bottom:18px}
-  .card{background:var(--warm-white);border-radius:14px;border:1px solid var(--border);overflow:hidden}
-  .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-  .card-title{font-size:14px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:7px}
-  .card-title i{font-size:16px;color:var(--peach-d)}
-  .card-edit{font-size:12px;color:var(--peach-d);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px}
-  .card-body{padding:20px}
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px; background: var(--sidebar-bg);
+  display: flex; flex-direction: column; flex-shrink: 0;
+  position: fixed; top: 0; left: 0; height: 100vh; z-index: 10;
+  transition: background .35s;
+}
+.sb-brand { padding: 22px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.sb-logo-row { display: flex; align-items: center; gap: 10px; }
+.sb-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg,#f4a982,#f7c5a0); display: flex; align-items: center; justify-content: center; }
+.sb-logo i { font-size: 17px; color: #2d4a38; }
+.sb-title { font-size: 14px; font-weight: 700; color: #fff; }
+.sb-sub { font-size: 10px; color: rgba(255,255,255,.4); }
+.sb-nav { padding: 14px 12px; flex: 1; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.nav-section { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.3); padding: 12px 8px 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; cursor: pointer; text-decoration: none; transition: background .15s; color: rgba(255,255,255,.6); font-size: 13px; font-weight: 600; }
+.nav-item:hover, .nav-item.active { background: rgba(244,169,130,.18); color: #fdeee6; }
+.nav-item:hover i, .nav-item.active i { color: #f4a982; }
+.nav-item i { font-size: 17px; color: rgba(255,255,255,.35); transition: color .15s; }
+.nav-badge { margin-left: auto; background: #be123c; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.sb-foot { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); }
+.sb-user { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#f4a982,#f7c5a0); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #2d4a38; }
+.sb-uname { font-size: 13px; font-weight: 700; color: #fff; }
+.sb-role { font-size: 11px; color: rgba(255,255,255,.35); }
 
-  /* FORM FIELDS */
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-  .field{margin-bottom:12px}
-  .field:last-child{margin-bottom:0}
-  .field label{display:block;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
-  .field input,.field select,.field textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-1);background:var(--cream);outline:none;transition:all .15s}
-  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--peach-d);box-shadow:0 0 0 3px rgba(224,125,86,.1);background:var(--warm-white)}
-  .field input[readonly]{background:var(--cream);color:var(--text-2);cursor:default}
-  .field textarea{resize:none;line-height:1.6}
+/* ── MAIN ── */
+.main { margin-left: 240px; flex: 1; }
+.topbar { background: var(--warm-white); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 5; transition: background .35s, border-color .35s; }
+.tb-title { font-size: 16px; font-weight: 700; color: var(--text-1); transition: color .35s; }
+.tb-sub { font-size: 12px; color: var(--text-2); transition: color .35s; }
+.tb-right { display: flex; align-items: center; gap: 10px; }
+.save-btn { background: linear-gradient(135deg, var(--peach), var(--peach-d)); color: #fff; border: none; border-radius: 10px; padding: 9px 20px; font-size: 13px; font-family: 'Quicksand', sans-serif; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 3px 12px rgba(224,125,86,.25); transition: all .15s; }
+.save-btn:hover { box-shadow: 0 5px 18px rgba(224,125,86,.35); transform: translateY(-1px); }
+.save-btn:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin .7s linear infinite; display: inline-block; }
 
-  /* ASSIGNED THERAPIST CARD */
-  .therapist-card{display:flex;align-items:center;gap:14px;background:var(--sage-soft);border:1px solid var(--sage);border-radius:12px;padding:14px 16px}
-  .t-avi{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--sage-d),#3d6b4a);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
-  .t-name{font-size:14px;font-weight:700;color:var(--text-1)}
-  .t-spec{font-size:12px;color:var(--text-2);margin-top:2px}
-  .t-actions{margin-left:auto;display:flex;gap:8px}
-  .t-btn{padding:7px 12px;border-radius:8px;font-size:12px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;text-decoration:none;border:none;transition:all .15s}
-  .t-btn-msg{background:var(--sage-d);color:#fff}
-  .t-btn-msg:hover{background:var(--sage-dd)}
-  .t-btn-view{background:transparent;color:var(--sage-dd);border:1.5px solid var(--sage-d)}
-  .t-btn-view:hover{background:var(--sage-soft)}
+.content { padding: 28px 32px; max-width: 960px; }
 
-  /* CONTACT CARDS */
-  .contact-card{background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
-  .contact-card:last-child{margin-bottom:0}
-  .cc-icon{width:36px;height:36px;border-radius:9px;background:var(--peach-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .cc-icon i{font-size:16px;color:var(--peach-d)}
-  .cc-name{font-size:13px;font-weight:700;color:var(--text-1)}
-  .cc-rel{font-size:11px;color:var(--text-3);margin-top:1px}
-  .cc-phone{font-size:12px;color:var(--text-2);margin-top:3px;display:flex;align-items:center;gap:4px}
-  .cc-phone i{font-size:13px;color:var(--text-3)}
-  .cc-actions{margin-left:auto;display:flex;gap:6px}
-  .cc-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--warm-white);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .15s}
-  .cc-btn:hover{border-color:var(--peach-d);color:var(--peach-d)}
-  .add-contact-btn{width:100%;padding:10px;border:1.5px dashed var(--border);border-radius:12px;background:transparent;font-family:'Quicksand',sans-serif;font-size:13px;font-weight:700;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;margin-top:10px}
-  .add-contact-btn:hover{border-color:var(--peach-d);color:var(--peach-d);background:var(--peach-soft)}
+/* ── PROFILE HERO ── */
+.profile-hero { background: linear-gradient(160deg, var(--sidebar-bg), #1e3528); border-radius: 18px; padding: 28px 32px; display: flex; align-items: center; gap: 24px; margin-bottom: 24px; position: relative; overflow: hidden; transition: background .35s; }
+.profile-hero::before { content: '🌿'; position: absolute; right: 40px; top: 10px; font-size: 100px; opacity: .08; pointer-events: none; }
+.hero-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg,#f4a982,#f7c5a0); display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: #2d4a38; border: 4px solid rgba(255,255,255,.2); flex-shrink: 0; position: relative; }
+.avatar-edit { position: absolute; bottom: 0; right: 0; width: 24px; height: 24px; border-radius: 50%; background: var(--peach-d); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.avatar-edit i { font-size: 11px; color: #fff; }
+.hero-info { flex: 1; }
+.hero-name { font-family: 'Lora', serif; font-size: 24px; color: #fff; margin-bottom: 4px; transition: all .3s; }
+.hero-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.hero-tag { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,.6); }
+.hero-tag i { font-size: 14px; color: var(--peach); }
+.wellness-score { background: rgba(244,169,130,.15); border: 1px solid rgba(244,169,130,.3); border-radius: 12px; padding: 10px 18px; text-align: center; flex-shrink: 0; }
+.ws-label { font-size: 10px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+.ws-val { font-size: 28px; font-weight: 700; color: var(--peach); line-height: 1; }
+.ws-sub { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 1px; }
 
-  /* COMMUNICATION PREFS */
-  .pref-list{display:flex;flex-direction:column;gap:12px}
-  .pref-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--cream);border:1px solid var(--border);border-radius:10px}
-  .pref-left{display:flex;align-items:center;gap:10px}
-  .pref-icon{width:32px;height:32px;border-radius:8px;background:var(--peach-soft);display:flex;align-items:center;justify-content:center}
-  .pref-icon i{font-size:15px;color:var(--peach-d)}
-  .pref-label{font-size:13px;font-weight:700;color:var(--text-1)}
-  .pref-sub{font-size:11px;color:var(--text-3)}
+/* ── SECTION CARDS ── */
+.section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.section-full { margin-bottom: 18px; }
+.card { background: var(--card-bg); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; transition: background .35s, border-color .35s; box-shadow: 0 2px 10px var(--shadow); }
+.card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; transition: border-color .35s; }
+.card-title { font-size: 14px; font-weight: 700; color: var(--text-1); display: flex; align-items: center; gap: 7px; transition: color .35s; }
+.card-title i { font-size: 16px; color: var(--peach-d); }
+.card-edit { font-size: 12px; color: var(--peach-d); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: color .15s; }
+.card-edit:hover { color: var(--peach); }
+.card-body { padding: 20px; }
 
-  /* TOGGLE */
-  .toggle{position:relative;width:42px;height:24px;flex-shrink:0}
-  .toggle input{opacity:0;width:0;height:0}
-  .toggle-track{position:absolute;inset:0;border-radius:24px;background:var(--border);cursor:pointer;transition:background .2s}
-  .toggle input:checked ~ .toggle-track{background:var(--peach-d)}
-  .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-  .toggle input:checked ~ .toggle-track .toggle-thumb{transform:translateX(18px)}
+/* ── FORM FIELDS ── */
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.field { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.field label { display: block; font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 6px; transition: color .35s; }
+.field input, .field select, .field textarea {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 10px 13px; font-size: 13px; font-family: 'Quicksand', sans-serif; font-weight: 600;
+  color: var(--text-1); background: var(--input-bg); outline: none; transition: all .15s, background .35s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--peach-d); box-shadow: 0 0 0 3px rgba(224,125,86,.1); background: var(--warm-white); }
+.field input[readonly] { background: var(--input-bg); color: var(--text-2); cursor: default; }
+.field textarea { resize: none; line-height: 1.6; }
 
-  /* TOAST */
-  .toast{position:fixed;bottom:24px;right:24px;background:var(--sidebar-bg);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
-  .toast.show{transform:translateY(0);opacity:1}
-  .toast i{font-size:16px;color:var(--peach)}
+/* ── THERAPIST CARD ── */
+.therapist-card { display: flex; align-items: center; gap: 14px; background: var(--sage-soft); border: 1px solid var(--sage); border-radius: 12px; padding: 14px 16px; transition: background .35s, border-color .35s; }
+.t-avi { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--sage-d), #3d6b4a); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.t-name { font-size: 14px; font-weight: 700; color: var(--text-1); transition: color .35s; }
+.t-spec { font-size: 12px; color: var(--text-2); margin-top: 2px; transition: color .35s; }
+.t-actions { margin-left: auto; display: flex; gap: 8px; }
+.t-btn { padding: 7px 12px; border-radius: 8px; font-size: 12px; font-family: 'Quicksand', sans-serif; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; text-decoration: none; border: none; transition: all .15s; }
+.t-btn-msg { background: var(--sage-d); color: #fff; }
+.t-btn-msg:hover { background: var(--sage-dd); }
+.t-btn-view { background: transparent; color: var(--sage-dd); border: 1.5px solid var(--sage-d); }
+.t-btn-view:hover { background: var(--sage-soft); }
+
+/* ── CONTACT CARDS ── */
+.contact-card { background: var(--input-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; transition: background .35s, border-color .35s; }
+.contact-card:last-child { margin-bottom: 0; }
+.cc-icon { width: 36px; height: 36px; border-radius: 9px; background: var(--peach-soft); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background .35s; }
+.cc-icon i { font-size: 16px; color: var(--peach-d); }
+.cc-name { font-size: 13px; font-weight: 700; color: var(--text-1); transition: color .35s; }
+.cc-rel { font-size: 11px; color: var(--text-3); margin-top: 1px; transition: color .35s; }
+.cc-phone { font-size: 12px; color: var(--text-2); margin-top: 3px; display: flex; align-items: center; gap: 4px; transition: color .35s; }
+.cc-phone i { font-size: 13px; color: var(--text-3); }
+.cc-actions { margin-left: auto; display: flex; gap: 6px; }
+.cc-btn { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: var(--card-bg); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-3); transition: all .15s; }
+.cc-btn:hover { border-color: var(--peach-d); color: var(--peach-d); }
+.add-contact-btn { width: 100%; padding: 10px; border: 1.5px dashed var(--border); border-radius: 12px; background: transparent; font-family: 'Quicksand', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-3); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all .15s; margin-top: 10px; }
+.add-contact-btn:hover { border-color: var(--peach-d); color: var(--peach-d); background: var(--peach-soft); }
+
+/* ── COMMUNICATION PREFS ── */
+.pref-list { display: flex; flex-direction: column; gap: 12px; }
+.pref-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 10px; transition: background .35s, border-color .35s; }
+.pref-left { display: flex; align-items: center; gap: 10px; }
+.pref-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--peach-soft); display: flex; align-items: center; justify-content: center; transition: background .35s; }
+.pref-icon i { font-size: 15px; color: var(--peach-d); }
+.pref-label { font-size: 13px; font-weight: 700; color: var(--text-1); transition: color .35s; }
+.pref-sub { font-size: 11px; color: var(--text-3); transition: color .35s; }
+
+/* ── TOGGLE ── */
+.toggle { position: relative; width: 42px; height: 24px; flex-shrink: 0; cursor: pointer; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track { position: absolute; inset: 0; border-radius: 24px; background: var(--border); cursor: pointer; transition: background .2s; }
+.toggle input:checked ~ .toggle-track { background: var(--peach-d); }
+.toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.toggle input:checked ~ .toggle-track .toggle-thumb { transform: translateX(18px); }
+
+/* ── UNSAVED PILL ── */
+.unsaved-pill { background: #fef3c7; color: #d97706; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: none; align-items: center; gap: 5px; }
+.unsaved-pill.visible { display: flex; }
+.unsaved-pulse { width: 6px; height: 6px; border-radius: 50%; background: #d97706; animation: pulse 1.4s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* ── TOAST ── */
+#toast-stack { position: fixed; bottom: 28px; right: 28px; z-index: 9999; display: flex; flex-direction: column-reverse; gap: 10px; pointer-events: none; }
+.toast { background: var(--sidebar-bg); color: #fff; padding: 13px 18px; border-radius: 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0,0,0,.22); transform: translateX(110px); opacity: 0; transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s; pointer-events: all; max-width: 320px; }
+.toast.show { transform: translateX(0); opacity: 1; }
+.toast .t-icon { color: var(--peach); font-size: 17px; flex-shrink: 0; }
+.toast .t-body { display: flex; flex-direction: column; gap: 1px; }
+.toast .t-title { font-size: 13px; font-weight: 700; }
+.toast .t-sub { font-size: 11px; color: rgba(255,255,255,.55); font-weight: 500; }
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (set from serenity_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body {
+  --cream:        #121212;
+  --warm-white:   #1e1e1e;
+  --peach-soft:   #2a1e18;
+  --peach:        #e08a62;
+  --peach-d:      #c96840;
+  --sage:         #3a5c44;
+  --sage-soft:    #1d2e22;
+  --sage-d:       #6daa7c;
+  --sage-dd:      #4d8a5e;
+  --lavender:     #1e1a2e;
+  --lavender-d:   #8b7ec0;
+  --rose:         #2e1a1a;
+  --rose-d:       #d47070;
+  --text-1:       #e5e0d8;
+  --text-2:       #9e918a;
+  --text-3:       #6b5e58;
+  --border:       #2e2825;
+  --sidebar-bg:   #1a2e20;
+  --danger:       #f87171;
+  --danger-l:     #2c1212;
+  --card-bg:      #242020;
+  --input-bg:     #1a1616;
+  --shadow:       rgba(0,0,0,.35);
+  /* for pages using --bg / --surface naming */
+  --bg:           #121212;
+  --surface:      #1e1e1e;
+  --accent-l:     rgba(45,106,79,.25);
+  --warn-l:       rgba(194,65,12,.18);
+  --blue-l:       rgba(29,78,216,.15);
+}
+html.dark body {
+  background: var(--cream, var(--bg));
+  color: var(--text-1);
+  transition: background .35s, color .35s;
+}
+html.dark .topbar  { background: var(--warm-white, var(--surface)); border-bottom-color: var(--border); }
+html.dark .main    { background: var(--cream, var(--bg)); }
+
+/* Cards / surfaces */
+html.dark .card, html.dark .entry-card, html.dark .appt-card,
+html.dark .msg-bubble-them, html.dark .resource-card,
+html.dark .stat-card, html.dark .metric-card, html.dark .mood-card,
+html.dark .section-card, html.dark .insight-card, html.dark .chart-card,
+html.dark .settings-section, html.dark .profile-section,
+html.dark .modal, html.dark .drawer,
+html.dark .mood-log-item, html.dark .trigger-item,
+html.dark .appt-item, html.dark .slot-btn,
+html.dark .resource-item, html.dark .filter-pill,
+html.dark .streak-card, html.dark .progress-card {
+  background: var(--warm-white, var(--surface));
+  border-color: var(--border);
+}
+
+/* Topbar / header surfaces */
+html.dark .card-header, html.dark .section-head,
+html.dark .table-head, html.dark .chat-header,
+html.dark .compose-area { background: var(--warm-white, var(--surface)); border-color: var(--border); }
+
+/* Table rows */
+html.dark thead th  { background: var(--cream, var(--bg)); color: var(--text-3); border-color: var(--border); }
+html.dark tbody tr  { border-color: var(--border); }
+html.dark tbody tr:hover { background: var(--peach-soft); }
+
+/* Inputs, selects, textareas */
+html.dark input, html.dark textarea, html.dark select,
+html.dark .search-box, html.dark .filter-select,
+html.dark .form-field, html.dark .compose-input {
+  background: var(--input-bg, var(--cream));
+  border-color: var(--border);
+  color: var(--text-1);
+}
+html.dark input::placeholder, html.dark textarea::placeholder { color: var(--text-3); }
+html.dark .search-box { background: var(--input-bg); border-color: var(--border); }
+html.dark .search-box input { background: transparent; color: var(--text-1); }
+
+/* Buttons */
+html.dark .icon-btn  { background: var(--input-bg); border-color: var(--border); color: var(--text-2); }
+html.dark .icon-btn:hover { background: var(--border); }
+
+/* Message bubbles */
+html.dark .msg-bubble-me   { background: var(--peach-soft); color: var(--text-1); }
+html.dark .msg-bubble-them { background: var(--warm-white); color: var(--text-1); }
+html.dark .conv-item:hover, html.dark .conv-item.active { background: var(--peach-soft); }
+
+/* Journal specific */
+html.dark .journal-card, html.dark .tag-chip,
+html.dark .mood-btn, html.dark .trigger-chip { background: var(--warm-white); border-color: var(--border); }
+html.dark .tag-chip.selected, html.dark .trigger-chip.selected { background: var(--sage-soft); }
+html.dark .writing-area { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+
+/* Analytics */
+html.dark .bar-track  { background: var(--border); }
+html.dark .chart-bg   { background: var(--warm-white); }
+
+/* Appointments */
+html.dark .calendar-grid .day       { background: var(--warm-white); border-color: var(--border); }
+html.dark .calendar-grid .day:hover { background: var(--peach-soft); }
+html.dark .calendar-grid .day.today { background: var(--peach-soft); border-color: var(--peach); }
+html.dark .time-slot  { background: var(--warm-white); border-color: var(--border); }
+html.dark .time-slot:hover { background: var(--peach-soft); }
+
+/* Resources */
+html.dark .resource-tag   { background: var(--sage-soft); color: var(--sage-d); }
+html.dark .category-pill  { background: var(--warm-white); border-color: var(--border); color: var(--text-2); }
+html.dark .category-pill.active { background: var(--peach-soft); border-color: var(--peach); color: var(--peach-d); }
+
+/* Settings-specific (already has body.dark but switching to html.dark) */
+html.dark .setting-row  { border-color: var(--border); }
+html.dark .setting-row:hover { background: var(--peach-soft); }
+html.dark .save-bar     { background: var(--warm-white); border-color: var(--border); }
+html.dark .theme-card   { background: var(--warm-white); border-color: var(--border); }
+html.dark .theme-card.selected { background: var(--peach-soft); border-color: var(--peach-d); }
+html.dark .toggle-slider { background: #3a3030; }
+html.dark .sys-select   { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+html.dark .section-divider { border-color: var(--border); color: var(--text-3); }
+
+/* Profile-specific */
+html.dark .profile-field input, html.dark .profile-field select { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+html.dark .info-row    { border-color: var(--border); }
+html.dark .log-item    { background: var(--warm-white); border-color: var(--border); }
+
+/* Dashboard */
+html.dark .quick-action { background: var(--warm-white); border-color: var(--border); }
+html.dark .quick-action:hover { background: var(--peach-soft); }
+html.dark .mood-ring    { background: var(--warm-white); }
+
+/* Modals */
+html.dark .modal-bg     { background: rgba(0,0,0,.65); }
+html.dark .modal        { background: var(--warm-white); border-color: var(--border); }
+
+/* Toasts */
+html.dark .toast { background: #2a2420; border-color: var(--border); color: var(--text-1); }
 </style>
 </head>
 <body>
 <div class="layout">
+
+  <!-- ════════════════ SIDEBAR ════════════════ -->
   <nav class="sidebar">
     <div class="sb-brand">
       <div class="sb-logo-row">
         <div class="sb-logo"><i class="ti ti-leaf"></i></div>
-        <div>
-          <div class="sb-title">Serenity</div>
-          <div class="sb-sub">Patient Portal</div>
-        </div>
+        <div><div class="sb-title">Serenity</div><div class="sb-sub">Patient Portal</div></div>
       </div>
     </div>
     <div class="sb-nav">
       <div class="nav-section">My Care</div>
       <a href="2_patient_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
-      <a href="3_journal_entry.html" class="nav-item"><i class="ti ti-notebook"></i>Journal</a>
-      <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
-      <a href="patient_analytics.html" class="nav-item"><i class="ti ti-chart-bar"></i>My Progress</a>
+      <a href="3_journal_entry.html"      class="nav-item"><i class="ti ti-notebook"></i>Journal</a>
+      <a href="5_appointments.html"       class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+      <a href="patient_analytics.html"    class="nav-item"><i class="ti ti-chart-bar"></i>My Progress</a>
       <div class="nav-section">Resources</div>
-      <a href="patient_resources.html" class="nav-item"><i class="ti ti-books"></i>Resources</a>
-      <a href="patient_messages.html" class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">2</span></a>
+      <a href="patient_resources.html"    class="nav-item"><i class="ti ti-books"></i>Resources</a>
+      <a href="patient_messages.html"     class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">2</span></a>
       <div class="nav-section">Account</div>
-      <a href="patient_profile.html" class="nav-item active"><i class="ti ti-user-circle"></i>My Profile</a>
-      <a href="patient_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+      <a href="patient_profile.html"      class="nav-item active"><i class="ti ti-user-circle"></i>My Profile</a>
+      <a href="patient_settings.html"     class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html"     class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
     </div>
     <div class="sb-foot">
-      <div class="sb-user">
-        <div class="sb-avatar">AJ</div>
+      <a href="patient_profile.html" class="sb-user">
+        <div class="sb-avatar" id="sbAvatarInitials">SA</div>
         <div>
-          <div class="sb-uname">Alex J.</div>
-          <div class="sb-role">Patient</div>
+          <div class="sb-uname" id="sbDisplayName">Sara Ahmed</div>
+          <div class="sb-role">Patient · Week 12</div>
         </div>
-      </div>
+      </a>
     </div>
   </nav>
 
+  <!-- ════════════════ MAIN ════════════════ -->
   <div class="main">
     <div class="topbar">
       <div>
@@ -184,23 +372,28 @@
         <div class="tb-sub">Manage your personal information and care preferences</div>
       </div>
       <div class="tb-right">
-        <button class="save-btn" onclick="saveProfile()"><i class="ti ti-device-floppy"></i> Save Changes</button>
+        <div class="unsaved-pill" id="unsavedPill"><span class="unsaved-pulse"></span>Unsaved changes</div>
+        <button class="save-btn" id="saveBtn" onclick="saveProfile()">
+          <i class="ti ti-device-floppy" id="saveBtnIcon"></i>
+          <span id="saveBtnText">Save Changes</span>
+        </button>
       </div>
     </div>
 
     <div class="content">
-      <!-- HERO -->
+
+      <!-- ── HERO ── -->
       <div class="profile-hero">
         <div class="hero-avatar">
-          AJ
+          <span id="heroInitials">SA</span>
           <div class="avatar-edit" title="Change photo"><i class="ti ti-pencil"></i></div>
         </div>
         <div class="hero-info">
-          <div class="hero-name">Alex Johnson</div>
+          <div class="hero-name" id="heroName">Sara Ahmed</div>
           <div class="hero-meta">
             <span class="hero-tag"><i class="ti ti-id-badge"></i> Patient #P-0042</span>
             <span class="hero-tag"><i class="ti ti-calendar"></i> Member since Jan 2024</span>
-            <span class="hero-tag"><i class="ti ti-map-pin"></i> Seattle, WA</span>
+            <span class="hero-tag"><i class="ti ti-map-pin"></i><span id="heroLocation">Seattle, WA</span></span>
           </div>
         </div>
         <div class="wellness-score">
@@ -210,7 +403,7 @@
         </div>
       </div>
 
-      <!-- PERSONAL INFO + ASSIGNED THERAPIST -->
+      <!-- ── PERSONAL INFO + ASSIGNED THERAPIST ── -->
       <div class="section-grid">
         <div class="card">
           <div class="card-header">
@@ -220,49 +413,59 @@
             <div class="field-row">
               <div class="field">
                 <label>First Name</label>
-                <input type="text" value="Alex"/>
+                <input type="text" id="firstName" value="Sara" oninput="markUnsaved()"/>
               </div>
               <div class="field">
                 <label>Last Name</label>
-                <input type="text" value="Johnson"/>
+                <input type="text" id="lastName" value="Ahmed" oninput="markUnsaved()"/>
               </div>
             </div>
             <div class="field">
               <label>Email Address</label>
-              <input type="email" value="alex.johnson@email.com"/>
+              <input type="email" id="email" value="sara.ahmed@email.com" oninput="markUnsaved()"/>
             </div>
             <div class="field-row">
               <div class="field">
                 <label>Phone</label>
-                <input type="tel" value="+1 (206) 555-0182"/>
+                <input type="tel" id="phone" value="+1 (206) 555-0182" oninput="markUnsaved()"/>
               </div>
               <div class="field">
                 <label>Date of Birth</label>
-                <input type="date" value="1994-07-15"/>
+                <input type="date" value="1994-07-15" onchange="markUnsaved()"/>
               </div>
             </div>
             <div class="field-row">
               <div class="field">
                 <label>Gender Identity</label>
-                <select>
+                <select onchange="markUnsaved()">
                   <option>Male</option>
-                  <option selected>Non-binary</option>
                   <option>Female</option>
+                  <option selected>Non-binary</option>
                   <option>Prefer not to say</option>
                 </select>
               </div>
               <div class="field">
                 <label>Timezone</label>
-                <select>
+                <select onchange="markUnsaved()">
                   <option selected>Pacific Time (PT)</option>
                   <option>Eastern Time (ET)</option>
                   <option>Central Time (CT)</option>
                 </select>
               </div>
             </div>
+            <div class="field-row">
+              <div class="field">
+                <label>City</label>
+                <input type="text" id="city" value="Seattle" oninput="markUnsaved()"/>
+              </div>
+              <div class="field">
+                <label>State / Region</label>
+                <input type="text" id="state" value="WA" oninput="markUnsaved()"/>
+              </div>
+            </div>
             <div class="field">
               <label>About Me (optional)</label>
-              <textarea rows="2" placeholder="Share a bit about yourself with your care team...">I'm navigating anxiety related to work transitions and seeking tools for daily mindfulness.</textarea>
+              <textarea id="bio" rows="3" oninput="markUnsaved()">I'm navigating anxiety related to work transitions and seeking tools for daily mindfulness.</textarea>
             </div>
           </div>
         </div>
@@ -285,27 +488,29 @@
                   <a href="#" class="t-btn t-btn-view"><i class="ti ti-eye"></i></a>
                 </div>
               </div>
-              <div style="margin-top:12px;font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:5px"><i class="ti ti-calendar"></i> Next session: Fri May 10 · 3:00 PM</div>
+              <div style="margin-top:12px;font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:5px">
+                <i class="ti ti-calendar"></i> Next session: Fri May 10 · 3:00 PM
+              </div>
             </div>
           </div>
 
           <div class="card">
             <div class="card-header">
-              <div class="card-title"><i class="ti ti-certificate"></i> Insurance & Billing</div>
+              <div class="card-title"><i class="ti ti-certificate"></i> Insurance &amp; Billing</div>
             </div>
             <div class="card-body">
               <div class="field">
                 <label>Insurance Provider</label>
-                <input type="text" value="BlueCross BlueShield"/>
+                <input type="text" value="BlueCross BlueShield" oninput="markUnsaved()"/>
               </div>
               <div class="field-row">
                 <div class="field">
                   <label>Member ID</label>
-                  <input type="text" value="BCBS-4421-08X"/>
+                  <input type="text" value="BCBS-4421-08X" oninput="markUnsaved()"/>
                 </div>
                 <div class="field">
                   <label>Group Number</label>
-                  <input type="text" value="G-00942"/>
+                  <input type="text" value="G-00942" oninput="markUnsaved()"/>
                 </div>
               </div>
             </div>
@@ -313,10 +518,13 @@
         </div>
       </div>
 
-      <!-- EMERGENCY CONTACTS -->
+      <!-- ── EMERGENCY CONTACTS ── -->
       <div class="card section-full">
         <div class="card-header">
-          <div class="card-title"><i class="ti ti-urgent"></i> Emergency Contacts <span style="font-size:11px;background:#fee2e2;color:#dc2626;padding:2px 9px;border-radius:20px;font-weight:700">Critical for Crisis</span></div>
+          <div class="card-title">
+            <i class="ti ti-urgent"></i> Emergency Contacts
+            <span style="font-size:11px;background:#fee2e2;color:#dc2626;padding:2px 9px;border-radius:20px;font-weight:700">Critical for Crisis</span>
+          </div>
           <div class="card-edit" onclick="editContacts()"><i class="ti ti-pencil"></i> Edit</div>
         </div>
         <div class="card-body">
@@ -329,7 +537,7 @@
             </div>
             <div class="cc-actions">
               <button class="cc-btn" title="Call"><i class="ti ti-phone"></i></button>
-              <button class="cc-btn" title="Edit"><i class="ti ti-pencil"></i></button>
+              <button class="cc-btn" title="Edit" onclick="showToast('Edit contact','Contact editor coming soon','ti-pencil')"><i class="ti ti-pencil"></i></button>
               <button class="cc-btn" title="Remove" style="color:#dc2626;border-color:#fca5a5"><i class="ti ti-trash"></i></button>
             </div>
           </div>
@@ -342,16 +550,19 @@
             </div>
             <div class="cc-actions">
               <button class="cc-btn" title="Call"><i class="ti ti-phone"></i></button>
-              <button class="cc-btn" title="Edit"><i class="ti ti-pencil"></i></button>
+              <button class="cc-btn" title="Edit" onclick="showToast('Edit contact','Contact editor coming soon','ti-pencil')"><i class="ti ti-pencil"></i></button>
               <button class="cc-btn" title="Remove" style="color:#dc2626;border-color:#fca5a5"><i class="ti ti-trash"></i></button>
             </div>
           </div>
           <button class="add-contact-btn" onclick="addContact()"><i class="ti ti-plus"></i> Add Emergency Contact</button>
-          <p style="font-size:11px;color:var(--text-3);margin-top:10px;padding:8px 12px;background:var(--peach-soft);border-radius:8px;line-height:1.6"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:middle;color:var(--peach-d)"></i> Your emergency contacts will only be reached during a crisis situation as determined by your care team.</p>
+          <p style="font-size:11px;color:var(--text-3);margin-top:10px;padding:8px 12px;background:var(--peach-soft);border-radius:8px;line-height:1.6;transition:background .35s,color .35s">
+            <i class="ti ti-info-circle" style="font-size:13px;vertical-align:middle;color:var(--peach-d)"></i>
+            Your emergency contacts will only be reached during a crisis situation as determined by your care team.
+          </p>
         </div>
       </div>
 
-      <!-- COMMUNICATION PREFERENCES -->
+      <!-- ── COMMUNICATION PREFERENCES ── -->
       <div class="card section-full">
         <div class="card-header">
           <div class="card-title"><i class="ti ti-bell"></i> Communication Preferences</div>
@@ -366,7 +577,10 @@
                   <div class="pref-sub">Session reminders, care updates</div>
                 </div>
               </div>
-              <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+              <label class="toggle">
+                <input type="checkbox" checked onchange="markUnsaved()"/>
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+              </label>
             </div>
             <div class="pref-item">
               <div class="pref-left">
@@ -376,7 +590,10 @@
                   <div class="pref-sub">Text reminders 1 hour before sessions</div>
                 </div>
               </div>
-              <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+              <label class="toggle">
+                <input type="checkbox" checked onchange="markUnsaved()"/>
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+              </label>
             </div>
             <div class="pref-item">
               <div class="pref-left">
@@ -386,17 +603,23 @@
                   <div class="pref-sub">Morning wellness nudge at 8:00 AM</div>
                 </div>
               </div>
-              <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+              <label class="toggle">
+                <input type="checkbox" checked onchange="markUnsaved()"/>
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+              </label>
             </div>
             <div class="pref-item">
               <div class="pref-left">
-                <div class="pref-icon"><i class="ti ti-journal"></i></div>
+                <div class="pref-icon"><i class="ti ti-notebook"></i></div>
                 <div>
                   <div class="pref-label">Journal Reminders</div>
                   <div class="pref-sub">Nightly prompt to log your day</div>
                 </div>
               </div>
-              <label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+              <label class="toggle">
+                <input type="checkbox" onchange="markUnsaved()"/>
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+              </label>
             </div>
             <div class="pref-item">
               <div class="pref-left">
@@ -406,29 +629,131 @@
                   <div class="pref-sub">Therapist can read your submitted entries</div>
                 </div>
               </div>
-              <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+              <label class="toggle">
+                <input type="checkbox" checked onchange="markUnsaved()"/>
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+              </label>
             </div>
           </div>
         </div>
       </div>
 
+      <div style="height:40px"></div>
     </div><!-- /content -->
   </div><!-- /main -->
 </div><!-- /layout -->
 
-<div class="toast" id="toast">
-  <i class="ti ti-circle-check"></i>
-  <span>Profile saved successfully!</span>
-</div>
+<!-- TOAST STACK -->
+<div id="toast-stack"></div>
 
 <script>
-  function saveProfile() {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
+// ═══════════════════════════════════════
+//  DARK MODE — restore from localStorage
+// ═══════════════════════════════════════
+const THEME_KEY = 'serenity_theme';
+(function restoreTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'light';
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved === 'dark' || (saved === 'system' && prefersDark);
+  document.documentElement.classList.toggle('dark', isDark);
+})();
+
+// ═══════════════════════════════════════
+//  UNSAVED CHANGES TRACKER
+// ═══════════════════════════════════════
+let _unsaved = false;
+function markUnsaved() {
+  if (!_unsaved) {
+    _unsaved = true;
+    document.getElementById('unsavedPill').classList.add('visible');
   }
-  function editContacts() { alert('Edit emergency contacts dialog would open here.'); }
-  function addContact() { alert('Add new emergency contact dialog would open here.'); }
+}
+
+// ═══════════════════════════════════════
+//  SAVE PROFILE — DOM update + spinner
+// ═══════════════════════════════════════
+function saveProfile() {
+  const btn     = document.getElementById('saveBtn');
+  const icon    = document.getElementById('saveBtnIcon');
+  const text    = document.getElementById('saveBtnText');
+
+  // 1 — Spinner state
+  btn.disabled = true;
+  icon.className = 'ti ti-loader-2 spin';
+  text.textContent = 'Saving…';
+
+  // 2 — Simulate 600ms server write
+  setTimeout(() => {
+    // 3 — Read current form values
+    const first    = document.getElementById('firstName').value.trim();
+    const last     = document.getElementById('lastName').value.trim();
+    const city     = document.getElementById('city').value.trim();
+    const state    = document.getElementById('state').value.trim();
+    const fullName = [first, last].filter(Boolean).join(' ') || 'Patient';
+    const initials = [first[0], last[0]].filter(Boolean).join('').toUpperCase() || 'P';
+    const location = [city, state].filter(Boolean).join(', ') || '';
+
+    // 4 — Update DOM
+    document.getElementById('heroName').textContent     = fullName;
+    document.getElementById('heroInitials').textContent = initials;
+    document.getElementById('heroLocation').textContent = location;
+    document.getElementById('sbDisplayName').textContent = fullName;
+    document.getElementById('sbAvatarInitials').textContent = initials;
+
+    // 5 — Restore button
+    btn.disabled = false;
+    icon.className = 'ti ti-circle-check';
+    text.textContent = 'Saved!';
+    setTimeout(() => {
+      icon.className = 'ti ti-device-floppy';
+      text.textContent = 'Save Changes';
+    }, 2200);
+
+    // 6 — Hide unsaved pill
+    _unsaved = false;
+    document.getElementById('unsavedPill').classList.remove('visible');
+
+    // 7 — Success toast
+    showToast('Profile changes saved!', `Welcome, ${first} 🌿 Your profile is up to date.`, 'ti-circle-check');
+  }, 600);
+}
+
+// ═══════════════════════════════════════
+//  CONTACT HELPERS
+// ═══════════════════════════════════════
+function editContacts() {
+  showToast('Edit contacts', 'Contact editor would open in a modal here.', 'ti-pencil');
+}
+function addContact() {
+  showToast('Add contact', 'New emergency contact dialog coming soon.', 'ti-user-plus');
+}
+
+// ═══════════════════════════════════════
+//  TOAST ENGINE
+// ═══════════════════════════════════════
+function showToast(title, sub, icon = 'ti-circle-check') {
+  const stack = document.getElementById('toast-stack');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `
+    <i class="ti ${icon} t-icon"></i>
+    <div class="t-body">
+      <div class="t-title">${title}</div>
+      ${sub ? `<div class="t-sub">${sub}</div>` : ''}
+    </div>
+  `;
+  stack.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 400);
+  }, 4000);
+}
+
+// Warn if navigating away with unsaved changes
+window.addEventListener('beforeunload', e => {
+  if (_unsaved) { e.preventDefault(); e.returnValue = ''; }
+});
 </script>
 </body>
 </html>

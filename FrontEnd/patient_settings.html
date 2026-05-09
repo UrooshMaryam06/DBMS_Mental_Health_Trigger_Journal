@@ -3,113 +3,375 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  var saved = localStorage.getItem('serenity_theme') || 'light';
+  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var isDark = saved === 'dark' || (saved === 'system' && prefersDark);
+  if(isDark){ document.documentElement.classList.add('dark'); }
+  else { document.documentElement.classList.remove('dark'); }
+})();
+</script>
 <title>Serenity — Settings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --cream:#faf7f2;--warm-white:#fff9f5;--peach-soft:#fdeee6;
-    --peach:#f4a982;--peach-d:#e07d56;
-    --sage:#b7d4bc;--sage-soft:#e8f4ea;--sage-d:#5a9264;
-    --text-1:#2d2420;--text-2:#6b5c56;--text-3:#a89890;
-    --border:#ede7e0;--sidebar-bg:#2d4a38;
-    --danger:#dc2626;--danger-l:#fef2f2;
-  }
-  body{font-family:'Quicksand',sans-serif;background:var(--cream);color:var(--text-1)}
-  .layout{display:flex;min-height:100vh}
-  .sidebar{width:240px;background:var(--sidebar-bg);display:flex;flex-direction:column;padding:0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
-  .sb-brand{padding:22px 20px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
-  .sb-logo-row{display:flex;align-items:center;gap:10px}
-  .sb-logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#f4a982,#f7c5a0);display:flex;align-items:center;justify-content:center}
-  .sb-logo i{font-size:17px;color:#2d4a38}
-  .sb-title{font-size:14px;font-weight:700;color:#fff}
-  .sb-sub{font-size:10px;color:rgba(255,255,255,.4)}
-  .sb-nav{padding:14px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
-  .nav-section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 8px 6px}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.6);font-size:13px;font-weight:600}
-  .nav-item:hover,.nav-item.active{background:rgba(244,169,130,.18);color:#fdeee6}
-  .nav-item:hover i,.nav-item.active i{color:#f4a982}
-  .nav-item i{font-size:17px;color:rgba(255,255,255,.35)}
-  .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
-  .sb-foot{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
-  .sb-user{display:flex;align-items:center;gap:10px}
-  .sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--peach),#f7c5a0);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#2d4a38}
-  .sb-uname{font-size:13px;font-weight:700;color:#fff}
-  .sb-role{font-size:11px;color:rgba(255,255,255,.35)}
+/* ─────────────────────────────────────────────────────────────
+   LIGHT (Serenity) token set — applied to :root by default
+───────────────────────────────────────────────────────────── */
+:root {
+  --cream:        #faf7f2;
+  --warm-white:   #fff9f5;
+  --peach-soft:   #fdeee6;
+  --peach:        #f4a982;
+  --peach-d:      #e07d56;
+  --sage:         #b7d4bc;
+  --sage-soft:    #e8f4ea;
+  --sage-d:       #5a9264;
+  --text-1:       #2d2420;
+  --text-2:       #6b5c56;
+  --text-3:       #a89890;
+  --border:       #ede7e0;
+  --sidebar-bg:   #2d4a38;
+  --danger:       #dc2626;
+  --danger-l:     #fef2f2;
+  --card-bg:      var(--warm-white);
+  --input-bg:     var(--cream);
+  --shadow:       rgba(45,36,32,.07);
+}
 
-  .main{margin-left:240px;flex:1}
-  .topbar{background:var(--warm-white);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
-  .tb-title{font-size:16px;font-weight:700;color:var(--text-1)}
-  .tb-sub{font-size:12px;color:var(--text-2)}
-  .save-btn{background:linear-gradient(135deg,var(--peach),var(--peach-d));color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 3px 12px rgba(224,125,86,.25);transition:all .15s}
-  .save-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(224,125,86,.35)}
 
-  .content{padding:28px 32px;max-width:720px}
 
-  .settings-section{margin-bottom:24px}
-  .section-label{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding:0 4px}
-  .card{background:var(--warm-white);border-radius:14px;border:1px solid var(--border);overflow:hidden}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .setting-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
-  .setting-item:last-child{border-bottom:none}
-  .si-left{display:flex;align-items:center;gap:12px}
-  .si-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .si-icon i{font-size:17px}
-  .si-title{font-size:14px;font-weight:700;color:var(--text-1)}
-  .si-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: var(--cream);
+  color: var(--text-1);
+  transition: background .35s, color .35s;
+}
+.layout { display: flex; min-height: 100vh; }
 
-  /* TOGGLE */
-  .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
-  .toggle input{opacity:0;width:0;height:0}
-  .toggle-track{position:absolute;inset:0;border-radius:24px;background:var(--border);cursor:pointer;transition:background .2s}
-  .toggle input:checked~.toggle-track{background:var(--peach-d)}
-  .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-  .toggle input:checked~.toggle-track .toggle-thumb{transform:translateX(20px)}
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 240px; background: var(--sidebar-bg);
+  display: flex; flex-direction: column;
+  flex-shrink: 0; position: fixed;
+  top: 0; left: 0; height: 100vh; z-index: 10;
+  transition: background .35s;
+}
+.sb-brand { padding: 22px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.sb-logo-row { display: flex; align-items: center; gap: 10px; }
+.sb-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg,#f4a982,#f7c5a0); display: flex; align-items: center; justify-content: center; }
+.sb-logo i { font-size: 17px; color: #2d4a38; }
+.sb-title { font-size: 14px; font-weight: 700; color: #fff; }
+.sb-sub { font-size: 10px; color: rgba(255,255,255,.4); }
+.sb-nav { padding: 14px 12px; flex: 1; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.nav-section { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.3); padding: 12px 8px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px;
+  cursor: pointer; text-decoration: none;
+  transition: background .15s; color: rgba(255,255,255,.6);
+  font-size: 13px; font-weight: 600;
+}
+.nav-item:hover, .nav-item.active { background: rgba(244,169,130,.18); color: #fdeee6; }
+.nav-item:hover i, .nav-item.active i { color: #f4a982; }
+.nav-item i { font-size: 17px; color: rgba(255,255,255,.35); transition: color .15s; }
+.nav-badge { margin-left: auto; background: #be123c; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+.sb-foot { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); }
+.sb-user { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#f4a982,#f7c5a0); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #2d4a38; }
+.sb-uname { font-size: 13px; font-weight: 700; color: #fff; }
+.sb-role { font-size: 11px; color: rgba(255,255,255,.35); }
 
-  /* THEME SELECTOR */
-  .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px 20px}
-  .theme-card{border:2px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;text-align:center}
-  .theme-card.selected{border-color:var(--peach-d);background:var(--peach-soft)}
-  .theme-preview{width:100%;height:44px;border-radius:8px;margin-bottom:8px}
-  .theme-name{font-size:12px;font-weight:700;color:var(--text-2)}
-  .theme-card.selected .theme-name{color:var(--peach-d)}
+/* ── MAIN ── */
+.main { margin-left: 240px; flex: 1; }
+.topbar {
+  background: var(--warm-white); border-bottom: 1px solid var(--border);
+  padding: 14px 28px; display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 5;
+  transition: background .35s, border-color .35s;
+}
+.tb-title { font-size: 16px; font-weight: 700; color: var(--text-1); transition: color .35s; }
+.tb-sub { font-size: 12px; color: var(--text-2); transition: color .35s; }
+.save-btn {
+  background: linear-gradient(135deg, var(--peach), var(--peach-d));
+  color: #fff; border: none; border-radius: 10px; padding: 9px 20px;
+  font-size: 13px; font-family: 'Quicksand', sans-serif; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 7px;
+  box-shadow: 0 3px 12px rgba(224,125,86,.25); transition: all .15s;
+}
+.save-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(224,125,86,.35); }
 
-  /* SELECT DROPDOWN */
-  .si-select{border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-1);background:var(--cream);outline:none;cursor:pointer;transition:border-color .15s}
-  .si-select:focus{border-color:var(--peach-d)}
+.content { padding: 28px 32px; max-width: 720px; }
 
-  /* EXPORT BUTTONS */
-  .export-btns{display:flex;gap:8px;flex-wrap:wrap;padding:16px 20px}
-  .export-btn{padding:9px 16px;border-radius:10px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;border:none}
-  .export-pdf{background:var(--peach-soft);color:var(--peach-d);border:1.5px solid var(--peach)}
-  .export-pdf:hover{background:var(--peach);color:#fff}
-  .export-csv{background:var(--sage-soft);color:var(--sage-d);border:1.5px solid var(--sage)}
-  .export-csv:hover{background:var(--sage);color:#fff}
-  .export-json{background:#f0f9ff;color:#0369a1;border:1.5px solid #bae6fd}
-  .export-json:hover{background:#bae6fd}
-  .export-sub{font-size:11px;color:var(--text-3);padding:0 20px 14px;line-height:1.5}
+/* ── SETTINGS SECTIONS ── */
+.settings-section { margin-bottom: 24px; }
+.section-label {
+  font-size: 11px; font-weight: 700; color: var(--text-3);
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 10px; padding: 0 4px;
+  transition: color .35s;
+}
+.card {
+  background: var(--card-bg); border-radius: 14px;
+  border: 1px solid var(--border); overflow: hidden;
+  transition: background .35s, border-color .35s;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+.setting-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  transition: background .15s, border-color .35s;
+}
+.setting-item:last-child { border-bottom: none; }
+.setting-item:hover { background: rgba(244,169,130,.04); }
+.si-left { display: flex; align-items: center; gap: 12px; }
+.si-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-icon i { font-size: 17px; }
+.si-title { font-size: 14px; font-weight: 700; color: var(--text-1); transition: color .35s; }
+.si-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; transition: color .35s; }
 
-  /* DANGER ZONE */
-  .danger-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
-  .danger-item:last-child{border-bottom:none}
-  .di-info{}
-  .di-title{font-size:14px;font-weight:700;color:var(--text-1)}
-  .di-sub{font-size:12px;color:var(--text-3);margin-top:2px}
-  .danger-btn{padding:8px 16px;border-radius:9px;font-size:12px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer;border:none;transition:all .15s}
-  .btn-warn{background:var(--danger-l);color:var(--danger);border:1.5px solid #fca5a5}
-  .btn-warn:hover{background:#fee2e2}
-  .btn-neutral{background:var(--cream);color:var(--text-2);border:1.5px solid var(--border)}
-  .btn-neutral:hover{border-color:var(--peach-d);color:var(--peach-d)}
+/* ── TOGGLE ── */
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; cursor: pointer; }
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute; inset: 0; border-radius: 24px;
+  background: var(--border); cursor: pointer;
+  transition: background .2s;
+}
+.toggle input:checked ~ .toggle-track { background: var(--peach-d); }
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; pointer-events: none;
+  transition: transform .2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.toggle input:checked ~ .toggle-track .toggle-thumb { transform: translateX(20px); }
 
-  .toast{position:fixed;bottom:24px;right:24px;background:var(--sidebar-bg);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
-  .toast.show{transform:translateY(0);opacity:1}
-  .toast i{color:var(--peach)}
+/* ── THEME GRID ── */
+.theme-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; padding: 16px 20px; }
+.theme-card {
+  border: 2px solid var(--border); border-radius: 12px; padding: 12px;
+  cursor: pointer; transition: all .2s; text-align: center;
+  background: var(--input-bg);
+}
+.theme-card:hover { border-color: var(--peach); }
+.theme-card.selected { border-color: var(--peach-d); background: var(--peach-soft); }
+.theme-preview { width: 100%; height: 44px; border-radius: 8px; margin-bottom: 8px; }
+.theme-name { font-size: 12px; font-weight: 700; color: var(--text-2); transition: color .2s; }
+.theme-card.selected .theme-name { color: var(--peach-d); }
+
+/* ── SELECT ── */
+.si-select {
+  border: 1.5px solid var(--border); border-radius: 9px;
+  padding: 7px 12px; font-size: 13px; font-family: 'Quicksand', sans-serif;
+  font-weight: 600; color: var(--text-1); background: var(--input-bg);
+  outline: none; cursor: pointer; transition: border-color .15s, background .35s, color .35s;
+}
+.si-select:focus { border-color: var(--peach-d); }
+
+/* ── EXPORT BUTTONS ── */
+.export-btns { display: flex; gap: 8px; flex-wrap: wrap; padding: 16px 20px; }
+.export-btn {
+  padding: 9px 16px; border-radius: 10px; font-size: 13px;
+  font-family: 'Quicksand', sans-serif; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  transition: all .15s; border: none;
+}
+.export-pdf { background: var(--peach-soft); color: var(--peach-d); border: 1.5px solid var(--peach); }
+.export-pdf:hover { background: var(--peach); color: #fff; }
+.export-csv { background: var(--sage-soft); color: var(--sage-d); border: 1.5px solid var(--sage); }
+.export-csv:hover { background: var(--sage); color: #fff; }
+.export-json { background: #f0f9ff; color: #0369a1; border: 1.5px solid #bae6fd; }
+.export-json:hover { background: #bae6fd; }
+.export-sub { font-size: 11px; color: var(--text-3); padding: 0 20px 14px; line-height: 1.5; transition: color .35s; }
+
+/* ── DANGER ZONE ── */
+.danger-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  transition: border-color .35s;
+}
+.danger-item:last-child { border-bottom: none; }
+.di-title { font-size: 14px; font-weight: 700; color: var(--text-1); transition: color .35s; }
+.di-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; transition: color .35s; }
+.danger-btn {
+  padding: 8px 16px; border-radius: 9px; font-size: 12px;
+  font-family: 'Quicksand', sans-serif; font-weight: 700;
+  cursor: pointer; border: none; transition: all .15s;
+}
+.btn-warn { background: var(--danger-l); color: var(--danger); border: 1.5px solid #fca5a5; }
+.btn-warn:hover { background: #fee2e2; }
+.btn-neutral { background: var(--input-bg); color: var(--text-2); border: 1.5px solid var(--border); transition: all .15s, background .35s; }
+.btn-neutral:hover { border-color: var(--peach-d); color: var(--peach-d); }
+
+/* ── TOAST ── */
+#toast-stack {
+  position: fixed; bottom: 28px; right: 28px;
+  z-index: 9999; display: flex; flex-direction: column-reverse; gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--sidebar-bg); color: #fff;
+  padding: 13px 18px; border-radius: 14px; font-size: 13px; font-weight: 700;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.22);
+  transform: translateX(110px); opacity: 0;
+  transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s;
+  pointer-events: all; max-width: 320px;
+}
+.toast.show { transform: translateX(0); opacity: 1; }
+.toast .t-icon { color: var(--peach); font-size: 17px; flex-shrink: 0; }
+.toast .t-body { display: flex; flex-direction: column; gap: 1px; }
+.toast .t-title { font-size: 13px; font-weight: 700; }
+.toast .t-sub { font-size: 11px; color: rgba(255,255,255,.55); font-weight: 500; }
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (set from serenity_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body {
+  --cream:        #121212;
+  --warm-white:   #1e1e1e;
+  --peach-soft:   #2a1e18;
+  --peach:        #e08a62;
+  --peach-d:      #c96840;
+  --sage:         #3a5c44;
+  --sage-soft:    #1d2e22;
+  --sage-d:       #6daa7c;
+  --sage-dd:      #4d8a5e;
+  --lavender:     #1e1a2e;
+  --lavender-d:   #8b7ec0;
+  --rose:         #2e1a1a;
+  --rose-d:       #d47070;
+  --text-1:       #e5e0d8;
+  --text-2:       #9e918a;
+  --text-3:       #6b5e58;
+  --border:       #2e2825;
+  --sidebar-bg:   #1a2e20;
+  --danger:       #f87171;
+  --danger-l:     #2c1212;
+  --card-bg:      #242020;
+  --input-bg:     #1a1616;
+  --shadow:       rgba(0,0,0,.35);
+  /* for pages using --bg / --surface naming */
+  --bg:           #121212;
+  --surface:      #1e1e1e;
+  --accent-l:     rgba(45,106,79,.25);
+  --warn-l:       rgba(194,65,12,.18);
+  --blue-l:       rgba(29,78,216,.15);
+}
+html.dark body {
+  background: var(--cream, var(--bg));
+  color: var(--text-1);
+  transition: background .35s, color .35s;
+}
+html.dark .topbar  { background: var(--warm-white, var(--surface)); border-bottom-color: var(--border); }
+html.dark .main    { background: var(--cream, var(--bg)); }
+
+/* Cards / surfaces */
+html.dark .card, html.dark .entry-card, html.dark .appt-card,
+html.dark .msg-bubble-them, html.dark .resource-card,
+html.dark .stat-card, html.dark .metric-card, html.dark .mood-card,
+html.dark .section-card, html.dark .insight-card, html.dark .chart-card,
+html.dark .settings-section, html.dark .profile-section,
+html.dark .modal, html.dark .drawer,
+html.dark .mood-log-item, html.dark .trigger-item,
+html.dark .appt-item, html.dark .slot-btn,
+html.dark .resource-item, html.dark .filter-pill,
+html.dark .streak-card, html.dark .progress-card {
+  background: var(--warm-white, var(--surface));
+  border-color: var(--border);
+}
+
+/* Topbar / header surfaces */
+html.dark .card-header, html.dark .section-head,
+html.dark .table-head, html.dark .chat-header,
+html.dark .compose-area { background: var(--warm-white, var(--surface)); border-color: var(--border); }
+
+/* Table rows */
+html.dark thead th  { background: var(--cream, var(--bg)); color: var(--text-3); border-color: var(--border); }
+html.dark tbody tr  { border-color: var(--border); }
+html.dark tbody tr:hover { background: var(--peach-soft); }
+
+/* Inputs, selects, textareas */
+html.dark input, html.dark textarea, html.dark select,
+html.dark .search-box, html.dark .filter-select,
+html.dark .form-field, html.dark .compose-input {
+  background: var(--input-bg, var(--cream));
+  border-color: var(--border);
+  color: var(--text-1);
+}
+html.dark input::placeholder, html.dark textarea::placeholder { color: var(--text-3); }
+html.dark .search-box { background: var(--input-bg); border-color: var(--border); }
+html.dark .search-box input { background: transparent; color: var(--text-1); }
+
+/* Buttons */
+html.dark .icon-btn  { background: var(--input-bg); border-color: var(--border); color: var(--text-2); }
+html.dark .icon-btn:hover { background: var(--border); }
+
+/* Message bubbles */
+html.dark .msg-bubble-me   { background: var(--peach-soft); color: var(--text-1); }
+html.dark .msg-bubble-them { background: var(--warm-white); color: var(--text-1); }
+html.dark .conv-item:hover, html.dark .conv-item.active { background: var(--peach-soft); }
+
+/* Journal specific */
+html.dark .journal-card, html.dark .tag-chip,
+html.dark .mood-btn, html.dark .trigger-chip { background: var(--warm-white); border-color: var(--border); }
+html.dark .tag-chip.selected, html.dark .trigger-chip.selected { background: var(--sage-soft); }
+html.dark .writing-area { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+
+/* Analytics */
+html.dark .bar-track  { background: var(--border); }
+html.dark .chart-bg   { background: var(--warm-white); }
+
+/* Appointments */
+html.dark .calendar-grid .day       { background: var(--warm-white); border-color: var(--border); }
+html.dark .calendar-grid .day:hover { background: var(--peach-soft); }
+html.dark .calendar-grid .day.today { background: var(--peach-soft); border-color: var(--peach); }
+html.dark .time-slot  { background: var(--warm-white); border-color: var(--border); }
+html.dark .time-slot:hover { background: var(--peach-soft); }
+
+/* Resources */
+html.dark .resource-tag   { background: var(--sage-soft); color: var(--sage-d); }
+html.dark .category-pill  { background: var(--warm-white); border-color: var(--border); color: var(--text-2); }
+html.dark .category-pill.active { background: var(--peach-soft); border-color: var(--peach); color: var(--peach-d); }
+
+/* Settings-specific (already has body.dark but switching to html.dark) */
+html.dark .setting-row  { border-color: var(--border); }
+html.dark .setting-row:hover { background: var(--peach-soft); }
+html.dark .save-bar     { background: var(--warm-white); border-color: var(--border); }
+html.dark .theme-card   { background: var(--warm-white); border-color: var(--border); }
+html.dark .theme-card.selected { background: var(--peach-soft); border-color: var(--peach-d); }
+html.dark .toggle-slider { background: #3a3030; }
+html.dark .sys-select   { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+html.dark .section-divider { border-color: var(--border); color: var(--text-3); }
+
+/* Profile-specific */
+html.dark .profile-field input, html.dark .profile-field select { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+html.dark .info-row    { border-color: var(--border); }
+html.dark .log-item    { background: var(--warm-white); border-color: var(--border); }
+
+/* Dashboard */
+html.dark .quick-action { background: var(--warm-white); border-color: var(--border); }
+html.dark .quick-action:hover { background: var(--peach-soft); }
+html.dark .mood-ring    { background: var(--warm-white); }
+
+/* Modals */
+html.dark .modal-bg     { background: rgba(0,0,0,.65); }
+html.dark .modal        { background: var(--warm-white); border-color: var(--border); }
+
+/* Toasts */
+html.dark .toast { background: #2a2420; border-color: var(--border); color: var(--text-1); }
 </style>
 </head>
 <body>
 <div class="layout">
+
+  <!-- ════════════════ SIDEBAR ════════════════ -->
   <nav class="sidebar">
     <div class="sb-brand">
       <div class="sb-logo-row">
@@ -120,145 +382,267 @@
     <div class="sb-nav">
       <div class="nav-section">My Care</div>
       <a href="2_patient_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
-      <a href="3_journal_entry.html" class="nav-item"><i class="ti ti-notebook"></i>Journal</a>
-      <a href="5_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
-      <a href="patient_analytics.html" class="nav-item"><i class="ti ti-chart-bar"></i>My Progress</a>
+      <a href="3_journal_entry.html"      class="nav-item"><i class="ti ti-notebook"></i>Journal</a>
+      <a href="5_appointments.html"       class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+      <a href="patient_analytics.html"    class="nav-item"><i class="ti ti-chart-bar"></i>My Progress</a>
       <div class="nav-section">Resources</div>
-      <a href="patient_resources.html" class="nav-item"><i class="ti ti-books"></i>Resources</a>
-      <a href="patient_messages.html" class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">2</span></a>
+      <a href="patient_resources.html"    class="nav-item"><i class="ti ti-books"></i>Resources</a>
+      <a href="patient_messages.html"     class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">2</span></a>
       <div class="nav-section">Account</div>
-      <a href="patient_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
-      <a href="patient_settings.html" class="nav-item active"><i class="ti ti-settings"></i>Settings</a>
-      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+      <a href="patient_profile.html"      class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+      <a href="patient_settings.html"     class="nav-item active"><i class="ti ti-settings"></i>Settings</a>
+      <a href="1_login_register.html"     class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
     </div>
     <div class="sb-foot">
-      <div class="sb-user">
-        <div class="sb-avatar">AJ</div>
-        <div><div class="sb-uname">Alex J.</div><div class="sb-role">Patient</div></div>
-      </div>
+      <a href="patient_profile.html" class="sb-user">
+        <div class="sb-avatar">SA</div>
+        <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+      </a>
     </div>
   </nav>
 
+  <!-- ════════════════ MAIN ════════════════ -->
   <div class="main">
     <div class="topbar">
-      <div><div class="tb-title">Settings</div><div class="tb-sub">Customize your Serenity experience</div></div>
-      <button class="save-btn" onclick="saveSettings()"><i class="ti ti-device-floppy"></i> Save</button>
+      <div>
+        <div class="tb-title">Settings</div>
+        <div class="tb-sub">Customize your Serenity experience</div>
+      </div>
+      <button class="save-btn" onclick="saveAllSettings()"><i class="ti ti-device-floppy"></i> Save Changes</button>
     </div>
 
     <div class="content">
-      <!-- APPEARANCE -->
+
+      <!-- ── APPEARANCE ── -->
       <div class="settings-section">
         <div class="section-label">Appearance</div>
         <div class="card">
+          <!-- Theme selector -->
           <div class="theme-grid">
-            <div class="theme-card selected" onclick="selectTheme(this,'light')">
+            <div class="theme-card selected" id="theme-light" onclick="applyTheme('light', this)">
               <div class="theme-preview" style="background:linear-gradient(135deg,#faf7f2,#f4a982)"></div>
               <div class="theme-name">☀ Light (Serenity)</div>
             </div>
-            <div class="theme-card" onclick="selectTheme(this,'dark')">
+            <div class="theme-card" id="theme-dark" onclick="applyTheme('dark', this)">
               <div class="theme-preview" style="background:linear-gradient(135deg,#1a1714,#2d4a38)"></div>
               <div class="theme-name">🌙 Dark Mode</div>
             </div>
-            <div class="theme-card" onclick="selectTheme(this,'system')">
+            <div class="theme-card" id="theme-system" onclick="applyTheme('system', this)">
               <div class="theme-preview" style="background:linear-gradient(135deg,#faf7f2 50%,#1a1714 50%)"></div>
               <div class="theme-name">⚙ System</div>
             </div>
           </div>
+
+          <!-- Font size -->
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#e8f4ea"><i class="ti ti-typography" style="color:#5a9264"></i></div>
-              <div><div class="si-title">Font Size</div><div class="si-sub">Adjust text size across the app</div></div>
+              <div>
+                <div class="si-title">Font Size</div>
+                <div class="si-sub">Adjust text size across the app</div>
+              </div>
             </div>
-            <select class="si-select"><option>Small</option><option selected>Medium</option><option>Large</option></select>
+            <select class="si-select" id="fontSizeSelect" onchange="handleSelect(this,'Font size','option')">
+              <option value="small">Small</option>
+              <option value="medium" selected>Medium</option>
+              <option value="large">Large</option>
+            </select>
           </div>
+
+          <!-- Reduce motion -->
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:var(--peach-soft)"><i class="ti ti-eye" style="color:var(--peach-d)"></i></div>
-              <div><div class="si-title">Reduce Motion</div><div class="si-sub">Minimize animations for accessibility</div></div>
+              <div>
+                <div class="si-title">Reduce Motion</div>
+                <div class="si-sub">Minimize animations for accessibility</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" id="reduceMotionToggle" onchange="handleToggle(this,'Reduce Motion','accessibility setting')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
         </div>
       </div>
 
-      <!-- NOTIFICATIONS -->
+      <!-- ── NOTIFICATIONS ── -->
       <div class="settings-section">
         <div class="section-label">Notifications</div>
         <div class="card">
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#fef3c7"><i class="ti ti-sun" style="color:#d97706"></i></div>
-              <div><div class="si-title">Daily Affirmation</div><div class="si-sub">Morning wellness nudge at 8:00 AM</div></div>
+              <div>
+                <div class="si-title">Daily Affirmation</div>
+                <div class="si-sub">Morning wellness nudge at 8:00 AM</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" checked onchange="handleToggle(this,'Daily affirmation notifications','8:00 AM morning nudge')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#e0e7ff"><i class="ti ti-notebook" style="color:#4f46e5"></i></div>
-              <div><div class="si-title">Journal Reminder</div><div class="si-sub">Evening prompt to log your mood</div></div>
+              <div>
+                <div class="si-title">Journal Reminder</div>
+                <div class="si-sub">Evening prompt to log your mood</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" checked onchange="handleToggle(this,'Journal reminder','nightly mood logging prompt')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#e8f4ea"><i class="ti ti-calendar" style="color:#5a9264"></i></div>
-              <div><div class="si-title">Session Reminders</div><div class="si-sub">Notification before appointments</div></div>
+              <div>
+                <div class="si-title">Session Reminders</div>
+                <div class="si-sub">Notification before appointments</div>
+              </div>
             </div>
-            <select class="si-select"><option>15 min before</option><option selected>1 hour before</option><option>1 day before</option></select>
+            <select class="si-select" onchange="handleSelect(this,'Session reminder','before appointment')">
+              <option>15 min before</option>
+              <option selected>1 hour before</option>
+              <option>1 day before</option>
+            </select>
           </div>
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:var(--peach-soft)"><i class="ti ti-message-2" style="color:var(--peach-d)"></i></div>
-              <div><div class="si-title">Message Notifications</div><div class="si-sub">Alerts for new therapist messages</div></div>
+              <div>
+                <div class="si-title">Message Notifications</div>
+                <div class="si-sub">Alerts for new therapist messages</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" checked onchange="handleToggle(this,'Message notifications','therapist message alerts')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#fdf2f8"><i class="ti ti-sparkles" style="color:#be185d"></i></div>
-              <div><div class="si-title">Milestone Celebrations</div><div class="si-sub">Celebrate streaks and progress milestones</div></div>
+              <div>
+                <div class="si-title">Milestone Celebrations</div>
+                <div class="si-sub">Celebrate streaks and progress milestones</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" checked onchange="handleToggle(this,'Milestone celebrations','progress & streak alerts')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
         </div>
       </div>
 
-      <!-- PRIVACY -->
+      <!-- ── SYNC & DATA ── -->
+      <div class="settings-section">
+        <div class="section-label">Sync & Data</div>
+        <div class="card">
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:var(--sage-soft)"><i class="ti ti-refresh" style="color:var(--sage-d)"></i></div>
+              <div>
+                <div class="si-title">Data Sync Frequency</div>
+                <div class="si-sub">How often your entries sync to the cloud</div>
+              </div>
+            </div>
+            <select class="si-select" onchange="handleSelect(this,'Data sync frequency','sync schedule')">
+              <option>Real-time</option>
+              <option selected>Daily</option>
+              <option>Weekly</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#ede9fe"><i class="ti ti-shield-lock" style="color:#6d28d9"></i></div>
+              <div>
+                <div class="si-title">End-to-End Encryption</div>
+                <div class="si-sub">All entries encrypted with your personal key</div>
+              </div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" checked onchange="handleToggle(this,'End-to-end encryption','all journal entries are encrypted')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div class="si-left">
+              <div class="si-icon" style="background:#fef3c7"><i class="ti ti-cloud-upload" style="color:#d97706"></i></div>
+              <div>
+                <div class="si-title">Auto-Backup</div>
+                <div class="si-sub">Weekly automatic backup of all data</div>
+              </div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" checked onchange="handleToggle(this,'Auto-backup','weekly data backup')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PRIVACY ── -->
       <div class="settings-section">
         <div class="section-label">Privacy & Data Sharing</div>
         <div class="card">
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#e8f4ea"><i class="ti ti-share" style="color:#5a9264"></i></div>
-              <div><div class="si-title">Share Journal with Therapist</div><div class="si-sub">Your therapist can view submitted entries</div></div>
+              <div>
+                <div class="si-title">Share Journal with Therapist</div>
+                <div class="si-sub">Your therapist can view submitted entries</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" checked onchange="handleToggle(this,'Journal sharing with therapist','therapist access updated')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#f0fdf4"><i class="ti ti-chart-bar" style="color:#16a34a"></i></div>
-              <div><div class="si-title">Anonymous Research Participation</div><div class="si-sub">Help improve mental health tools (de-identified)</div></div>
+              <div>
+                <div class="si-title">Anonymous Research Participation</div>
+                <div class="si-sub">Help improve mental health tools (de-identified)</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" onchange="handleToggle(this,'Research participation','your de-identified data helps others')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
           <div class="setting-item">
             <div class="si-left">
               <div class="si-icon" style="background:#fdf4ff"><i class="ti ti-lock" style="color:#7e22ce"></i></div>
-              <div><div class="si-title">Hide Mood Score from Summary</div><div class="si-sub">Anonymize mood trends on export</div></div>
+              <div>
+                <div class="si-title">Hide Mood Score from Summary</div>
+                <div class="si-sub">Anonymize mood trends on export</div>
+              </div>
             </div>
-            <label class="toggle"><input type="checkbox"/><div class="toggle-track"><div class="toggle-thumb"></div></div></label>
+            <label class="toggle">
+              <input type="checkbox" onchange="handleToggle(this,'Mood score anonymization','mood data hidden from exports')"/>
+              <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            </label>
           </div>
         </div>
       </div>
 
-      <!-- DATA EXPORT -->
+      <!-- ── DATA EXPORT ── -->
       <div class="settings-section">
         <div class="section-label">Data Export</div>
         <div class="card">
           <div class="setting-item" style="border-bottom:none;padding-bottom:8px">
             <div class="si-left">
               <div class="si-icon" style="background:#fff7ed"><i class="ti ti-download" style="color:#c2410c"></i></div>
-              <div><div class="si-title">Export My Journal History</div><div class="si-sub">Download all your journal entries</div></div>
+              <div>
+                <div class="si-title">Export My Journal History</div>
+                <div class="si-sub">Download all your journal entries</div>
+              </div>
             </div>
           </div>
           <div class="export-btns">
@@ -266,62 +650,165 @@
             <button class="export-btn export-csv" onclick="triggerExport('CSV')"><i class="ti ti-file-type-csv"></i> Export as CSV</button>
             <button class="export-btn export-json" onclick="triggerExport('JSON')"><i class="ti ti-braces"></i> Export as JSON</button>
           </div>
-          <div class="export-sub">Your data export will include all journal entries, mood scores, and session notes from Jan 2024 onwards. Exports are encrypted and valid for 24 hours after generation.</div>
+          <div class="export-sub">Your data export includes all journal entries, mood scores, and session notes from Jan 2024 onwards. Exports are encrypted and valid for 24 hours after generation.</div>
         </div>
       </div>
 
-      <!-- DANGER ZONE -->
+      <!-- ── DANGER ZONE ── -->
       <div class="settings-section">
         <div class="section-label" style="color:#dc2626">Danger Zone</div>
         <div class="card" style="border-color:#fca5a5">
           <div class="danger-item">
-            <div class="di-info">
+            <div>
               <div class="di-title">Pause My Account</div>
               <div class="di-sub">Temporarily disable access. Your data is preserved.</div>
             </div>
-            <button class="danger-btn btn-neutral">Pause Account</button>
+            <button class="danger-btn btn-neutral" onclick="confirmDanger('pause')">Pause Account</button>
           </div>
           <div class="danger-item">
-            <div class="di-info">
+            <div>
               <div class="di-title">Delete All Journal Data</div>
               <div class="di-sub">Permanently delete all journal entries. Irreversible.</div>
             </div>
-            <button class="danger-btn btn-warn" onclick="confirmDelete('journal data')">Delete Journals</button>
+            <button class="danger-btn btn-warn" onclick="confirmDanger('journals')"><i class="ti ti-trash" style="font-size:13px"></i> Delete Journals</button>
           </div>
           <div class="danger-item">
-            <div class="di-info">
+            <div>
               <div class="di-title">Delete My Account</div>
               <div class="di-sub">Permanently remove your account and all data. This cannot be undone.</div>
             </div>
-            <button class="danger-btn btn-warn" style="background:#dc2626;color:#fff;border-color:#dc2626" onclick="confirmDelete('account')">Delete Account</button>
+            <button class="danger-btn" style="background:#dc2626;color:#fff;border:none" onclick="confirmDanger('account')"><i class="ti ti-user-minus" style="font-size:13px"></i> Delete Account</button>
           </div>
         </div>
       </div>
-    </div><!-- /content -->
-  </div>
-</div>
 
-<div class="toast" id="toast"><i class="ti ti-circle-check"></i><span id="toast-msg">Settings saved!</span></div>
+      <div style="height:40px"></div>
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- TOAST STACK -->
+<div id="toast-stack"></div>
 
 <script>
-  function selectTheme(el, theme) {
+// ═══════════════════════════════════════════════════
+//  DARK MODE — localStorage-persisted across all pages
+// ═══════════════════════════════════════════════════
+const THEME_KEY = 'serenity_theme';
+
+function applyTheme(mode, cardEl) {
+  // Deselect all theme cards
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+  if (cardEl) cardEl.classList.add('selected');
+
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = mode === 'dark' || (mode === 'system' && prefersDark);
+  document.documentElement.classList.toggle('dark', isDark);
+
+  // Persist to localStorage for cross-page continuity
+  localStorage.setItem(THEME_KEY, mode);
+
+  const labels = { light: 'Light (Serenity)', dark: 'Dark Mode', system: 'System default' };
+  showToast(
+    `Theme: ${labels[mode] || mode}`,
+    isDark ? '🌙 Dark palette applied — all pages updated' : '☀ Serenity light mode active',
+    'ti-palette'
+  );
+}
+
+// On load: restore saved theme
+(function restoreTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'light';
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved === 'dark' || (saved === 'system' && prefersDark);
+  document.documentElement.classList.toggle('dark', isDark);
+  const card = document.getElementById('theme-' + saved);
+  if (card) {
     document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    showToast(`Theme set to ${theme}`);
+    card.classList.add('selected');
   }
-  function saveSettings() { showToast('Settings saved successfully!'); }
-  function triggerExport(format) { showToast(`Generating ${format} export… you'll be notified when ready.`); }
-  function confirmDelete(what) {
-    if (confirm(`Are you sure you want to delete your ${what}? This action cannot be undone.`)) {
-      showToast(`Deletion request submitted for your ${what}.`);
-    }
+})();
+
+// ═══════════════════════════════════════════════════
+//  TOGGLE HANDLER (all toggles call this)
+// ═══════════════════════════════════════════════════
+function handleToggle(checkbox, settingName, detail) {
+  const state = checkbox.checked ? 'enabled' : 'disabled';
+  showToast(
+    `${settingName} ${state}`,
+    detail ? `${detail.charAt(0).toUpperCase() + detail.slice(1)}` : '',
+    checkbox.checked ? 'ti-circle-check' : 'ti-circle-minus'
+  );
+}
+
+// ═══════════════════════════════════════════════════
+//  SELECT HANDLER
+// ═══════════════════════════════════════════════════
+function handleSelect(select, settingName, unit) {
+  showToast(
+    `${settingName} updated`,
+    `Set to: ${select.options[select.selectedIndex].text}`,
+    'ti-adjustments'
+  );
+}
+
+// ═══════════════════════════════════════════════════
+//  SAVE ALL
+// ═══════════════════════════════════════════════════
+function saveAllSettings() {
+  showToast('Settings saved successfully!', 'Your preferences have been updated', 'ti-device-floppy');
+}
+
+// ═══════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════
+function triggerExport(format) {
+  showToast(
+    `Generating ${format} export…`,
+    "You'll be notified when your file is ready",
+    'ti-download'
+  );
+}
+
+// ═══════════════════════════════════════════════════
+//  DANGER ZONE
+// ═══════════════════════════════════════════════════
+const dangerMessages = {
+  pause:   { title: 'Pause account?', body: 'Your account will be paused. You can reactivate at any time.', ok: 'Yes, Pause' },
+  journals:{ title: 'Delete all journal data?', body: 'This will permanently delete every journal entry. This cannot be undone.', ok: 'Delete Journals' },
+  account: { title: 'Delete your account?', body: 'Your account and all associated data will be permanently removed. This action cannot be reversed.', ok: 'Delete Account' },
+};
+function confirmDanger(type) {
+  const cfg = dangerMessages[type];
+  if (!cfg) return;
+  if (confirm(`${cfg.title}\n\n${cfg.body}`)) {
+    showToast('Request submitted', 'Our team has been notified of your request.', 'ti-info-circle');
   }
-  function showToast(msg) {
-    document.getElementById('toast-msg').textContent = msg;
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
+}
+
+// ═══════════════════════════════════════════════════
+//  TOAST ENGINE
+// ═══════════════════════════════════════════════════
+function showToast(title, sub, icon = 'ti-circle-check') {
+  const stack = document.getElementById('toast-stack');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `
+    <i class="ti ${icon} t-icon"></i>
+    <div class="t-body">
+      <div class="t-title">${title}</div>
+      ${sub ? `<div class="t-sub">${sub}</div>` : ''}
+    </div>
+  `;
+  stack.appendChild(t);
+  // Animate in
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+  // Animate out after 3.5 s
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 400);
+  }, 3500);
+}
 </script>
 </body>
 </html>

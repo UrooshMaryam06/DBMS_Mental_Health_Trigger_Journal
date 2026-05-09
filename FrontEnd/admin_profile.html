@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+  (function(){
+    if(localStorage.getItem('theme')==='dark'){
+      document.documentElement.classList.add('dark');
+    }else{
+      document.documentElement.classList.remove('dark');
+    }
+  })();
+</script>
 <title>MH Journal — Admin Profile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
@@ -113,6 +122,91 @@
   .toast{position:fixed;bottom:24px;right:24px;background:var(--sidebar);color:#fff;border:1px solid rgba(167,139,250,.3);padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
   .toast.show{transform:translateY(0);opacity:1}
   .toast i{color:#c4b5fd}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE  — html.dark  (set from localStorage)
+═══════════════════════════════════════════════════════════ */
+html.dark{color-scheme:dark}
+html.dark body{
+  --bg:#0b0f19;--surface:#111827;--border:#1e293b;
+  --text-1:#e2e8f0;--text-2:#94a3b8;--text-3:#475569;
+  --accent-l:rgba(124,58,237,.18);
+  --warn-l:rgba(217,119,6,.15);--warn:#f59e0b;
+  --ok-l:rgba(22,163,74,.12);
+  --danger-l:rgba(220,38,38,.13);
+  --blue-l:rgba(29,78,216,.15);
+}
+html.dark body{background:var(--bg);color:var(--text-1)}
+html.dark .topbar{background:#111827;border-bottom-color:#1e293b}
+html.dark .main{background:#0b0f19}
+html.dark .mc,html.dark .db-card,html.dark .log-card,html.dark .table-card,
+html.dark .dbh-card,html.dark .card,html.dark .jstat,html.dark .stat-card,
+html.dark .modal,html.dark .slide-over{background:#111827;border-color:#1e293b}
+html.dark .table-head,html.dark .table-foot,html.dark .card-head,html.dark .card-header,
+html.dark .so-head,html.dark .so-foot,html.dark .section-head{background:#111827;border-color:#1e293b}
+html.dark thead th{background:#0d1424;color:#475569;border-color:#1e293b}
+html.dark tbody tr{border-color:#1a2035}
+html.dark tbody tr:hover{background:#141d2e}
+html.dark .db-bar,.html.dark .perf-track{background:#1e293b}
+html.dark .perf-track{background:#1e293b}
+html.dark .db-bar{background:#1e293b}
+html.dark .server-item{background:#0d1424;border-color:#1e293b}
+html.dark .log-item{background:#0d1424}
+html.dark .search-box{background:#0d1424;border-color:#1e293b}
+html.dark .search-box input{color:#e2e8f0}
+html.dark .filter-select{background:#0d1424;border-color:#1e293b;color:#94a3b8}
+html.dark .form-field{background:#0d1424;border-color:#1e293b;color:#e2e8f0}
+html.dark .form-field:focus{border-color:#7c3aed}
+html.dark .icon-btn{background:#0d1424;border-color:#1e293b;color:#94a3b8}
+html.dark .icon-btn:hover{background:#1e293b}
+html.dark .act-btn{border-color:#1e293b;color:#94a3b8}
+html.dark .act-btn:hover{background:#1e293b}
+html.dark .act-delete:hover{background:rgba(220,38,38,.1)}
+html.dark .pg-btn{background:#111827;border-color:#1e293b;color:#94a3b8}
+html.dark .log-table-row{border-color:#1a2035}
+html.dark .log-table-row:hover{background:#141d2e}
+html.dark .tq-item{border-color:#1a2035}
+html.dark .tq-item:hover{background:#141d2e}
+html.dark .info-row{border-color:#1a2035}
+html.dark .rb-patient{background:rgba(29,78,216,.15);color:#93c5fd}
+html.dark .rb-therapist{background:rgba(22,163,74,.12);color:#86efac}
+html.dark .rb-admin{background:rgba(124,58,237,.18);color:#c4b5fd}
+html.dark .sb-active{background:rgba(22,163,74,.15);color:#4ade80}
+html.dark .sb-suspended{background:rgba(220,38,38,.13);color:#fca5a5}
+html.dark .sb-pending{background:rgba(217,119,6,.15);color:#fcd34d}
+html.dark .crisis-high{background:rgba(220,38,38,.15);color:#fca5a5}
+html.dark .crisis-med{background:rgba(217,119,6,.15);color:#fcd34d}
+html.dark .crisis-none{background:rgba(22,163,74,.12);color:#86efac}
+html.dark .lt-tag.success{background:rgba(22,163,74,.12);color:#86efac}
+html.dark .lt-tag.warning{background:rgba(217,119,6,.15);color:#fcd34d}
+html.dark .lt-tag.danger{background:rgba(220,38,38,.15);color:#fca5a5}
+html.dark .lt-tag.info{background:rgba(29,78,216,.15);color:#93c5fd}
+html.dark .lic-info{background:rgba(29,78,216,.15)}
+html.dark .lic-warn{background:rgba(217,119,6,.1)}
+html.dark .lic-err{background:rgba(220,38,38,.1)}
+html.dark .lic-ok{background:rgba(22,163,74,.1)}
+html.dark .m-cancel{background:transparent;border-color:#1e293b;color:#94a3b8}
+html.dark .m-cancel:hover{background:#1e293b}
+html.dark .modal-bg{background:rgba(0,0,0,.7)}
+html.dark .drawer{background:#111827}
+html.dark .progress-track{background:#1e293b}
+html.dark .notif-dot{border-color:#111827}
+html.dark .section-header h2{color:#e2e8f0}
+html.dark .greeting h1{color:#e2e8f0}
+html.dark .tq-license{background:#0d1424;color:#475569}
+
+html.dark .card{background:#111827;border-color:#1e293b}
+html.dark .card-header{background:#111827;border-color:#1e293b}
+html.dark .card-body{background:#111827}
+html.dark .mfa-item{background:#0d1424;border-color:#1e293b}
+html.dark .perm-item{background:#0d1424;border-color:#1e293b}
+html.dark .log-item{background:#0d1424;border-color:#1e293b}
+html.dark .field input,.html.dark .field select{background:#0d1424;border-color:#1e293b;color:#e2e8f0}
+html.dark .field input{background:#0d1424;border-color:#1e293b;color:#e2e8f0}
+html.dark .field select{background:#0d1424;border-color:#1e293b;color:#e2e8f0}
+html.dark .field input:focus,.html.dark .field select:focus{border-color:#7c3aed}
+html.dark .pill-off{background:rgba(255,255,255,.06);color:#475569}
+html.dark .save-btn:hover{background:#4c1d95}
 </style>
 </head>
 <body>

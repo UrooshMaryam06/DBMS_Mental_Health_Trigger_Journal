@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  if(localStorage.getItem('mhj_theme')==='dark'){
+    document.documentElement.classList.add('dark');
+  }else{
+    document.documentElement.classList.remove('dark');
+  }
+})();
+</script>
+<title>MH Journal — Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--surface:#ffffff;--border:#e2e8f0;--border-d:#cbd5e1;
+  --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --accent:#4f46e5;--accent-l:#eef2ff;--accent-m:#c7d2fe;--accent-d:#3730a3;
+  --sidebar:#0f172a;--sidebar-hover:rgba(99,102,241,.14);--sidebar-active:rgba(99,102,241,.18);
+  --danger:#dc2626;--danger-l:#fef2f2;--danger-m:#fca5a5;
+  --warn:#d97706;--warn-l:#fffbeb;--ok:#16a34a;--ok-l:#f0fdf4;
+  --radius:12px;--shadow-sm:0 1px 3px rgba(0,0,0,.07);--shadow-md:0 4px 16px rgba(0,0,0,.09);--shadow-lg:0 12px 40px rgba(0,0,0,.13);
+}
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);overflow-x:hidden;line-height:1.5}
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:244px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:30;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:11px;padding:22px 20px 20px;border-bottom:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(79,70,229,.5)}
+.sb-logo i{font-size:18px;color:#fff}
+.sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.32);margin-top:2px;font-weight:500}
+.sb-nav{padding:14px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:14px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .14s,color .14s;color:rgba(255,255,255,.52);font-size:13px;font-weight:500;white-space:nowrap}
+.nav-item:hover{background:var(--sidebar-hover);color:rgba(255,255,255,.88)}
+.nav-item.active{background:var(--sidebar-active);color:#c7d2fe}
+.nav-item i{font-size:17px;color:rgba(255,255,255,.3);transition:color .14s;flex-shrink:0}
+.nav-item:hover i,.nav-item.active i{color:#a5b4fc}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.sb-foot{padding:14px 20px;border-top:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600;color:#fff}
+.sb-role{font-size:11px;color:rgba(255,255,255,.32);margin-top:1px}
+
+.main{margin-left:244px;flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:14px}
+.tb-title{font-size:15px;font-weight:700;color:var(--text-1);letter-spacing:-.02em}
+.tb-sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:9px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:all .14s;flex-shrink:0}
+.icon-btn:hover{background:#e8edf2;border-color:var(--border-d);color:var(--text-1)}
+.icon-btn i{font-size:18px}
+
+.content{padding:26px 28px;flex:1}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.section-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text-1);letter-spacing:-.01em}
+.section-sub{font-size:13px;color:var(--text-2);margin-top:2px}
+
+/* RANGE TOGGLES */
+.range-group{display:flex;gap:4px;background:var(--border);padding:3px;border-radius:9px}
+.range-btn{border:none;border-radius:7px;padding:6px 16px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;background:transparent;color:var(--text-2);transition:all .17s}
+.range-btn.active{background:var(--accent);color:#fff;box-shadow:0 1px 6px rgba(79,70,229,.3)}
+
+/* METRICS ROW */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.mc{background:var(--surface);border-radius:var(--radius);border:.5px solid var(--border);padding:16px 18px;transition:box-shadow .2s;box-shadow:var(--shadow-sm)}
+.mc:hover{box-shadow:var(--shadow-md)}
+.mc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:11px}
+.mc-icon i{font-size:18px}
+.mc-label{font-size:12px;color:var(--text-2);margin-bottom:4px;font-weight:500}
+.mc-val{font-size:26px;font-weight:800;line-height:1;color:var(--text-1);letter-spacing:-.02em}
+.mc-trend{font-size:11px;margin-top:5px;color:var(--text-3)}
+.mc-trend.up{color:var(--ok)}
+.mc-trend.down{color:var(--danger)}
+
+/* CHARTS GRID */
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+.chart-card{background:var(--surface);border-radius:var(--radius);border:.5px solid var(--border);padding:20px;box-shadow:var(--shadow-sm)}
+.chart-card.full{grid-column:1/-1}
+.cc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:8px}
+.cc-title{font-size:14px;font-weight:700;color:var(--text-1)}
+.cc-sub{font-size:12px;color:var(--text-3);margin-top:2px}
+.cc-legend{display:flex;gap:14px;flex-wrap:wrap}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.chart-wrap{position:relative;height:220px}
+.chart-wrap.tall{height:280px}
+
+/* PROGRESS BARS */
+.prog-list{display:flex;flex-direction:column;gap:14px;margin-top:4px}
+.prog-item{}
+.prog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.prog-name{font-size:13px;font-weight:600;color:var(--text-1)}
+.prog-val{font-size:13px;font-weight:700;color:var(--text-2)}
+.prog-bar{height:8px;border-radius:8px;background:var(--border);overflow:hidden}
+.prog-fill{height:8px;border-radius:8px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* TRIGGER TAGS */
+.trigger-cloud{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.tr-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.tr-h{background:var(--danger-l);color:var(--danger)}
+.tr-m{background:var(--warn-l);color:var(--warn)}
+.tr-l{background:var(--ok-l);color:var(--ok)}
+.tr-tag i{font-size:11px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.content>*{animation:fadeUp .3s ease both}
+.content>*:nth-child(1){animation-delay:.04s}
+.content>*:nth-child(2){animation-delay:.09s}
+.content>*:nth-child(3){animation-delay:.14s}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:16px;flex-shrink:0}
+.t-ok i{color:#4ade80}
+@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (driven by mhj_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body{
+  --bg:#0b0f19;--surface:#1e293b;--border:#334155;--border-d:#475569;
+  --text-1:#f1f5f9;--text-2:#94a3b8;--text-3:#64748b;
+  --accent-l:#1e1b4b;--accent-m:rgba(99,102,241,.25);
+  --danger-l:#2c0a0a;--danger-m:#7f1d1d;
+  --warn-l:#1c1003;--ok-l:#052e16;
+  background:#0b0f19;color:#f1f5f9;
+}
+html.dark body .topbar,
+html.dark body .settings-card,html.dark body .surface-card,
+html.dark body .card,html.dark body .metric-card,html.dark body .chart-card,
+html.dark body .stat-card,html.dark body .section-card,
+html.dark body .appt-card,html.dark body .session-card,
+html.dark body .patient-card,html.dark body .review-card,
+html.dark body .resource-card,html.dark body .res-card,
+html.dark body .msg-sidebar,html.dark body .chat-area,
+html.dark body .profile-card,html.dark body .modal,
+html.dark body .drawer,html.dark body .bg-white,
+html.dark body .filter-bar{
+  background:var(--surface)!important;
+  border-color:var(--border)!important;
+  color:var(--text-1)!important;
+}
+html.dark body .topbar{border-bottom-color:var(--border)!important}
+html.dark body .text-slate-900,html.dark body .text-slate-800{color:var(--text-1)!important}
+html.dark body .text-slate-500,html.dark body .text-slate-400{color:var(--text-2)!important}
+html.dark body .border-slate-100,html.dark body .border-slate-200{border-color:var(--border)!important}
+html.dark body thead th{background:#0d1424;color:var(--text-3);border-color:var(--border)}
+html.dark body tbody tr{border-color:var(--border)}
+html.dark body tbody tr:hover{background:#141d2e}
+html.dark body input,html.dark body textarea,html.dark body select,
+html.dark body .s-input,html.dark body .s-select,
+html.dark body .search-box,html.dark body .search-res,
+html.dark body .form-field,html.dark body .compose-input{
+  background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important;
+}
+html.dark body input::placeholder,html.dark body textarea::placeholder{color:var(--text-3)!important}
+html.dark body .icon-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .icon-btn:hover{background:var(--border)}
+html.dark body .range-btn{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .range-btn.active{background:var(--accent)!important;color:#fff!important}
+html.dark body .cat-chip{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .cat-chip.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+html.dark body .assign-select{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important}
+html.dark body .setting-row{border-color:var(--border)!important}
+html.dark body .danger-zone{background:#1a0a0a!important;border-color:#7f1d1d!important}
+html.dark body .thread-item{border-color:var(--border)!important}
+html.dark body .thread-item:hover,html.dark body .thread-item.active{background:#263148!important}
+html.dark body .bubble-in{background:#263148!important;color:var(--text-1)!important}
+html.dark body .mc{background:var(--surface)!important;border-color:var(--border)!important}
+html.dark body .quick-card,html.dark body .log-item{background:var(--surface);border-color:var(--border)}
+html.dark body .filter-chip{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .calendar-day{background:var(--surface);border-color:var(--border)}
+html.dark body .calendar-day:hover{background:#141d2e}
+html.dark body .time-slot,html.dark body .slot-btn{background:var(--surface);border-color:var(--border)}
+html.dark body .vt-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .vt-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .panel{background:var(--surface);border-color:var(--border)}
+html.dark body .profile-section,html.dark body .info-row{border-color:var(--border)}
+html.dark body .log-entry{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item:hover,html.dark body .queue-item.active{background:#141d2e}
+html.dark body .review-action-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .modal-bg,html.dark body .modal-overlay{background:rgba(0,0,0,.7)}
+html.dark body .modal,html.dark body .modal-inner,html.dark body .assign-modal-inner{
+  background:var(--surface)!important;border-color:var(--border)!important;
+}
+html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--text-1)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" role="navigation">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Therapist Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="4_therapist_dashboard.html#patients" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+    <a href="therapist_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+    <a href="therapist_reviews.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+    <div class="nav-section">Tools</div>
+    <a href="therapist_messages.html" class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">3</span></a>
+    <a href="therapist_analytics.html" class="nav-item active" aria-current="page"><i class="ti ti-chart-bar"></i>Analytics</a>
+    <a href="therapist_resources.html" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+    <div class="nav-section">Account</div>
+    <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+    <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto;color:rgba(255,255,255,.38)"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user" onclick="window.location.href='therapist_profile.html'">
+      <div class="sb-avatar">IK</div>
+      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="tb-title">Caseload Analytics</div>
+      <div class="tb-sub">Aggregate trends across 12 active patients</div>
+    </div>
+    <div class="tb-right">
+      <a href="4_therapist_dashboard.html" class="icon-btn" title="Dashboard"><i class="ti ti-layout-dashboard"></i></a>
+      <a href="therapist_profile.html" class="icon-btn" title="Profile"><i class="ti ti-user-circle"></i></a>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- SECTION HEAD WITH RANGE TOGGLE -->
+    <div class="section-head">
+      <div>
+        <div class="section-title">Caseload Overview</div>
+        <div class="section-sub">Recovery rates, mood tracking, and trigger distribution</div>
+      </div>
+      <div class="range-group" role="group" aria-label="Date range">
+        <button class="range-btn" onclick="setRange('week',this)">Week</button>
+        <button class="range-btn active" onclick="setRange('month',this)">Month</button>
+        <button class="range-btn" onclick="setRange('quarter',this)">Quarter</button>
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="mc">
+        <div class="mc-icon" style="background:var(--accent-l)"><i class="ti ti-users" style="color:var(--accent)"></i></div>
+        <div class="mc-label">Active Patients</div>
+        <div class="mc-val" id="m-patients">12</div>
+        <div class="mc-trend up" id="m-patients-t">↑ 2 new this month</div>
+      </div>
+      <div class="mc">
+        <div class="mc-icon" style="background:var(--ok-l)"><i class="ti ti-trending-up" style="color:var(--ok)"></i></div>
+        <div class="mc-label">Avg. Recovery Rate</div>
+        <div class="mc-val" id="m-recovery">68%</div>
+        <div class="mc-trend up" id="m-recovery-t">↑ 4% from last period</div>
+      </div>
+      <div class="mc">
+        <div class="mc-icon" style="background:var(--warn-l)"><i class="ti ti-mood-smile" style="color:var(--warn)"></i></div>
+        <div class="mc-label">Avg. Mood Score</div>
+        <div class="mc-val" id="m-mood">5.8</div>
+        <div class="mc-trend up" id="m-mood-t">↑ 0.6 this period</div>
+      </div>
+      <div class="mc">
+        <div class="mc-icon" style="background:var(--danger-l)"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i></div>
+        <div class="mc-label">Crisis Events</div>
+        <div class="mc-val" id="m-crisis" style="color:var(--danger)">2</div>
+        <div class="mc-trend down" id="m-crisis-t">↓ 1 from last period</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW 1 -->
+    <div class="charts-grid">
+      <!-- Mood Trend Chart -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Aggregate Mood Trend</div>
+            <div class="cc-sub">Average mood score across all patients</div>
+          </div>
+          <div class="cc-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:#4f46e5"></div>Avg Mood</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#dc2626"></div>Crisis Threshold</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="moodChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Recovery Donut -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Recovery Status</div>
+            <div class="cc-sub">Patient caseload breakdown</div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:180px">
+          <canvas id="recoveryChart"></canvas>
+        </div>
+        <div class="cc-legend" style="margin-top:12px;justify-content:center">
+          <div class="leg-item"><div class="leg-dot" style="background:#16a34a"></div>Improving</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#4f46e5"></div>Stable</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#d97706"></div>Declining</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#dc2626"></div>Crisis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW 2 -->
+    <div class="charts-grid" style="margin-bottom:16px">
+      <!-- Session Engagement -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Session Attendance Rate</div>
+            <div class="cc-sub">Completed vs. no-show sessions per period</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="sessionChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Trigger Distribution -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <div>
+            <div class="cc-title">Top Triggers</div>
+            <div class="cc-sub">Frequency across caseload</div>
+          </div>
+        </div>
+        <div class="prog-list" id="triggerBars"></div>
+      </div>
+    </div>
+
+    <!-- TRIGGER CLOUD -->
+    <div class="chart-card full" style="margin-bottom:0">
+      <div class="cc-head">
+        <div>
+          <div class="cc-title">Trigger Distribution Overview</div>
+          <div class="cc-sub">All reported triggers — sized by frequency</div>
+        </div>
+      </div>
+      <div class="trigger-cloud" id="triggerCloud"></div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<div class="toast" id="toast" role="alert"><i id="toastIcon" class="ti ti-circle-check"></i><span id="toastMsg"></span></div>
+
+<script>
+/* ── DARK MODE ── */
+(function(){ if(localStorage.getItem('mhj_theme')==='dark') document.documentElement.classList.add('dark'); })();
+
+/* ── DATA SETS ── */
+const DATA = {
+  week: {
+    labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    mood:[4.8,5.1,5.0,5.4,5.7,5.5,5.8],
+    sessions:{completed:[6,5,7,6,5,3,4],noshow:[1,1,0,1,0,0,1]},
+    recovery:[4,3,2,1], // improving,stable,declining,crisis
+    metrics:{patients:'12',recovery:'62%',mood:'5.3',crisis:'3',
+      pt:'↑ 2 new this month',rt:'↑ 1% this week',mt:'↑ 0.4 this week',ct:'↑ Crisis unchanged'}
+  },
+  month: {
+    labels:['Apr 14','Apr 17','Apr 20','Apr 23','Apr 26','Apr 29','May 2','May 5','May 9'],
+    mood:[4.2,4.6,4.9,5.2,5.0,5.5,5.6,5.8,5.9],
+    sessions:{completed:[18,22,19,24,21,23,20,22,18],noshow:[3,2,4,2,3,1,2,1,2]},
+    recovery:[6,3,2,1],
+    metrics:{patients:'12',recovery:'68%',mood:'5.8',crisis:'2',
+      pt:'↑ 2 new this month',rt:'↑ 4% from last period',mt:'↑ 0.6 this period',ct:'↓ 1 from last period'}
+  },
+  quarter: {
+    labels:['Feb','Mar','Apr (W1)','Apr (W2)','Apr (W3)','Apr (W4)','May'],
+    mood:[3.8,4.1,4.7,5.0,5.3,5.6,5.8],
+    sessions:{completed:[14,16,20,22,21,23,18],noshow:[5,4,3,3,2,1,2]},
+    recovery:[7,3,1,1],
+    metrics:{patients:'12',recovery:'74%',mood:'5.8',crisis:'2',
+      pt:'↑ 4 new this quarter',rt:'↑ 12% this quarter',mt:'↑ 2.0 this quarter',ct:'↓ 3 from last quarter'}
+  }
+};
+
+const TRIGGERS = [
+  {name:'Work Stress',count:7,cls:'prog-fill',color:'#dc2626',type:'h'},
+  {name:'Panic Attacks',count:5,cls:'prog-fill',color:'#d97706',type:'m'},
+  {name:'Family Conflict',count:5,cls:'prog-fill',color:'#d97706',type:'m'},
+  {name:'Depression',count:4,cls:'prog-fill',color:'#dc2626',type:'h'},
+  {name:'Sleep Disorder',count:4,cls:'prog-fill',color:'#d97706',type:'m'},
+  {name:'Social Anxiety',count:3,cls:'prog-fill',color:'#4f46e5',type:'l'},
+  {name:'Academic Pressure',count:3,cls:'prog-fill',color:'#16a34a',type:'l'},
+  {name:'Financial Stress',count:2,cls:'prog-fill',color:'#16a34a',type:'l'},
+];
+
+let moodChart, recoveryChart, sessionChart;
+let currentRange = 'month';
+let toastTimer;
+
+function isDark() { return document.documentElement.classList.contains('dark'); }
+function gridColor() { return isDark() ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.05)'; }
+function tickColor() { return isDark() ? '#64748b' : '#94a3b8'; }
+
+function buildCharts(range) {
+  const d = DATA[range];
+  const common = {
+    plugins:{legend:{display:false}},
+    responsive:true,maintainAspectRatio:false,
+  };
+
+  // MOOD TREND
+  if(moodChart) moodChart.destroy();
+  moodChart = new Chart(document.getElementById('moodChart'), {
+    type:'line',
+    data:{
+      labels:d.labels,
+      datasets:[
+        {label:'Avg Mood',data:d.mood,borderColor:'#4f46e5',backgroundColor:'rgba(79,70,229,.1)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#4f46e5',borderWidth:2.5},
+        {label:'Crisis Threshold',data:Array(d.labels.length).fill(3),borderColor:'rgba(220,38,38,.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false},
+      ]
+    },
+    options:{...common,
+      scales:{
+        x:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11,family:'DM Sans'}}},
+        y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11,family:'DM Sans'}},min:0,max:10,stepSize:2},
+      },
+      plugins:{...common.plugins, tooltip:{callbacks:{label:ctx=>'Mood: '+ctx.raw+'/10'}}}
+    }
+  });
+
+  // RECOVERY DONUT
+  if(recoveryChart) recoveryChart.destroy();
+  recoveryChart = new Chart(document.getElementById('recoveryChart'), {
+    type:'doughnut',
+    data:{
+      labels:['Improving','Stable','Declining','Crisis'],
+      datasets:[{data:d.recovery,backgroundColor:['#16a34a','#4f46e5','#d97706','#dc2626'],borderWidth:0,hoverOffset:6}]
+    },
+    options:{...common, cutout:'68%', plugins:{...common.plugins, tooltip:{callbacks:{label:ctx=>ctx.label+': '+ctx.raw+' patients'}}}}
+  });
+
+  // SESSION ATTENDANCE
+  if(sessionChart) sessionChart.destroy();
+  sessionChart = new Chart(document.getElementById('sessionChart'), {
+    type:'bar',
+    data:{
+      labels:d.labels,
+      datasets:[
+        {label:'Completed',data:d.sessions.completed,backgroundColor:'rgba(79,70,229,.8)',borderRadius:4,borderSkipped:false},
+        {label:'No-Show',data:d.sessions.noshow,backgroundColor:'rgba(220,38,38,.65)',borderRadius:4,borderSkipped:false},
+      ]
+    },
+    options:{...common,
+      scales:{
+        x:{grid:{display:false},ticks:{color:tickColor(),font:{size:11,family:'DM Sans'}}},
+        y:{grid:{color:gridColor()},ticks:{color:tickColor(),font:{size:11,family:'DM Sans'}},stacked:false},
+      },
+      plugins:{legend:{display:true,position:'top',labels:{font:{size:11,family:'DM Sans'},color:tickColor(),boxWidth:12}}}
+    }
+  });
+}
+
+function updateMetrics(range) {
+  const m = DATA[range].metrics;
+  document.getElementById('m-patients').textContent = m.patients;
+  document.getElementById('m-recovery').textContent = m.recovery;
+  document.getElementById('m-mood').textContent = m.mood;
+  document.getElementById('m-crisis').textContent = m.crisis;
+  document.getElementById('m-patients-t').textContent = m.pt;
+  document.getElementById('m-recovery-t').textContent = m.rt;
+  document.getElementById('m-mood-t').textContent = m.mt;
+  document.getElementById('m-crisis-t').textContent = m.ct;
+}
+
+function setRange(range, btn) {
+  currentRange = range;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildCharts(range);
+  updateMetrics(range);
+}
+
+function renderTriggers() {
+  const max = TRIGGERS[0].count;
+  document.getElementById('triggerBars').innerHTML = TRIGGERS.slice(0,6).map(t => `
+    <div class="prog-item">
+      <div class="prog-head">
+        <div class="prog-name">${t.name}</div>
+        <div class="prog-val">${t.count} patients</div>
+      </div>
+      <div class="prog-bar">
+        <div class="prog-fill" style="width:${(t.count/max*100).toFixed(0)}%;background:${t.color}"></div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('triggerCloud').innerHTML = TRIGGERS.map(t => `
+    <span class="tr-tag tr-${t.type}">
+      <i class="ti ti-tag"></i>${t.name} ×${t.count}
+    </span>
+  `).join('');
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  buildCharts(currentRange);
+  renderTriggers();
+});
+</script>
+</body>
+</html>

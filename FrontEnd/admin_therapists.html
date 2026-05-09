@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+  (function(){
+    if(localStorage.getItem('theme')==='dark'){
+      document.documentElement.classList.add('dark');
+    }else{
+      document.documentElement.classList.remove('dark');
+    }
+  })();
+</script>
+<title>MH Admin — Therapist Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;
+  --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --accent:#7c3aed;--accent-l:#f5f3ff;--accent-d:#4c1d95;
+  --sidebar:#1e1b2e;--sidebar-act:rgba(167,139,250,.15);
+  --danger:#dc2626;--danger-l:#fef2f2;
+  --warn:#d97706;--warn-l:#fffbeb;
+  --ok:#16a34a;--ok-l:#f0fdf4;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 24px;border-bottom:.5px solid rgba(255,255,255,.06)}
+.sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo i{font-size:17px;color:#fff}
+.sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:1px}
+.sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+.nav-section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.5);font-size:13px;font-weight:500}
+.nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#c4b5fd}
+.nav-item:hover i,.nav-item.active i{color:#c4b5fd}
+.nav-item i{font-size:17px;color:rgba(255,255,255,.3);transition:color .15s}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.nav-warn{margin-left:auto;background:var(--warn);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sb-foot{padding:16px 20px;border-top:.5px solid rgba(255,255,255,.06)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c4b5fd,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b2e}
+.sb-uname{font-size:13px;font-weight:500;color:#fff}
+.sb-role{font-size:11px;color:rgba(255,255,255,.3)}
+.main{margin-left:240px;flex:1}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.tb-title{font-size:16px;font-weight:700;color:var(--text-1)}
+.tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s;position:relative}
+.icon-btn:hover{background:#e8eef4}
+.icon-btn i{font-size:18px}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+.add-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+.add-btn:hover{background:var(--accent-d)}
+.content{padding:24px 28px}
+/* STAT PILLS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--surface);border-radius:12px;border:.5px solid var(--border);padding:14px 16px}
+.sc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.sc-icon i{font-size:16px}
+.sc-label{font-size:11px;color:var(--text-3);margin-bottom:3px;font-weight:500}
+.sc-val{font-size:22px;font-weight:700;color:var(--text-1)}
+/* TABLE CARD */
+.table-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);overflow:hidden}
+.table-head{padding:16px 20px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.th-left{display:flex;align-items:center;gap:10px}
+.search-box{display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:9px;padding:7px 13px;background:var(--bg)}
+.search-box i{font-size:14px;color:var(--text-3)}
+.search-box input{border:none;background:transparent;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);width:180px}
+.search-box input::placeholder{color:var(--text-3)}
+.filter-select{border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-2);outline:none;cursor:pointer}
+table{width:100%;border-collapse:collapse}
+thead{background:#f8fafc}
+thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;border-bottom:.5px solid var(--border)}
+tbody tr{border-bottom:.5px solid #f1f5f9;transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8fafc}
+td{padding:13px 16px;font-size:13px;vertical-align:middle}
+.doc-cell{display:flex;align-items:center;gap:10px}
+.doc-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.doc-name{font-size:13px;font-weight:600;color:var(--text-1)}
+.doc-id{font-size:11px;color:var(--text-3)}
+.tag-wrap{display:flex;flex-wrap:wrap;gap:4px}
+.spec-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.st-cbt{background:#eef2ff;color:#3730a3}
+.st-trauma{background:#fdf4ff;color:#7e22ce}
+.st-anx{background:#f0fdf4;color:#15803d}
+.st-dbt{background:#fff7ed;color:#c2410c}
+.st-grief{background:#f0f9ff;color:#0369a1}
+.lic-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.lic-active{background:var(--ok-l);color:var(--ok)}
+.lic-pending{background:var(--warn-l);color:var(--warn)}
+.lic-suspended{background:var(--danger-l);color:var(--danger)}
+.act-btn{border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:transparent;color:var(--text-2);transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.act-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
+.act-btn.approve{background:var(--accent);color:#fff;border-color:var(--accent)}
+.act-btn.approve:hover{background:var(--accent-d)}
+.act-btn.revoke{background:var(--danger-l);color:var(--danger);border-color:#fca5a5}
+.act-btn.revoke:hover{background:#fee2e2}
+.pg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:.5px solid var(--border);font-size:12px;color:var(--text-3)}
+.pg-btns{display:flex;gap:4px}
+.pg-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;color:var(--text-2);transition:all .15s}
+.pg-btn:hover,.pg-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* DRAWER */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(3px)}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{width:420px;max-width:95vw;background:var(--surface);height:100vh;overflow-y:auto;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);padding:28px 24px;display:flex;flex-direction:column;gap:18px}
+.drawer-overlay.open .drawer{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between}
+.drawer-title{font-size:16px;font-weight:700;color:var(--text-1)}
+.drawer-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-3)}
+.drawer-close:hover{background:var(--bg)}
+.drawer-section{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;padding-bottom:6px;border-bottom:.5px solid var(--border)}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid #f8fafc;font-size:13px}
+.info-row span:first-child{color:var(--text-3);font-weight:500}
+.info-row span:last-child{color:var(--text-1);font-weight:600}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--sidebar);color:#fff;border:1px solid rgba(167,139,250,.3);padding:13px 18px;border-radius:13px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:0 8px 28px rgba(0,0,0,.2);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:16px}
+.t-ok i{color:#a78bfa}.t-warn i{color:#fbbf24}.t-danger i{color:#f87171}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE  — html.dark  (set from localStorage)
+═══════════════════════════════════════════════════════════ */
+html.dark{color-scheme:dark}
+html.dark body{
+  --bg:#0b0f19;--surface:#111827;--border:#1e293b;
+  --text-1:#e2e8f0;--text-2:#94a3b8;--text-3:#475569;
+  --accent-l:rgba(124,58,237,.18);
+  --warn-l:rgba(217,119,6,.15);--warn:#f59e0b;
+  --ok-l:rgba(22,163,74,.12);
+  --danger-l:rgba(220,38,38,.13);
+  --blue-l:rgba(29,78,216,.15);
+}
+html.dark body{background:var(--bg);color:var(--text-1)}
+html.dark .topbar{background:#111827;border-bottom-color:#1e293b}
+html.dark .main{background:#0b0f19}
+html.dark .mc,html.dark .db-card,html.dark .log-card,html.dark .table-card,
+html.dark .dbh-card,html.dark .card,html.dark .jstat,html.dark .stat-card,
+html.dark .modal,html.dark .slide-over{background:#111827;border-color:#1e293b}
+html.dark .table-head,html.dark .table-foot,html.dark .card-head,html.dark .card-header,
+html.dark .so-head,html.dark .so-foot,html.dark .section-head{background:#111827;border-color:#1e293b}
+html.dark thead th{background:#0d1424;color:#475569;border-color:#1e293b}
+html.dark tbody tr{border-color:#1a2035}
+html.dark tbody tr:hover{background:#141d2e}
+html.dark .db-bar,.html.dark .perf-track{background:#1e293b}
+html.dark .perf-track{background:#1e293b}
+html.dark .db-bar{background:#1e293b}
+html.dark .server-item{background:#0d1424;border-color:#1e293b}
+html.dark .log-item{background:#0d1424}
+html.dark .search-box{background:#0d1424;border-color:#1e293b}
+html.dark .search-box input{color:#e2e8f0}
+html.dark .filter-select{background:#0d1424;border-color:#1e293b;color:#94a3b8}
+html.dark .form-field{background:#0d1424;border-color:#1e293b;color:#e2e8f0}
+html.dark .form-field:focus{border-color:#7c3aed}
+html.dark .icon-btn{background:#0d1424;border-color:#1e293b;color:#94a3b8}
+html.dark .icon-btn:hover{background:#1e293b}
+html.dark .act-btn{border-color:#1e293b;color:#94a3b8}
+html.dark .act-btn:hover{background:#1e293b}
+html.dark .act-delete:hover{background:rgba(220,38,38,.1)}
+html.dark .pg-btn{background:#111827;border-color:#1e293b;color:#94a3b8}
+html.dark .log-table-row{border-color:#1a2035}
+html.dark .log-table-row:hover{background:#141d2e}
+html.dark .tq-item{border-color:#1a2035}
+html.dark .tq-item:hover{background:#141d2e}
+html.dark .info-row{border-color:#1a2035}
+html.dark .rb-patient{background:rgba(29,78,216,.15);color:#93c5fd}
+html.dark .rb-therapist{background:rgba(22,163,74,.12);color:#86efac}
+html.dark .rb-admin{background:rgba(124,58,237,.18);color:#c4b5fd}
+html.dark .sb-active{background:rgba(22,163,74,.15);color:#4ade80}
+html.dark .sb-suspended{background:rgba(220,38,38,.13);color:#fca5a5}
+html.dark .sb-pending{background:rgba(217,119,6,.15);color:#fcd34d}
+html.dark .crisis-high{background:rgba(220,38,38,.15);color:#fca5a5}
+html.dark .crisis-med{background:rgba(217,119,6,.15);color:#fcd34d}
+html.dark .crisis-none{background:rgba(22,163,74,.12);color:#86efac}
+html.dark .lt-tag.success{background:rgba(22,163,74,.12);color:#86efac}
+html.dark .lt-tag.warning{background:rgba(217,119,6,.15);color:#fcd34d}
+html.dark .lt-tag.danger{background:rgba(220,38,38,.15);color:#fca5a5}
+html.dark .lt-tag.info{background:rgba(29,78,216,.15);color:#93c5fd}
+html.dark .lic-info{background:rgba(29,78,216,.15)}
+html.dark .lic-warn{background:rgba(217,119,6,.1)}
+html.dark .lic-err{background:rgba(220,38,38,.1)}
+html.dark .lic-ok{background:rgba(22,163,74,.1)}
+html.dark .m-cancel{background:transparent;border-color:#1e293b;color:#94a3b8}
+html.dark .m-cancel:hover{background:#1e293b}
+html.dark .modal-bg{background:rgba(0,0,0,.7)}
+html.dark .drawer{background:#111827}
+html.dark .progress-track{background:#1e293b}
+html.dark .notif-dot{border-color:#111827}
+html.dark .section-header h2{color:#e2e8f0}
+html.dark .greeting h1{color:#e2e8f0}
+html.dark .tq-license{background:#0d1424;color:#475569}
+
+html.dark .stat-card{background:#111827;border-color:#1e293b}
+html.dark .drawer{background:#111827;border-color:#1e293b}
+html.dark .drawer-close{border-color:#1e293b;color:#94a3b8}
+html.dark .drawer-close:hover{background:#1e293b}
+html.dark .drawer-section{border-color:#1e293b;color:#475569}
+html.dark .info-row{border-color:#1a2035}
+html.dark .lic-active{background:rgba(22,163,74,.12);color:#86efac}
+html.dark .lic-pending{background:rgba(217,119,6,.15);color:#fcd34d}
+html.dark .lic-suspended{background:rgba(220,38,38,.13);color:#fca5a5}
+html.dark .act-btn.revoke{background:rgba(220,38,38,.1);color:#fca5a5;border-color:rgba(220,38,38,.3)}
+html.dark .drawer-overlay{background:rgba(0,0,0,.7)}
+html.dark .pg-row{border-color:#1e293b;color:#475569}
+html.dark thead{background:#0d1424}
+html.dark .icon-btn:hover{background:#1e293b}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-shield-lock"></i></div>
+    <div><div class="sb-title">MH Admin</div><div class="sb-sub">System Control</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Overview</div>
+    <a href="6_admin_panel.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <div class="nav-section">Management</div>
+    <a href="6_admin_panel.html" class="nav-item"><i class="ti ti-users"></i>User Management<span class="nav-badge">3</span></a>
+    <a href="admin_therapists.html" class="nav-item active"><i class="ti ti-stethoscope"></i>Therapists</a>
+    <a href="#" class="nav-item"><i class="ti ti-calendar"></i>All Appointments</a>
+    <a href="admin_journals.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Entries</a>
+    <div class="nav-section">System</div>
+    <a href="admin_system_logs.html" class="nav-item"><i class="ti ti-terminal-2"></i>System Logs<span class="nav-warn">!</span></a>
+    <a href="admin_db_health.html" class="nav-item"><i class="ti ti-database"></i>Database Health</a>
+    <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+    <div class="nav-section">Account</div>
+    <a href="admin_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>Admin Profile</a>
+    <a href="admin_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-avatar">SA</div>
+      <div><div class="sb-uname">System Admin</div><div class="sb-role">Super Administrator</div></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title">Therapist Management</div>
+      <div class="tb-sub">Register, verify, and manage all licensed therapists</div>
+    </div>
+    <div class="tb-right">
+      <a href="#" class="icon-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></a>
+      <button class="add-btn" onclick="showToast('Add Therapist form would open here.','ok')"><i class="ti ti-plus"></i>Add Therapist</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="sc-icon" style="background:var(--accent-l)"><i class="ti ti-stethoscope" style="color:var(--accent)"></i></div>
+        <div class="sc-label">Total Therapists</div><div class="sc-val">24</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon" style="background:var(--ok-l)"><i class="ti ti-circle-check" style="color:var(--ok)"></i></div>
+        <div class="sc-label">Active Licensed</div><div class="sc-val">19</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon" style="background:var(--warn-l)"><i class="ti ti-clock" style="color:var(--warn)"></i></div>
+        <div class="sc-label">Pending Verification</div><div class="sc-val" style="color:var(--warn)">4</div>
+      </div>
+      <div class="stat-card">
+        <div class="sc-icon" style="background:var(--danger-l)"><i class="ti ti-ban" style="color:var(--danger)"></i></div>
+        <div class="sc-label">Suspended</div><div class="sc-val" style="color:var(--danger)">1</div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-head">
+        <div class="th-left">
+          <div class="search-box"><i class="ti ti-search"></i><input type="text" id="th-search" placeholder="Search by name, license, specialization…" oninput="filterTable(this.value)"/></div>
+          <select class="filter-select" onchange="filterByStatus(this.value)">
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+        <div style="font-size:12px;color:var(--text-3)">24 therapists total</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Therapist</th>
+            <th>Specializations</th>
+            <th>License</th>
+            <th>Active Patients</th>
+            <th>License Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="therapist-body">
+          <tr data-status="active" data-name="sofia reyes cbt anxiety trauma lpc-wa-44821">
+            <td><div class="doc-cell"><div class="doc-av" style="background:#ede9fe;color:#5b21b6">SR</div><div><div class="doc-name">Dr. Sofia Reyes</div><div class="doc-id">ID: TH-0001 · LPC-WA-44821</div></div></div></td>
+            <td><div class="tag-wrap"><span class="spec-tag st-cbt">CBT</span><span class="spec-tag st-anx">Anxiety</span><span class="spec-tag st-trauma">Trauma</span></div></td>
+            <td style="font-size:12px;color:var(--text-2);font-family:monospace">LPC-WA-44821</td>
+            <td><strong>12</strong> <span style="font-size:11px;color:var(--text-3)">/ 15 cap</span></td>
+            <td><span class="lic-badge lic-active"><i class="ti ti-circle-check"></i>Active</span></td>
+            <td>
+              <button class="act-btn" onclick="openDrawer('Sofia Reyes','TH-0001','CBT, Anxiety, Trauma','LPC-WA-44821','Active',12)"><i class="ti ti-eye"></i>View</button>
+              <button class="act-btn revoke" onclick="showToast('Revoking Dr. Sofia Reyes access…','warn')"><i class="ti ti-ban"></i>Revoke</button>
+            </td>
+          </tr>
+          <tr data-status="active" data-name="imran khan dbt social anxiety lpc-wa-38211">
+            <td><div class="doc-cell"><div class="doc-av" style="background:#dcfce7;color:#15803d">IK</div><div><div class="doc-name">Dr. Imran Khan</div><div class="doc-id">ID: TH-0002 · LPC-WA-38211</div></div></div></td>
+            <td><div class="tag-wrap"><span class="spec-tag st-dbt">DBT</span><span class="spec-tag st-anx">Social Anxiety</span></div></td>
+            <td style="font-size:12px;color:var(--text-2);font-family:monospace">LPC-WA-38211</td>
+            <td><strong>9</strong> <span style="font-size:11px;color:var(--text-3)">/ 15 cap</span></td>
+            <td><span class="lic-badge lic-active"><i class="ti ti-circle-check"></i>Active</span></td>
+            <td>
+              <button class="act-btn" onclick="openDrawer('Imran Khan','TH-0002','DBT, Social Anxiety','LPC-WA-38211','Active',9)"><i class="ti ti-eye"></i>View</button>
+              <button class="act-btn revoke" onclick="showToast('Revoking Dr. Imran Khan access…','warn')"><i class="ti ti-ban"></i>Revoke</button>
+            </td>
+          </tr>
+          <tr data-status="pending" data-name="aisha malik grief emdr lpc-wa-81299">
+            <td><div class="doc-cell"><div class="doc-av" style="background:#fce7f3;color:#9d174d">AM</div><div><div class="doc-name">Dr. Aisha Malik</div><div class="doc-id">ID: TH-0023 · LPC-WA-81299</div></div></div></td>
+            <td><div class="tag-wrap"><span class="spec-tag st-grief">Grief</span><span class="spec-tag st-trauma">EMDR</span></div></td>
+            <td style="font-size:12px;color:var(--text-2);font-family:monospace">LPC-WA-81299</td>
+            <td><strong>0</strong> <span style="font-size:11px;color:var(--text-3)">(not yet active)</span></td>
+            <td><span class="lic-badge lic-pending"><i class="ti ti-clock"></i>Pending</span></td>
+            <td>
+              <button class="act-btn approve" onclick="approveLicense(this,'Aisha Malik')"><i class="ti ti-certificate"></i>Approve License</button>
+              <button class="act-btn" onclick="openDrawer('Aisha Malik','TH-0023','Grief, EMDR','LPC-WA-81299','Pending',0)"><i class="ti ti-eye"></i>View</button>
+            </td>
+          </tr>
+          <tr data-status="pending" data-name="reza nasiri cbt depression lpc-ca-10028">
+            <td><div class="doc-cell"><div class="doc-av" style="background:#e0f2fe;color:#0369a1">RN</div><div><div class="doc-name">Dr. Reza Nasiri</div><div class="doc-id">ID: TH-0024 · LPC-CA-10028</div></div></div></td>
+            <td><div class="tag-wrap"><span class="spec-tag st-cbt">CBT</span><span class="spec-tag st-anx">Depression</span></div></td>
+            <td style="font-size:12px;color:var(--text-2);font-family:monospace">LPC-CA-10028</td>
+            <td><strong>0</strong> <span style="font-size:11px;color:var(--text-3)">(not yet active)</span></td>
+            <td><span class="lic-badge lic-pending"><i class="ti ti-clock"></i>Pending</span></td>
+            <td>
+              <button class="act-btn approve" onclick="approveLicense(this,'Reza Nasiri')"><i class="ti ti-certificate"></i>Approve License</button>
+              <button class="act-btn" onclick="openDrawer('Reza Nasiri','TH-0024','CBT, Depression','LPC-CA-10028','Pending',0)"><i class="ti ti-eye"></i>View</button>
+            </td>
+          </tr>
+          <tr data-status="active" data-name="chen wei trauma ptsd emdr lpc-wa-55432">
+            <td><div class="doc-cell"><div class="doc-av" style="background:#fef3c7;color:#b45309">CW</div><div><div class="doc-name">Dr. Chen Wei</div><div class="doc-id">ID: TH-0011 · LPC-WA-55432</div></div></div></td>
+            <td><div class="tag-wrap"><span class="spec-tag st-trauma">Trauma</span><span class="spec-tag st-trauma">PTSD</span><span class="spec-tag st-trauma">EMDR</span></div></td>
+            <td style="font-size:12px;color:var(--text-2);font-family:monospace">LPC-WA-55432</td>
+            <td><strong>14</strong> <span style="font-size:11px;color:var(--text-3)">/ 15 cap</span></td>
+            <td><span class="lic-badge lic-active"><i class="ti ti-circle-check"></i>Active</span></td>
+            <td>
+              <button class="act-btn" onclick="openDrawer('Chen Wei','TH-0011','Trauma, PTSD, EMDR','LPC-WA-55432','Active',14)"><i class="ti ti-eye"></i>View</button>
+              <button class="act-btn revoke" onclick="showToast('Revoking Dr. Chen Wei access…','warn')"><i class="ti ti-ban"></i>Revoke</button>
+            </td>
+          </tr>
+          <tr data-status="suspended" data-name="james ford dbt cbt lpc-wa-22918">
+            <td><div class="doc-cell"><div class="doc-av" style="background:#f1f5f9;color:#94a3b8">JF</div><div><div class="doc-name">Dr. James Ford</div><div class="doc-id">ID: TH-0007 · LPC-WA-22918</div></div></div></td>
+            <td><div class="tag-wrap"><span class="spec-tag st-dbt">DBT</span><span class="spec-tag st-cbt">CBT</span></div></td>
+            <td style="font-size:12px;color:var(--text-2);font-family:monospace">LPC-WA-22918</td>
+            <td><strong>0</strong> <span style="font-size:11px;color:var(--text-3)">(suspended)</span></td>
+            <td><span class="lic-badge lic-suspended"><i class="ti ti-ban"></i>Suspended</span></td>
+            <td>
+              <button class="act-btn approve" onclick="reinstate(this,'James Ford')"><i class="ti ti-refresh"></i>Reinstate</button>
+              <button class="act-btn" onclick="openDrawer('James Ford','TH-0007','DBT, CBT','LPC-WA-22918','Suspended',0)"><i class="ti ti-eye"></i>View</button>
+            </td>
+          </tr>
+          <tr data-status="pending" data-name="lena novak grief anxiety lpc-wa-98001">
+            <td><div class="doc-cell"><div class="doc-av" style="background:#f3e8ff;color:#6b21a8">LN</div><div><div class="doc-name">Dr. Lena Novak</div><div class="doc-id">ID: TH-0025 · LPC-WA-98001</div></div></div></td>
+            <td><div class="tag-wrap"><span class="spec-tag st-grief">Grief</span><span class="spec-tag st-anx">Anxiety</span></div></td>
+            <td style="font-size:12px;color:var(--text-2);font-family:monospace">LPC-WA-98001</td>
+            <td><strong>0</strong> <span style="font-size:11px;color:var(--text-3)">(not yet active)</span></td>
+            <td><span class="lic-badge lic-pending"><i class="ti ti-clock"></i>Pending</span></td>
+            <td>
+              <button class="act-btn approve" onclick="approveLicense(this,'Lena Novak')"><i class="ti ti-certificate"></i>Approve License</button>
+              <button class="act-btn" onclick="openDrawer('Lena Novak','TH-0025','Grief, Anxiety','LPC-WA-98001','Pending',0)"><i class="ti ti-eye"></i>View</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pg-row">
+        <span>Showing 7 of 24 therapists</span>
+        <div class="pg-btns">
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn" onclick="this.parentNode.querySelectorAll('.pg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">2</button>
+          <button class="pg-btn" onclick="this.parentNode.querySelectorAll('.pg-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">3</button>
+          <button class="pg-btn"><i class="ti ti-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div><!-- /layout -->
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawer">
+  <div class="drawer">
+    <div class="drawer-head">
+      <div class="drawer-title" id="drawer-name">Therapist Details</div>
+      <button class="drawer-close" onclick="closeDrawer()"><i class="ti ti-x"></i></button>
+    </div>
+    <div>
+      <div class="drawer-section">Identity</div>
+      <div class="info-row"><span>Therapist ID</span><span id="d-id"></span></div>
+      <div class="info-row"><span>License Number</span><span id="d-lic" style="font-family:monospace"></span></div>
+      <div class="info-row"><span>License Status</span><span id="d-status"></span></div>
+      <div class="info-row"><span>Active Patients</span><span id="d-patients"></span></div>
+    </div>
+    <div>
+      <div class="drawer-section">Specializations</div>
+      <div id="d-specs" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+    </div>
+    <div>
+      <div class="drawer-section">Platform Activity</div>
+      <div class="info-row"><span>Member Since</span><span>Jan 2024</span></div>
+      <div class="info-row"><span>Total Sessions</span><span>142</span></div>
+      <div class="info-row"><span>Avg. Rating</span><span>4.8 / 5.0</span></div>
+      <div class="info-row"><span>Last Login</span><span>Today, 8:42 AM</span></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="add-btn" style="flex:1" onclick="closeDrawer();showToast('Action applied.','ok')"><i class="ti ti-certificate"></i>Approve Credentials</button>
+      <button style="flex:1;padding:9px 14px;border-radius:10px;border:1.5px solid #fca5a5;background:var(--danger-l);color:var(--danger);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer" onclick="closeDrawer();showToast('Access revoked.','warn')"><i class="ti ti-ban"></i> Revoke Access</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-circle-check" id="t-icon"></i><span id="t-msg">Done</span></div>
+
+<script>
+function filterTable(q){document.querySelectorAll('#therapist-body tr').forEach(r=>{r.style.display=r.dataset.name.toLowerCase().includes(q.toLowerCase())?'':'none'})}
+function filterByStatus(v){document.querySelectorAll('#therapist-body tr').forEach(r=>{r.style.display=(v==='all'||r.dataset.status===v)?'':'none'})}
+
+function approveLicense(btn,name){
+  const row=btn.closest('tr');
+  row.querySelector('.lic-badge').outerHTML='<span class="lic-badge lic-active"><i class="ti ti-circle-check"></i>Active</span>';
+  btn.outerHTML='<button class="act-btn revoke" onclick="showToast(\'Revoking…\',\'warn\')"><i class="ti ti-ban"></i>Revoke</button>';
+  row.dataset.status='active';
+  showToast('License for Dr. '+name+' approved!','ok');
+}
+function reinstate(btn,name){
+  const row=btn.closest('tr');
+  row.querySelector('.lic-badge').outerHTML='<span class="lic-badge lic-active"><i class="ti ti-circle-check"></i>Active</span>';
+  btn.outerHTML='<button class="act-btn revoke" onclick="showToast(\'Revoking…\',\'warn\')"><i class="ti ti-ban"></i>Revoke</button>';
+  row.dataset.status='active';
+  showToast('Dr. '+name+' reinstated!','ok');
+}
+
+function openDrawer(name,id,specs,lic,status,patients){
+  document.getElementById('drawer-name').textContent='Dr. '+name;
+  document.getElementById('d-id').textContent=id;
+  document.getElementById('d-lic').textContent=lic;
+  document.getElementById('d-status').textContent=status;
+  document.getElementById('d-patients').textContent=patients+' active';
+  const sw=document.getElementById('d-specs');sw.innerHTML='';
+  specs.split(', ').forEach(s=>{const t=document.createElement('span');t.className='spec-tag st-cbt';t.textContent=s;sw.appendChild(t)});
+  document.getElementById('drawer').classList.add('open');
+}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
+document.getElementById('drawer').addEventListener('click',e=>{if(e.target===document.getElementById('drawer'))closeDrawer()});
+
+let tt;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  document.getElementById('t-msg').textContent=msg;
+  document.getElementById('t-icon').className=type==='ok'?'ti ti-circle-check':type==='warn'?'ti ti-alert-triangle':'ti ti-alert-circle';
+  t.className='toast t-'+type+' show';
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3400);
+}
+</script>
+</body>
+</html>

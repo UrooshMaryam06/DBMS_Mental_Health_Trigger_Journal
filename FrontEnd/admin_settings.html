@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+  (function(){
+    if(localStorage.getItem('theme')==='dark'){
+      document.documentElement.classList.add('dark');
+    }else{
+      document.documentElement.classList.remove('dark');
+    }
+  })();
+</script>
+<title>MH Journal — System Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;
+  --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --accent:#7c3aed;--accent-l:#f5f3ff;--accent-d:#4c1d95;
+  --sidebar:#1e1b2e;--sidebar-act:rgba(167,139,250,.15);
+  --danger:#dc2626;--danger-l:#fef2f2;
+  --warn:#d97706;--warn-l:#fffbeb;
+  --ok:#16a34a;--ok-l:#f0fdf4;
+  --blue:#1d4ed8;--blue-l:#dbeafe;
+  --card-bg:var(--surface);
+  --input-bg:var(--bg);
+  --transition-speed:.25s;
+}
+
+
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);overflow-x:hidden;transition:background var(--transition-speed),color var(--transition-speed)}
+.layout{display:flex;min-height:100vh}
+
+/* ─── SIDEBAR ───────────────────────────────────────────────── */
+.sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:.5px solid rgba(255,255,255,.06)}
+.sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo i{font-size:17px;color:#fff}
+.sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:1px}
+.sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+.nav-section{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 8px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.5);font-size:13px;font-weight:500;border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover,.nav-item.active{background:var(--sidebar-act);color:#c4b5fd}
+.nav-item:hover i,.nav-item.active i{color:#c4b5fd}
+.nav-item i{font-size:17px;color:rgba(255,255,255,.3);transition:color .15s}
+.nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sb-foot{padding:16px 20px;border-top:.5px solid rgba(255,255,255,.06)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c4b5fd,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b2e;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:500;color:#fff}
+.sb-role{font-size:11px;color:rgba(255,255,255,.3)}
+.sb-foot-links{display:flex;gap:4px;margin-top:10px}
+.sb-foot-link{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 8px;border-radius:8px;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);cursor:pointer;text-decoration:none;transition:background .15s}
+.sb-foot-link:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7)}
+.sb-foot-link.active-link{background:var(--sidebar-act);color:#c4b5fd}
+.sb-foot-link i{font-size:14px}
+
+/* ─── MAIN ───────────────────────────────────────────────────── */
+.main{margin-left:240px;flex:1}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5;transition:background var(--transition-speed),border-color var(--transition-speed)}
+.tb-title{font-size:16px;font-weight:700;color:var(--text-1)}
+.tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s;position:relative}
+.icon-btn:hover{background:#e8eef4}
+.icon-btn i{font-size:18px}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+.save-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:background .15s,opacity .15s}
+.save-btn:hover{background:var(--accent-d)}
+.save-btn:disabled{background:#6d28d9;opacity:.7;cursor:not-allowed}
+
+.content{padding:28px;max-width:960px}
+.page-header{margin-bottom:28px}
+.page-header h1{font-family:'DM Serif Display',serif;font-size:24px;color:var(--text-1);margin-bottom:5px}
+.page-header p{font-size:13px;color:var(--text-2);line-height:1.6}
+
+/* ─── SECTION CARDS ──────────────────────────────────────────── */
+.settings-section{background:var(--card-bg);border-radius:16px;border:.5px solid var(--border);overflow:hidden;margin-bottom:20px;transition:background var(--transition-speed),border-color var(--transition-speed)}
+.section-head{padding:18px 22px;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:12px}
+.section-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-icon i{font-size:19px}
+.si-purple{background:var(--accent-l)} .si-purple i{color:var(--accent)}
+.si-blue{background:var(--blue-l)} .si-blue i{color:var(--blue)}
+.si-green{background:var(--ok-l)} .si-green i{color:var(--ok)}
+.si-warn{background:var(--warn-l)} .si-warn i{color:var(--warn)}
+.si-danger{background:var(--danger-l)} .si-danger i{color:var(--danger)}
+.section-title-group{flex:1}
+.section-title{font-size:14px;font-weight:700;color:var(--text-1)}
+.section-desc{font-size:12px;color:var(--text-2);margin-top:2px}
+.section-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--ok-l);color:var(--ok)}
+.section-badge.warn{background:var(--warn-l);color:var(--warn)}
+
+.section-body{padding:0}
+
+/* ─── SETTING ROW ─────────────────────────────────────────────── */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:.5px solid var(--border);gap:20px;transition:background .15s}
+.setting-row:last-child{border-bottom:none}
+.setting-row:hover{background:rgba(124,58,237,.02)}
+.sr-left{flex:1;min-width:0}
+.sr-label{font-size:13px;font-weight:600;color:var(--text-1);margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.sr-sub{font-size:12px;color:var(--text-2);line-height:1.5}
+.sr-right{flex-shrink:0;display:flex;align-items:center;gap:10px}
+
+/* ─── TOGGLE ─────────────────────────────────────────────────── */
+.toggle-wrap{position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0}
+.toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:#cbd5e1;border-radius:24px;cursor:pointer;transition:background .2s}
+.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-wrap input:checked + .toggle-slider{background:var(--accent)}
+.toggle-wrap input:checked + .toggle-slider:before{transform:translateX(20px)}
+.toggle-label{font-size:12px;font-weight:600;color:var(--text-3);min-width:28px;text-align:right;transition:color .2s}
+.toggle-wrap input:checked ~ .toggle-label{color:var(--accent)}
+
+/* ─── STATUS PILL ────────────────────────────────────────────── */
+.status-pill{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;transition:background .2s,color .2s}
+.pill-on{background:var(--ok-l);color:var(--ok)}
+.pill-off{background:#f1f5f9;color:var(--text-3)}
+
+
+/* ─── SELECT ─────────────────────────────────────────────────── */
+.sys-select{border:1.5px solid var(--border);border-radius:9px;padding:8px 32px 8px 12px;background:var(--input-bg);font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s,background var(--transition-speed)}
+.sys-select:focus{border-color:var(--accent)}
+
+
+/* ─── RANGE SLIDER ───────────────────────────────────────────── */
+.slider-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:180px}
+.slider-track{width:100%;position:relative}
+input[type=range]{-webkit-appearance:none;appearance:none;width:180px;height:6px;border-radius:6px;background:linear-gradient(to right, var(--accent) 0%, var(--accent) var(--val,40%), var(--border) var(--val,40%), var(--border) 100%);outline:none;cursor:pointer;transition:background var(--transition-speed)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid var(--accent);box-shadow:0 2px 8px rgba(124,58,237,.3);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid var(--accent);box-shadow:0 2px 8px rgba(124,58,237,.3);cursor:pointer}
+.slider-val{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-l);padding:3px 10px;border-radius:7px;min-width:54px;text-align:center;transition:background var(--transition-speed)}
+.slider-ticks{display:flex;justify-content:space-between;width:180px;margin-top:4px}
+.slider-tick{font-size:10px;color:var(--text-3)}
+
+/* ─── INLINE VALUE TAG ───────────────────────────────────────── */
+.val-tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;background:var(--accent-l);color:var(--accent)}
+.val-tag.changed{background:#dcfce7;color:#15803d;animation:pop .3s}
+@keyframes pop{0%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+/* ─── DIVIDER LABEL ──────────────────────────────────────────── */
+.section-divider{padding:10px 22px 6px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);border-bottom:.5px solid var(--border);background:rgba(0,0,0,.01)}
+
+
+/* ─── DANGER ZONE ────────────────────────────────────────────── */
+.danger-row{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:.5px solid var(--border);gap:20px}
+.danger-row:last-child{border-bottom:none}
+.danger-btn{background:transparent;border:1.5px solid var(--danger);color:var(--danger);border-radius:9px;padding:8px 16px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.danger-btn:hover{background:var(--danger);color:#fff}
+
+/* ─── TOAST ──────────────────────────────────────────────────── */
+#toastContainer{position:fixed;bottom:28px;right:28px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:#1e1b2e;color:#fff;border-radius:14px;padding:14px 20px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:12px;box-shadow:0 12px 40px rgba(0,0,0,.3);transform:translateX(120px);opacity:0;transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s;max-width:340px;border:.5px solid rgba(255,255,255,.08);pointer-events:all}
+.toast.show{transform:translateX(0);opacity:1}
+.toast.success .t-icon{color:#22c55e}
+.toast.error   .t-icon{color:#ef4444}
+.toast.info    .t-icon{color:#a78bfa}
+.toast.warn    .t-icon{color:#f59e0b}
+.t-icon{font-size:20px;flex-shrink:0}
+.toast-msg{flex:1;line-height:1.4}
+.toast-title{font-size:13px;font-weight:700;margin-bottom:2px}
+.toast-sub{font-size:11px;color:rgba(255,255,255,.5)}
+
+/* ─── CONFIRM MODAL ──────────────────────────────────────────── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-bg.show{display:flex}
+.modal{background:var(--surface);border-radius:18px;padding:30px;max-width:420px;width:90%;border:.5px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.modal-icon i{font-size:24px}
+.mi-warn{background:var(--warn-l)} .mi-warn i{color:var(--warn)}
+.mi-danger{background:var(--danger-l)} .mi-danger i{color:var(--danger)}
+.mi-ok{background:var(--ok-l)} .mi-ok i{color:var(--ok)}
+.modal-title{font-size:17px;font-weight:700;color:var(--text-1);margin-bottom:8px}
+.modal-body{font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:24px}
+.modal-acts{display:flex;gap:10px;justify-content:flex-end}
+.m-cancel{background:transparent;border:1.5px solid var(--border);border-radius:9px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text-2);transition:background .15s}
+.m-cancel:hover{background:var(--bg)}
+.m-ok{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:background .15s}
+.m-ok:hover{background:var(--accent-d)}
+.m-ok.danger{background:var(--danger)}
+.m-ok.danger:hover{background:#991b1b}
+
+/* ─── BREADCRUMB ─────────────────────────────────────────────── */
+.breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:22px;font-size:12px;color:var(--text-3)}
+.breadcrumb a{color:var(--text-3);text-decoration:none;transition:color .15s}
+.breadcrumb a:hover{color:var(--accent)}
+.breadcrumb i{font-size:12px}
+
+/* ─── SAVE BAR ───────────────────────────────────────────────── */
+.save-bar{display:flex;align-items:center;justify-content:space-between;background:var(--card-bg);border-radius:16px;border:.5px solid var(--border);padding:18px 22px;margin-bottom:20px;gap:16px;transition:background var(--transition-speed)}
+.save-bar-info{display:flex;align-items:center;gap:12px}
+.unsaved-dot{width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0;opacity:0;transition:opacity .3s}
+.unsaved-dot.visible{opacity:1;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.save-bar-text{font-size:13px;color:var(--text-2)}
+.save-bar-text strong{color:var(--text-1)}
+.save-actions{display:flex;gap:8px;align-items:center}
+.reset-btn{background:transparent;border:1.5px solid var(--border);color:var(--text-2);border-radius:9px;padding:8px 16px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .15s}
+.reset-btn:hover{border-color:var(--text-2);color:var(--text-1)}
+
+/* ─── SPIN ───────────────────────────────────────────────────── */
+.spin{animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── DARK TOGGLE SPECIAL ────────────────────────────────────── */
+.theme-preview{display:flex;gap:6px;margin-top:8px}
+.tp-chip{width:20px;height:20px;border-radius:5px;border:1.5px solid transparent;cursor:pointer;transition:transform .15s,border-color .15s;flex-shrink:0}
+.tp-chip:hover{transform:scale(1.15)}
+.tp-chip.selected{border-color:var(--accent)}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:768px){
+  .sidebar{width:200px}
+  .main{margin-left:200px}
+  .content{padding:20px}
+  input[type=range]{width:140px}
+  .slider-ticks{width:140px}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark  (set from localStorage)
+═══════════════════════════════════════════════════════════ */
+html.dark{color-scheme:dark}
+html.dark body{
+  --bg:#0b0f19;--surface:#111827;--border:#1e293b;
+  --text-1:#e2e8f0;--text-2:#94a3b8;--text-3:#475569;
+  --accent-l:rgba(124,58,237,.18);
+  --card-bg:#111827;--input-bg:#0d1424;
+  --warn-l:rgba(217,119,6,.15);--warn:#f59e0b;
+  --ok-l:rgba(22,163,74,.12);
+  --danger-l:rgba(220,38,38,.13);
+  --blue-l:rgba(29,78,216,.15);
+}
+html.dark body{background:var(--bg);color:var(--text-1)}
+html.dark .topbar{background:#111827;border-bottom-color:#1e293b}
+html.dark .settings-section{background:#111827;border-color:#1e293b}
+html.dark .section-head{background:#111827;border-color:#1e293b}
+html.dark .setting-row{border-color:#1e293b}
+html.dark .setting-row:hover{background:rgba(124,58,237,.05)}
+html.dark .save-bar{background:#111827;border-color:#1e293b}
+html.dark .section-divider{background:rgba(255,255,255,.01);border-color:#1e293b}
+html.dark .danger-row{border-color:#1e293b}
+html.dark .sys-select{background:#0d1424;border-color:#1e293b;color:#e2e8f0}
+html.dark .slider-val{background:rgba(124,58,237,.18);color:#c4b5fd}
+html.dark input[type=range]{background:linear-gradient(to right,#7c3aed 0%,#7c3aed var(--val,40%),#1e293b var(--val,40%),#1e293b 100%)}
+html.dark .icon-btn{background:#0d1424;border-color:#1e293b;color:#94a3b8}
+html.dark .icon-btn:hover{background:#1e293b}
+html.dark .modal{background:#111827;border-color:#1e293b}
+html.dark .m-cancel{background:transparent;border-color:#1e293b;color:#94a3b8}
+html.dark .m-cancel:hover{background:#1e293b}
+html.dark .reset-btn{background:transparent;border-color:#1e293b;color:#94a3b8}
+html.dark .reset-btn:hover{border-color:#94a3b8;color:#e2e8f0}
+html.dark .pill-off{background:rgba(255,255,255,.06);color:#475569}
+html.dark .mi-warn{background:rgba(217,119,6,.15)}
+html.dark .mi-danger{background:rgba(220,38,38,.13)}
+html.dark .mi-ok{background:rgba(22,163,74,.12)}
+html.dark .modal-bg{background:rgba(0,0,0,.7)}
+html.dark .notif-dot{border-color:#111827}
+html.dark code{background:rgba(124,58,237,.15)!important;color:#c4b5fd!important}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ══════════════════════ SIDEBAR ══════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo"><i class="ti ti-shield-lock"></i></div>
+      <div><div class="sb-title">MH Journal</div><div class="sb-sub">Admin Control Panel</div></div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="nav-section">Overview</div>
+      <a href="6_admin_panel.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+
+      <div class="nav-section">Management</div>
+      <a href="6_admin_panel.html#users" class="nav-item"><i class="ti ti-users"></i>User Management<span class="nav-badge">3</span></a>
+      <a href="admin_therapists.html" class="nav-item"><i class="ti ti-stethoscope"></i>Therapist Verification<span class="nav-badge" style="background:var(--warn)">2</span></a>
+      <a href="6_admin_panel.html#journal" class="nav-item"><i class="ti ti-notebook"></i>Journal Database</a>
+
+      <div class="nav-section">System</div>
+      <a href="admin_system_logs.html" class="nav-item"><i class="ti ti-terminal-2"></i>System Logs<span class="nav-badge" style="background:var(--warn)">!</span></a>
+      <a href="admin_db_health.html" class="nav-item"><i class="ti ti-database"></i>Database Health</a>
+      <a href="admin_settings.html" class="nav-item active"><i class="ti ti-settings"></i>Settings</a>
+    </nav>
+
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-avatar">AD</div>
+        <div><div class="sb-uname">Admin User</div><div class="sb-role">Super Administrator</div></div>
+      </div>
+      <div class="sb-foot-links">
+        <a href="admin_profile.html" class="sb-foot-link"><i class="ti ti-user-circle"></i>Profile</a>
+        <a href="admin_settings.html" class="sb-foot-link active-link"><i class="ti ti-settings"></i>Settings</a>
+        <a href="1_login_register.html" class="sb-foot-link"><i class="ti ti-logout"></i>Sign Out</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════ MAIN ═════════════════════════════ -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="tb-title">System Settings</div>
+        <div class="tb-sub">Global platform configuration &amp; administrative controls</div>
+      </div>
+      <div class="tb-right">
+        <a href="#" class="icon-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></a>
+        <button class="save-btn" id="topSaveBtn" onclick="saveSettings()">
+          <i class="ti ti-device-floppy"></i>Save Configuration
+        </button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb">
+        <a href="6_admin_panel.html"><i class="ti ti-layout-dashboard"></i></a>
+        <i class="ti ti-chevron-right"></i>
+        <span>System Settings</span>
+      </div>
+
+      <!-- Page header -->
+      <div class="page-header">
+        <h1>Platform Configuration ⚙️</h1>
+        <p>Manage global system behavior, security policies, database rules, and user access controls. Changes are written to <code style="background:var(--accent-l);color:var(--accent);padding:1px 6px;border-radius:4px;font-size:11px">config.json</code> on save.</p>
+      </div>
+
+      <!-- Save bar -->
+      <div class="save-bar" id="saveBar">
+        <div class="save-bar-info">
+          <div class="unsaved-dot" id="unsavedDot"></div>
+          <div class="save-bar-text"><strong id="saveBarLabel">All settings saved</strong> <span id="saveBarSub">— Last updated May 9, 2026 at 11:42 AM</span></div>
+        </div>
+        <div class="save-actions">
+          <button class="reset-btn" onclick="resetSettings()"><i class="ti ti-refresh" style="font-size:13px;margin-right:4px"></i>Reset to Defaults</button>
+          <button class="save-btn" id="mainSaveBtn" onclick="saveSettings()">
+            <i class="ti ti-device-floppy"></i>Save Configuration
+          </button>
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════
+           1. UI & APPEARANCE
+      ════════════════════════════════════════════════════════ -->
+      <div class="settings-section">
+        <div class="section-head">
+          <div class="section-icon si-purple"><i class="ti ti-palette"></i></div>
+          <div class="section-title-group">
+            <div class="section-title">UI &amp; Appearance</div>
+            <div class="section-desc">Interface theme, display mode, and visual preferences</div>
+          </div>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">System Dark Mode
+                <span class="status-pill pill-off" id="darkModePill">Off</span>
+              </div>
+              <div class="sr-sub">Applies a high-contrast dark palette across the entire admin interface. Toggles immediately — no page reload required.</div>
+            </div>
+            <div class="sr-right">
+              <label class="toggle-wrap">
+                <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this)"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Compact Sidebar Mode</div>
+              <div class="sr-sub">Collapses sidebar labels to icon-only view, maximizing workspace for data-heavy panels.</div>
+            </div>
+            <div class="sr-right">
+              <span class="val-tag" id="sidebarModeTag">Standard</span>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="compactSidebarToggle" onchange="handleToggle(this,'sidebarModeTag','Compact','Standard')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Animations &amp; Transitions</div>
+              <div class="sr-sub">Disable smooth CSS transitions and motion effects. Recommended for accessibility or low-powered devices.</div>
+            </div>
+            <div class="sr-right">
+              <span class="val-tag" id="animTag">Enabled</span>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="animToggle" checked onchange="handleToggle(this,'animTag','Enabled','Disabled')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Admin Panel Language</div>
+              <div class="sr-sub">Display language for the admin interface. Does not affect patient-facing content.</div>
+            </div>
+            <div class="sr-right">
+              <select class="sys-select" onchange="markUnsaved()">
+                <option value="en" selected>English (US)</option>
+                <option value="en-gb">English (UK)</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+                <option value="ur">اردو</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════
+           2. SECURITY & AUTHENTICATION
+      ════════════════════════════════════════════════════════ -->
+      <div class="settings-section">
+        <div class="section-head">
+          <div class="section-icon si-blue"><i class="ti ti-shield-check"></i></div>
+          <div class="section-title-group">
+            <div class="section-title">Security &amp; Authentication</div>
+            <div class="section-desc">MFA policy, session management, and access hardening</div>
+          </div>
+          <span class="section-badge warn">3 policies active</span>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">
+                <i class="ti ti-lock" style="color:var(--accent);font-size:15px"></i>
+                Force MFA for All Therapists
+                <span class="status-pill pill-on" id="mfaTherapistPill">Enforced</span>
+              </div>
+              <div class="sr-sub">All practicing therapists must enroll in two-factor authentication before accessing patient records. Existing sessions will be terminated on change.</div>
+            </div>
+            <div class="sr-right">
+              <label class="toggle-wrap">
+                <input type="checkbox" id="mfaTherapistToggle" checked onchange="handleMfaToggle(this,'mfaTherapistPill','therapist')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">
+                <i class="ti ti-lock" style="color:var(--accent);font-size:15px"></i>
+                Force MFA for Admins
+                <span class="status-pill pill-on" id="mfaAdminPill">Enforced</span>
+              </div>
+              <div class="sr-sub">Requires all admin-role accounts to authenticate with a second factor on every login. Disabling this lowers platform security posture significantly.</div>
+            </div>
+            <div class="sr-right">
+              <label class="toggle-wrap">
+                <input type="checkbox" id="mfaAdminToggle" checked onchange="handleMfaToggle(this,'mfaAdminPill','admin')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-divider">Session Management</div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Session Timeout Threshold</div>
+              <div class="sr-sub">Automatically invalidates inactive admin and therapist sessions after the specified duration. Patients have a fixed 24-hour session window.</div>
+            </div>
+            <div class="sr-right">
+              <select class="sys-select" id="sessionTimeout" onchange="handleSessionTimeout(this)">
+                <option value="15">15 minutes</option>
+                <option value="30" selected>30 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="240">4 hours</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Concurrent Session Limit</div>
+              <div class="sr-sub">Maximum number of simultaneous active sessions allowed per admin account. Exceeding this invalidates the oldest session.</div>
+            </div>
+            <div class="sr-right">
+              <select class="sys-select" onchange="markUnsaved()">
+                <option value="1">1 session</option>
+                <option value="2" selected>2 sessions</option>
+                <option value="3">3 sessions</option>
+                <option value="5">5 sessions</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Login Brute-Force Protection</div>
+              <div class="sr-sub">Automatically suspends accounts after 5 consecutive failed login attempts and alerts the admin team via system log.</div>
+            </div>
+            <div class="sr-right">
+              <span class="val-tag" id="bruteTag">Active</span>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="bruteToggle" checked onchange="handleToggle(this,'bruteTag','Active','Disabled')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════
+           3. DATABASE & BACKUP
+      ════════════════════════════════════════════════════════ -->
+      <div class="settings-section">
+        <div class="section-head">
+          <div class="section-icon si-green"><i class="ti ti-database-export"></i></div>
+          <div class="section-title-group">
+            <div class="section-title">Database &amp; Backup Rules</div>
+            <div class="section-desc">Automated backup schedules, storage thresholds, and Supabase sync policy</div>
+          </div>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Hourly Automated Backups
+                <span class="status-pill pill-on" id="hourlyBackupPill">Active</span>
+              </div>
+              <div class="sr-sub">Streams incremental WAL (Write-Ahead Log) snapshots to Supabase Storage every 60 minutes. Adds ~200 MB/hr storage overhead.</div>
+            </div>
+            <div class="sr-right">
+              <label class="toggle-wrap">
+                <input type="checkbox" id="hourlyBackupToggle" checked onchange="handleBackupToggle(this,'hourlyBackupPill','hourly')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Daily Full Backups
+                <span class="status-pill pill-on" id="dailyBackupPill">Active</span>
+              </div>
+              <div class="sr-sub">Triggers a full PostgreSQL <code style="background:var(--accent-l);color:var(--accent);padding:1px 5px;border-radius:4px;font-size:11px">pg_dump</code> to Supabase every day at 02:00 UTC. Current backup size: 14.6 GB.</div>
+            </div>
+            <div class="sr-right">
+              <label class="toggle-wrap">
+                <input type="checkbox" id="dailyBackupToggle" checked onchange="handleBackupToggle(this,'dailyBackupPill','daily')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-divider">Storage Thresholds</div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Audit Log Archiving Threshold</div>
+              <div class="sr-sub">System audit logs older than the selected duration are compressed and moved to cold Supabase Storage. Archived logs remain searchable but with 2–4s latency.</div>
+            </div>
+            <div class="sr-right">
+              <div class="slider-wrap">
+                <span class="slider-val" id="archiveVal">90 days</span>
+                <input type="range" id="archiveSlider" min="30" max="365" step="30" value="90"
+                  oninput="updateSlider(this,'archiveVal',v => v+' days')"
+                  style="--val:19.2%"/>
+                <div class="slider-ticks">
+                  <span class="slider-tick">30d</span>
+                  <span class="slider-tick">90d</span>
+                  <span class="slider-tick">180d</span>
+                  <span class="slider-tick">365d</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Backup Retention Period</div>
+              <div class="sr-sub">Number of daily full backups retained on Supabase before the oldest is pruned. Higher values increase storage costs.</div>
+            </div>
+            <div class="sr-right">
+              <select class="sys-select" onchange="markUnsaved()">
+                <option value="7">7 days</option>
+                <option value="14" selected>14 days</option>
+                <option value="30">30 days</option>
+                <option value="90">90 days</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Disk Usage Alert Threshold</div>
+              <div class="sr-sub">System generates a critical log entry and sends an admin notification when any DB server exceeds this disk utilization percentage.</div>
+            </div>
+            <div class="sr-right">
+              <div class="slider-wrap">
+                <span class="slider-val" id="diskAlertVal">70%</span>
+                <input type="range" id="diskAlertSlider" min="50" max="95" step="5" value="70"
+                  oninput="updateSlider(this,'diskAlertVal',v => v+'%')"
+                  style="--val:44.4%"/>
+                <div class="slider-ticks">
+                  <span class="slider-tick">50%</span>
+                  <span class="slider-tick">70%</span>
+                  <span class="slider-tick">85%</span>
+                  <span class="slider-tick">95%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════
+           4. PLATFORM OPERATIONS & REGISTRATION
+      ════════════════════════════════════════════════════════ -->
+      <div class="settings-section">
+        <div class="section-head">
+          <div class="section-icon si-warn"><i class="ti ti-users-group"></i></div>
+          <div class="section-title-group">
+            <div class="section-title">Platform Operations &amp; User Registration</div>
+            <div class="section-desc">Onboarding mode, crisis detection sensitivity, and user flow controls</div>
+          </div>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Registration Mode
+                <span class="status-pill pill-on" id="regModePill">Open Signups</span>
+              </div>
+              <div class="sr-sub">
+                <strong style="color:var(--text-1)" id="regModeDesc">Open Signups:</strong> New accounts are activated immediately after email verification. Toggle off to require admin approval before new users can access the platform.
+              </div>
+            </div>
+            <div class="sr-right">
+              <label class="toggle-wrap">
+                <input type="checkbox" id="regModeToggle" checked onchange="handleRegMode(this)"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Therapist Registration Requires Credential Review</div>
+              <div class="sr-sub">New therapist accounts are placed in a "Pending Verification" queue until an admin reviews and approves their license credentials.</div>
+            </div>
+            <div class="sr-right">
+              <span class="val-tag" id="therapistReviewTag">Required</span>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="therapistReviewToggle" checked onchange="handleToggle(this,'therapistReviewTag','Required','Bypassed')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-divider">Crisis Alert Engine</div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Crisis Alert Sensitivity
+                <span class="status-pill pill-on" id="crisisSensitivityPill" style="background:#fee2e2;color:#991b1b">Level 3 — High</span>
+              </div>
+              <div class="sr-sub">
+                Sets the weighted threshold for flagging high-risk journal entries. <strong style="color:var(--text-1)">Level 1</strong> flags only explicit terms. <strong style="color:var(--text-1)">Level 5</strong> uses semantic analysis for contextual risk. Higher sensitivity may increase false positives.
+              </div>
+            </div>
+            <div class="sr-right">
+              <div class="slider-wrap">
+                <span class="slider-val" id="crisisVal" style="background:#fee2e2;color:#991b1b">3 / 5</span>
+                <input type="range" id="crisisSlider" min="1" max="5" step="1" value="3"
+                  oninput="updateCrisisSlider(this)"
+                  style="--val:50%"/>
+                <div class="slider-ticks">
+                  <span class="slider-tick">1</span>
+                  <span class="slider-tick">2</span>
+                  <span class="slider-tick">3</span>
+                  <span class="slider-tick">4</span>
+                  <span class="slider-tick">5</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Therapist Crisis Notification</div>
+              <div class="sr-sub">When a patient journal entry trips the crisis threshold, automatically notify the assigned therapist via in-platform alert and email.</div>
+            </div>
+            <div class="sr-right">
+              <span class="val-tag" id="crisisNotifTag">Active</span>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="crisisNotifToggle" checked onchange="handleToggle(this,'crisisNotifTag','Active','Muted')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Maximum Patients per Therapist</div>
+              <div class="sr-sub">Prevents therapist overload by capping the patient roster. Exceeding this limit requires admin override or therapist capacity adjustment.</div>
+            </div>
+            <div class="sr-right">
+              <div class="slider-wrap">
+                <span class="slider-val" id="patientCapVal">25</span>
+                <input type="range" id="patientCapSlider" min="5" max="50" step="5" value="25"
+                  oninput="updateSlider(this,'patientCapVal',v => String(v))"
+                  style="--val:44.4%"/>
+                <div class="slider-ticks">
+                  <span class="slider-tick">5</span>
+                  <span class="slider-tick">25</span>
+                  <span class="slider-tick">50</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════
+           5. NOTIFICATIONS & COMMUNICATIONS
+      ════════════════════════════════════════════════════════ -->
+      <div class="settings-section">
+        <div class="section-head">
+          <div class="section-icon si-purple"><i class="ti ti-bell"></i></div>
+          <div class="section-title-group">
+            <div class="section-title">Notifications &amp; Communications</div>
+            <div class="section-desc">System alert channels, digest frequency, and email delivery settings</div>
+          </div>
+        </div>
+        <div class="section-body">
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Admin Email Digest</div>
+              <div class="sr-sub">Sends a formatted summary of system events, pending approvals, and flagged crisis entries to all super-admins.</div>
+            </div>
+            <div class="sr-right">
+              <select class="sys-select" onchange="markUnsaved()">
+                <option value="realtime">Real-time alerts only</option>
+                <option value="daily" selected>Daily digest (08:00 UTC)</option>
+                <option value="weekly">Weekly summary</option>
+                <option value="off">Off</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">System Error Alerts (Critical Only)</div>
+              <div class="sr-sub">Pushes immediate in-platform toasts and emails for P0/P1 severity incidents — database failures, auth service outages, or abnormal CPU spikes.</div>
+            </div>
+            <div class="sr-right">
+              <span class="val-tag" id="criticalAlertTag">Active</span>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="criticalAlertToggle" checked onchange="handleToggle(this,'criticalAlertTag','Active','Muted')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="sr-left">
+              <div class="sr-label">Therapist Approval Notifications</div>
+              <div class="sr-sub">Notifies admins when a new therapist completes registration and enters the credential review queue.</div>
+            </div>
+            <div class="sr-right">
+              <span class="val-tag" id="therapistNotifTag">Active</span>
+              <label class="toggle-wrap">
+                <input type="checkbox" id="therapistNotifToggle" checked onchange="handleToggle(this,'therapistNotifTag','Active','Off')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ════════════════════════════════════════════════════════
+           6. DANGER ZONE
+      ════════════════════════════════════════════════════════ -->
+      <div class="settings-section" style="border-color:rgba(220,38,38,.25)">
+        <div class="section-head" style="border-bottom-color:rgba(220,38,38,.15)">
+          <div class="section-icon si-danger"><i class="ti ti-alert-octagon"></i></div>
+          <div class="section-title-group">
+            <div class="section-title" style="color:var(--danger)">Danger Zone</div>
+            <div class="section-desc">Irreversible system operations — use with extreme caution</div>
+          </div>
+        </div>
+        <div class="section-body">
+
+          <div class="danger-row">
+            <div class="sr-left">
+              <div class="sr-label" style="color:var(--text-1)">Flush Redis Cache</div>
+              <div class="sr-sub">Clears all cached query results and session data from Redis. Causes a temporary 15–30% performance drop while caches rebuild. All active users will notice slower response times.</div>
+            </div>
+            <div class="sr-right">
+              <button class="danger-btn" onclick="confirmDanger('flushCache')"><i class="ti ti-database-x"></i>Flush Cache</button>
+            </div>
+          </div>
+
+          <div class="danger-row">
+            <div class="sr-left">
+              <div class="sr-label" style="color:var(--text-1)">Force-Expire All Active Sessions</div>
+              <div class="sr-sub">Immediately invalidates every authenticated session across the platform. All users — including admins and therapists — will be logged out and must re-authenticate. Use only during security incidents.</div>
+            </div>
+            <div class="sr-right">
+              <button class="danger-btn" onclick="confirmDanger('expireSessions')"><i class="ti ti-logout"></i>Expire Sessions</button>
+            </div>
+          </div>
+
+          <div class="danger-row">
+            <div class="sr-left">
+              <div class="sr-label" style="color:var(--text-1)">Reset Platform to Maintenance Mode</div>
+              <div class="sr-sub">Displays a maintenance page to all non-admin users. Disables patient journal submissions and therapist portal access. Admin panel remains accessible.</div>
+            </div>
+            <div class="sr-right">
+              <button class="danger-btn" onclick="confirmDanger('maintenanceMode')"><i class="ti ti-tool"></i>Maintenance Mode</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- Bottom padding -->
+      <div style="height:32px"></div>
+
+    </div><!-- /content -->
+  </main><!-- /main -->
+</div><!-- /layout -->
+
+
+<!-- ══════════════════════ CONFIRM MODAL ════════════════════════ -->
+<div class="modal-bg" id="confirmModal">
+  <div class="modal">
+    <div class="modal-icon" id="modalIcon"><i id="modalIconI" class="ti ti-alert-triangle"></i></div>
+    <div class="modal-title" id="modalTitle">Confirm Action</div>
+    <div class="modal-body" id="modalBody">Are you sure you want to proceed?</div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeModal()">Cancel</button>
+      <button class="m-ok" id="modalOkBtn" onclick="executeModalAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TOAST CONTAINER ══════════════════════ -->
+<div id="toastContainer"></div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let unsavedChanges = false;
+let pendingModalAction = null;
+
+// ═══════════════════════════════════════════════════════════════
+//  UNSAVED CHANGES TRACKING
+// ═══════════════════════════════════════════════════════════════
+function markUnsaved() {
+  if (!unsavedChanges) {
+    unsavedChanges = true;
+    document.getElementById('unsavedDot').classList.add('visible');
+    document.getElementById('saveBarLabel').textContent = 'Unsaved changes';
+    document.getElementById('saveBarSub').textContent = '— Click "Save Configuration" to apply';
+  }
+}
+
+function markSaved() {
+  unsavedChanges = false;
+  document.getElementById('unsavedDot').classList.remove('visible');
+  document.getElementById('saveBarLabel').textContent = 'All settings saved';
+  const now = new Date();
+  const time = now.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  document.getElementById('saveBarSub').textContent = `— Last updated ${time}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DARK MODE
+// ═══════════════════════════════════════════════════════════════
+function toggleDarkMode(checkbox) {
+  const isDark = checkbox.checked;
+  if(isDark){
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('theme','dark');
+  }else{
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme','light');
+  }
+  const pill = document.getElementById('darkModePill');
+  pill.textContent = isDark ? 'On' : 'Off';
+  pill.className = 'status-pill ' + (isDark ? 'pill-on' : 'pill-off');
+  markUnsaved();
+  showToast(
+    isDark ? 'Dark mode enabled' : 'Light mode restored',
+    isDark ? 'Dark palette active across all admin pages' : 'Standard light theme restored globally',
+    'info'
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GENERIC TOGGLE HANDLER
+// ═══════════════════════════════════════════════════════════════
+function handleToggle(checkbox, tagId, onLabel, offLabel) {
+  const tag = document.getElementById(tagId);
+  if (!tag) return;
+  tag.textContent = checkbox.checked ? onLabel : offLabel;
+  tag.classList.add('changed');
+  setTimeout(() => tag.classList.remove('changed'), 400);
+  markUnsaved();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MFA TOGGLE (requires confirmation)
+// ═══════════════════════════════════════════════════════════════
+function handleMfaToggle(checkbox, pillId, role) {
+  const isEnforcing = checkbox.checked;
+  const pill = document.getElementById(pillId);
+  pill.textContent = isEnforcing ? 'Enforced' : 'Disabled';
+  pill.className = 'status-pill ' + (isEnforcing ? 'pill-on' : 'pill-off');
+  markUnsaved();
+
+  if (!isEnforcing) {
+    showToast(
+      `⚠️ MFA disabled for ${role}s`,
+      'Security policy weakened — save config to persist.',
+      'warn'
+    );
+  } else {
+    showToast(
+      `MFA enforced for all ${role}s`,
+      'Existing sessions without MFA will be terminated on next login.',
+      'success'
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SESSION TIMEOUT
+// ═══════════════════════════════════════════════════════════════
+function handleSessionTimeout(select) {
+  const labels = { '15': '15 min', '30': '30 min', '60': '1 hour', '240': '4 hours' };
+  markUnsaved();
+  showToast(
+    'Session timeout updated',
+    `Active sessions will expire after ${labels[select.value] || select.value} of inactivity.`,
+    'info'
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  BACKUP TOGGLES
+// ═══════════════════════════════════════════════════════════════
+function handleBackupToggle(checkbox, pillId, type) {
+  const pill = document.getElementById(pillId);
+  pill.textContent = checkbox.checked ? 'Active' : 'Paused';
+  pill.className = 'status-pill ' + (checkbox.checked ? 'pill-on' : 'pill-off');
+  markUnsaved();
+
+  if (checkbox.checked) {
+    showToast(
+      `${type === 'hourly' ? 'Hourly' : 'Daily'} backups enabled`,
+      `Supabase sync schedule activated.`,
+      'success'
+    );
+  } else {
+    showToast(
+      `${type === 'hourly' ? 'Hourly' : 'Daily'} backups paused`,
+      'Data protection reduced — re-enable before extended downtime.',
+      'warn'
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  REGISTRATION MODE
+// ═══════════════════════════════════════════════════════════════
+function handleRegMode(checkbox) {
+  const isOpen = checkbox.checked;
+  const pill = document.getElementById('regModePill');
+  const desc = document.getElementById('regModeDesc');
+  pill.textContent = isOpen ? 'Open Signups' : 'Approval Required';
+  pill.className = 'status-pill ' + (isOpen ? 'pill-on' : 'pill-off');
+  desc.textContent = isOpen
+    ? 'Open Signups:'
+    : 'Admin Approval Required:';
+  markUnsaved();
+  showToast(
+    isOpen ? 'Registration opened' : 'Registration locked',
+    isOpen
+      ? 'New users can sign up and access the platform immediately.'
+      : 'New accounts will enter a pending state until admin approval.',
+    isOpen ? 'success' : 'warn'
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RANGE SLIDERS (generic)
+// ═══════════════════════════════════════════════════════════════
+function updateSlider(input, valId, formatter) {
+  const min = +input.min, max = +input.max, val = +input.value;
+  const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+  input.style.setProperty('--val', pct);
+  document.getElementById(valId).textContent = formatter(val);
+  markUnsaved();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CRISIS SLIDER (custom colors per level)
+// ═══════════════════════════════════════════════════════════════
+const crisisColors = {
+  1: { bg: '#f0fdf4', fg: '#15803d', label: 'Level 1 — Low' },
+  2: { bg: '#fef9c3', fg: '#a16207', label: 'Level 2 — Moderate' },
+  3: { bg: '#fee2e2', fg: '#991b1b', label: 'Level 3 — High' },
+  4: { bg: '#fce7f3', fg: '#9d174d', label: 'Level 4 — Elevated' },
+  5: { bg: '#1e1b2e', fg: '#c4b5fd', label: 'Level 5 — Maximum' },
+};
+
+function updateCrisisSlider(input) {
+  const val = +input.value;
+  const min = +input.min, max = +input.max;
+  const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+  input.style.setProperty('--val', pct);
+
+  const c = crisisColors[val];
+  const valEl = document.getElementById('crisisVal');
+  const pillEl = document.getElementById('crisisSensitivityPill');
+  valEl.textContent = val + ' / 5';
+  valEl.style.background = c.bg;
+  valEl.style.color = c.fg;
+  pillEl.textContent = c.label;
+  pillEl.style.background = c.bg;
+  pillEl.style.color = c.fg;
+  markUnsaved();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SAVE SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function saveSettings() {
+  const topBtn = document.getElementById('topSaveBtn');
+  const mainBtn = document.getElementById('mainSaveBtn');
+
+  [topBtn, mainBtn].forEach(btn => {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Applying parameters…';
+  });
+
+  // Simulate async config write
+  setTimeout(() => {
+    [topBtn, mainBtn].forEach(btn => {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-device-floppy"></i> Save Configuration';
+    });
+    markSaved();
+    showToast(
+      'Configuration saved',
+      'System parameters updated and written to config.json!',
+      'success'
+    );
+  }, 1800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RESET TO DEFAULTS
+// ═══════════════════════════════════════════════════════════════
+function resetSettings() {
+  pendingModalAction = 'reset';
+  document.getElementById('modalIcon').className = 'modal-icon mi-warn';
+  document.getElementById('modalIconI').className = 'ti ti-refresh-alert';
+  document.getElementById('modalTitle').textContent = 'Reset to Default Settings?';
+  document.getElementById('modalBody').textContent = 'This will revert all configuration values to their factory defaults. Your current session timeout, backup rules, crisis sensitivity, and MFA policies will be overwritten. This action cannot be undone unless you manually reconfigure.';
+  document.getElementById('modalOkBtn').className = 'm-ok';
+  document.getElementById('modalOkBtn').textContent = 'Yes, Reset';
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DANGER ZONE ACTIONS
+// ═══════════════════════════════════════════════════════════════
+const dangerConfig = {
+  flushCache: {
+    icon: 'mi-danger', iconI: 'ti ti-database-x',
+    title: 'Flush Redis Cache?',
+    body: 'This will immediately purge all Redis cached data, including active query results and session tokens. All users will experience a 15–30% slowdown while caches rebuild. Are you absolutely sure?',
+    btnClass: 'm-ok danger',
+    btnLabel: 'Flush Cache Now',
+    successMsg: 'Redis cache flushed successfully.',
+    successSub: 'Cache is rebuilding — expect temporary slowdown.',
+  },
+  expireSessions: {
+    icon: 'mi-danger', iconI: 'ti ti-logout',
+    title: 'Force-Expire ALL Sessions?',
+    body: 'Every authenticated session on the platform — including yours — will be immediately invalidated. You will be redirected to the login page. Use only during confirmed security incidents.',
+    btnClass: 'm-ok danger',
+    btnLabel: 'Expire All Sessions',
+    successMsg: 'All sessions terminated.',
+    successSub: 'All users have been signed out of the platform.',
+  },
+  maintenanceMode: {
+    icon: 'mi-warn', iconI: 'ti ti-tool',
+    title: 'Enable Maintenance Mode?',
+    body: 'All non-admin users (patients and therapists) will be shown a maintenance page and blocked from using the platform. Journal entries cannot be submitted. The admin panel remains accessible. Disable maintenance mode from this settings page to restore access.',
+    btnClass: 'm-ok',
+    btnLabel: 'Enable Maintenance Mode',
+    successMsg: 'Maintenance mode activated.',
+    successSub: 'Patient and therapist access suspended platform-wide.',
+  },
+};
+
+function confirmDanger(action) {
+  const cfg = dangerConfig[action];
+  if (!cfg) return;
+  pendingModalAction = action;
+  document.getElementById('modalIcon').className = 'modal-icon ' + cfg.icon;
+  document.getElementById('modalIconI').className = 'ti ' + cfg.iconI;
+  document.getElementById('modalTitle').textContent = cfg.title;
+  document.getElementById('modalBody').textContent = cfg.body;
+  document.getElementById('modalOkBtn').className = cfg.btnClass;
+  document.getElementById('modalOkBtn').textContent = cfg.btnLabel;
+  document.getElementById('confirmModal').classList.add('show');
+}
+
+function executeModalAction() {
+  closeModal();
+  if (!pendingModalAction) return;
+
+  if (pendingModalAction === 'reset') {
+    showToast('Settings reset to defaults', 'All configuration values have been restored.', 'info');
+    markSaved();
+    pendingModalAction = null;
+    return;
+  }
+
+  const cfg = dangerConfig[pendingModalAction];
+  if (cfg) {
+    showToast(cfg.successMsg, cfg.successSub, pendingModalAction === 'maintenanceMode' ? 'warn' : 'success');
+  }
+  pendingModalAction = null;
+}
+
+function closeModal() {
+  document.getElementById('confirmModal').classList.remove('show');
+  pendingModalAction = null;
+}
+
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  TOAST SYSTEM
+// ═══════════════════════════════════════════════════════════════
+const toastIcons = {
+  success: 'ti-circle-check',
+  error:   'ti-circle-x',
+  info:    'ti-info-circle',
+  warn:    'ti-alert-triangle',
+};
+
+function showToast(title, sub, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <i class="ti ${toastIcons[type] || toastIcons.info} t-icon"></i>
+    <div class="toast-msg">
+      <div class="toast-title">${title}</div>
+      ${sub ? `<div class="toast-sub">${sub}</div>` : ''}
+    </div>
+  `;
+  container.appendChild(toast);
+  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  WARN ON UNLOAD
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('beforeunload', e => {
+  if (unsavedChanges) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT — sync all range slider gradients on load
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Sync dark mode toggle state from localStorage
+  const isDark = localStorage.getItem('theme') === 'dark';
+  const toggle = document.getElementById('darkModeToggle');
+  if(toggle) toggle.checked = isDark;
+  const pill = document.getElementById('darkModePill');
+  if(pill){ pill.textContent = isDark ? 'On' : 'Off'; pill.className = 'status-pill ' + (isDark ? 'pill-on' : 'pill-off'); }
+
+  document.querySelectorAll('input[type=range]').forEach(r => {
+    const min = +r.min, max = +r.max, val = +r.value;
+    const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+    r.style.setProperty('--val', pct);
+  });
+});
+</script>
+</body>
+</html>

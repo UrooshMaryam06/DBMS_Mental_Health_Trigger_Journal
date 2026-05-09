@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  var saved = localStorage.getItem('serenity_theme') || 'light';
+  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var isDark = saved === 'dark' || (saved === 'system' && prefersDark);
+  if(isDark){ document.documentElement.classList.add('dark'); }
+  else { document.documentElement.classList.remove('dark'); }
+})();
+</script>
 <title>MH Journal — Resource Library</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
@@ -117,6 +126,143 @@
   .content>*:nth-child(4){animation-delay:.16s}
   .content>*:nth-child(5){animation-delay:.20s}
   .content>*:nth-child(6){animation-delay:.24s}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (set from serenity_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body {
+  --cream:        #121212;
+  --warm-white:   #1e1e1e;
+  --peach-soft:   #2a1e18;
+  --peach:        #e08a62;
+  --peach-d:      #c96840;
+  --sage:         #3a5c44;
+  --sage-soft:    #1d2e22;
+  --sage-d:       #6daa7c;
+  --sage-dd:      #4d8a5e;
+  --lavender:     #1e1a2e;
+  --lavender-d:   #8b7ec0;
+  --rose:         #2e1a1a;
+  --rose-d:       #d47070;
+  --text-1:       #e5e0d8;
+  --text-2:       #9e918a;
+  --text-3:       #6b5e58;
+  --border:       #2e2825;
+  --sidebar-bg:   #1a2e20;
+  --danger:       #f87171;
+  --danger-l:     #2c1212;
+  --card-bg:      #242020;
+  --input-bg:     #1a1616;
+  --shadow:       rgba(0,0,0,.35);
+  /* for pages using --bg / --surface naming */
+  --bg:           #121212;
+  --surface:      #1e1e1e;
+  --accent-l:     rgba(45,106,79,.25);
+  --warn-l:       rgba(194,65,12,.18);
+  --blue-l:       rgba(29,78,216,.15);
+}
+html.dark body {
+  background: var(--cream, var(--bg));
+  color: var(--text-1);
+  transition: background .35s, color .35s;
+}
+html.dark .topbar  { background: var(--warm-white, var(--surface)); border-bottom-color: var(--border); }
+html.dark .main    { background: var(--cream, var(--bg)); }
+
+/* Cards / surfaces */
+html.dark .card, html.dark .entry-card, html.dark .appt-card,
+html.dark .msg-bubble-them, html.dark .resource-card,
+html.dark .stat-card, html.dark .metric-card, html.dark .mood-card,
+html.dark .section-card, html.dark .insight-card, html.dark .chart-card,
+html.dark .settings-section, html.dark .profile-section,
+html.dark .modal, html.dark .drawer,
+html.dark .mood-log-item, html.dark .trigger-item,
+html.dark .appt-item, html.dark .slot-btn,
+html.dark .resource-item, html.dark .filter-pill,
+html.dark .streak-card, html.dark .progress-card {
+  background: var(--warm-white, var(--surface));
+  border-color: var(--border);
+}
+
+/* Topbar / header surfaces */
+html.dark .card-header, html.dark .section-head,
+html.dark .table-head, html.dark .chat-header,
+html.dark .compose-area { background: var(--warm-white, var(--surface)); border-color: var(--border); }
+
+/* Table rows */
+html.dark thead th  { background: var(--cream, var(--bg)); color: var(--text-3); border-color: var(--border); }
+html.dark tbody tr  { border-color: var(--border); }
+html.dark tbody tr:hover { background: var(--peach-soft); }
+
+/* Inputs, selects, textareas */
+html.dark input, html.dark textarea, html.dark select,
+html.dark .search-box, html.dark .filter-select,
+html.dark .form-field, html.dark .compose-input {
+  background: var(--input-bg, var(--cream));
+  border-color: var(--border);
+  color: var(--text-1);
+}
+html.dark input::placeholder, html.dark textarea::placeholder { color: var(--text-3); }
+html.dark .search-box { background: var(--input-bg); border-color: var(--border); }
+html.dark .search-box input { background: transparent; color: var(--text-1); }
+
+/* Buttons */
+html.dark .icon-btn  { background: var(--input-bg); border-color: var(--border); color: var(--text-2); }
+html.dark .icon-btn:hover { background: var(--border); }
+
+/* Message bubbles */
+html.dark .msg-bubble-me   { background: var(--peach-soft); color: var(--text-1); }
+html.dark .msg-bubble-them { background: var(--warm-white); color: var(--text-1); }
+html.dark .conv-item:hover, html.dark .conv-item.active { background: var(--peach-soft); }
+
+/* Journal specific */
+html.dark .journal-card, html.dark .tag-chip,
+html.dark .mood-btn, html.dark .trigger-chip { background: var(--warm-white); border-color: var(--border); }
+html.dark .tag-chip.selected, html.dark .trigger-chip.selected { background: var(--sage-soft); }
+html.dark .writing-area { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+
+/* Analytics */
+html.dark .bar-track  { background: var(--border); }
+html.dark .chart-bg   { background: var(--warm-white); }
+
+/* Appointments */
+html.dark .calendar-grid .day       { background: var(--warm-white); border-color: var(--border); }
+html.dark .calendar-grid .day:hover { background: var(--peach-soft); }
+html.dark .calendar-grid .day.today { background: var(--peach-soft); border-color: var(--peach); }
+html.dark .time-slot  { background: var(--warm-white); border-color: var(--border); }
+html.dark .time-slot:hover { background: var(--peach-soft); }
+
+/* Resources */
+html.dark .resource-tag   { background: var(--sage-soft); color: var(--sage-d); }
+html.dark .category-pill  { background: var(--warm-white); border-color: var(--border); color: var(--text-2); }
+html.dark .category-pill.active { background: var(--peach-soft); border-color: var(--peach); color: var(--peach-d); }
+
+/* Settings-specific (already has body.dark but switching to html.dark) */
+html.dark .setting-row  { border-color: var(--border); }
+html.dark .setting-row:hover { background: var(--peach-soft); }
+html.dark .save-bar     { background: var(--warm-white); border-color: var(--border); }
+html.dark .theme-card   { background: var(--warm-white); border-color: var(--border); }
+html.dark .theme-card.selected { background: var(--peach-soft); border-color: var(--peach-d); }
+html.dark .toggle-slider { background: #3a3030; }
+html.dark .sys-select   { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+html.dark .section-divider { border-color: var(--border); color: var(--text-3); }
+
+/* Profile-specific */
+html.dark .profile-field input, html.dark .profile-field select { background: var(--input-bg); border-color: var(--border); color: var(--text-1); }
+html.dark .info-row    { border-color: var(--border); }
+html.dark .log-item    { background: var(--warm-white); border-color: var(--border); }
+
+/* Dashboard */
+html.dark .quick-action { background: var(--warm-white); border-color: var(--border); }
+html.dark .quick-action:hover { background: var(--peach-soft); }
+html.dark .mood-ring    { background: var(--warm-white); }
+
+/* Modals */
+html.dark .modal-bg     { background: rgba(0,0,0,.65); }
+html.dark .modal        { background: var(--warm-white); border-color: var(--border); }
+
+/* Toasts */
+html.dark .toast { background: #2a2420; border-color: var(--border); color: var(--text-1); }
 </style>
 </head>
 <body>

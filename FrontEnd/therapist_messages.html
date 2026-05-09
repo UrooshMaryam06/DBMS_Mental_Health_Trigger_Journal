@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  if(localStorage.getItem('mhj_theme')==='dark'){
+    document.documentElement.classList.add('dark');
+  }else{
+    document.documentElement.classList.remove('dark');
+  }
+})();
+</script>
+<title>MH Journal — Messages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+
+<style>
+/* ══ RESET ══ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--surface:#ffffff;--border:#e2e8f0;--border-d:#cbd5e1;
+  --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --accent:#4f46e5;--accent-l:#eef2ff;--accent-m:#c7d2fe;--accent-d:#3730a3;
+  --sidebar:#0f172a;--sidebar-hover:rgba(99,102,241,.14);--sidebar-active:rgba(99,102,241,.18);
+  --danger:#dc2626;--danger-l:#fef2f2;--danger-m:#fca5a5;
+  --warn:#d97706;--warn-l:#fffbeb;--ok:#16a34a;--ok-l:#f0fdf4;
+  --radius:12px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.07);
+  --shadow-md:0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.13);
+}
+/* DARK THEME OVERRIDE */
+
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);overflow-x:hidden;line-height:1.5}
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:244px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:30;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:11px;padding:22px 20px 20px;border-bottom:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(79,70,229,.5)}
+.sb-logo i{font-size:18px;color:#fff}
+.sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.32);margin-top:2px;font-weight:500}
+.sb-nav{padding:14px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:14px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .14s,color .14s;color:rgba(255,255,255,.52);font-size:13px;font-weight:500;white-space:nowrap}
+.nav-item:hover{background:var(--sidebar-hover);color:rgba(255,255,255,.88)}
+.nav-item.active{background:var(--sidebar-active);color:#c7d2fe}
+.nav-item i{font-size:17px;color:rgba(255,255,255,.3);transition:color .14s;flex-shrink:0}
+.nav-item:hover i,.nav-item.active i{color:#a5b4fc}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.sb-foot{padding:14px 20px;border-top:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600;color:#fff}
+.sb-role{font-size:11px;color:rgba(255,255,255,.32);margin-top:1px}
+
+/* MAIN */
+.main{margin-left:244px;flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:14px}
+.tb-title{font-size:15px;font-weight:700;color:var(--text-1);letter-spacing:-.02em}
+.tb-sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:9px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:all .14s;position:relative;flex-shrink:0}
+.icon-btn:hover{background:#e8edf2;border-color:var(--border-d);color:var(--text-1)}
+.icon-btn i{font-size:18px}
+
+/* MESSAGES WORKSPACE */
+.msg-workspace{display:flex;flex:1;overflow:hidden}
+
+/* LEFT: Thread List */
+.msg-sidebar{width:300px;flex-shrink:0;border-right:.5px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.ms-head{padding:14px 16px;border-bottom:.5px solid var(--border);flex-shrink:0}
+.ms-head-title{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:9px}
+.thread-search{width:100%;border:1px solid var(--border);border-radius:9px;padding:7px 12px 7px 34px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);outline:none;transition:border-color .14s}
+.thread-search:focus{border-color:var(--accent)}
+.ts-wrap{position:relative}
+.ts-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--text-3);pointer-events:none}
+.thread-list{overflow-y:auto;flex:1}
+.thread-item{padding:12px 16px;border-bottom:.5px solid var(--border);cursor:pointer;transition:background .13s;display:flex;align-items:flex-start;gap:10px}
+.thread-item:hover{background:#f8fafc}
+.thread-item.active{background:var(--accent-l);border-left:3px solid var(--accent)}
+.thread-item.unread .ti-name{font-weight:700}
+.t-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;position:relative}
+.t-unread-dot{position:absolute;top:0;right:0;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.ti-body{flex:1;min-width:0}
+.ti-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.ti-name{font-size:13px;font-weight:600;color:var(--text-1)}
+.ti-time{font-size:11px;color:var(--text-3);flex-shrink:0;margin-left:6px}
+.ti-preview{font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ti-preview.unread-preview{font-weight:600;color:var(--text-1)}
+.ti-crisis{font-size:10px;background:var(--danger-l);color:var(--danger);padding:1px 6px;border-radius:10px;font-weight:700;margin-left:5px}
+
+/* RIGHT: Chat Area */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.chat-placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-3)}
+.chat-placeholder i{font-size:44px;opacity:.35}
+.chat-placeholder p{font-size:14px;font-weight:500}
+
+.chat-header{background:var(--surface);border-bottom:.5px solid var(--border);padding:13px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.ch-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.ch-name{font-size:14px;font-weight:700;color:var(--text-1)}
+.ch-status{font-size:12px;color:var(--text-3)}
+.ch-actions{margin-left:auto;display:flex;gap:8px}
+.ch-btn{border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--text-2);background:var(--surface);transition:all .14s}
+.ch-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ch-btn.danger{border-color:var(--danger-m);color:var(--danger);background:var(--danger-l)}
+
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+.bubble-wrap{display:flex;gap:8px;align-items:flex-end}
+.bubble-wrap.out{flex-direction:row-reverse}
+.b-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0}
+.bubble{max-width:68%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.55}
+.bubble-in{background:var(--surface);color:var(--text-1);border-bottom-left-radius:4px;box-shadow:var(--shadow-sm)}
+.bubble-out{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.b-time{font-size:10px;color:var(--text-3);margin-top:3px;text-align:right}
+.bubble-wrap.out .b-time{text-align:left}
+.sys-msg{text-align:center;font-size:11px;color:var(--text-3);padding:4px 0}
+
+.chat-input-wrap{background:var(--surface);border-top:.5px solid var(--border);padding:14px 20px;display:flex;align-items:flex-end;gap:10px;flex-shrink:0}
+.chat-input{flex:1;border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);outline:none;resize:none;max-height:120px;line-height:1.5;transition:border-color .14s}
+.chat-input:focus{border-color:var(--accent)}
+.send-btn{width:40px;height:40px;border-radius:10px;background:var(--accent);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0}
+.send-btn:hover{background:var(--accent-d);transform:scale(1.05)}
+.send-btn i{font-size:18px;color:#fff}
+.attach-btn{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .14s}
+.attach-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* CRISIS BANNER */
+.crisis-banner{background:var(--danger-l);border-bottom:1px solid var(--danger-m);padding:8px 20px;display:flex;align-items:center;gap:8px;font-size:12px;color:#991b1b;font-weight:600;flex-shrink:0}
+.crisis-banner i{color:var(--danger);font-size:15px}
+.crisis-banner button{margin-left:auto;border:1px solid var(--danger-m);background:transparent;color:var(--danger);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:16px;flex-shrink:0}
+.t-ok i{color:#4ade80}.t-err i{color:#f87171}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.bubble-wrap{animation:fadeUp .2s ease both}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (driven by mhj_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body{
+  --bg:#0b0f19;--surface:#1e293b;--border:#334155;--border-d:#475569;
+  --text-1:#f1f5f9;--text-2:#94a3b8;--text-3:#64748b;
+  --accent-l:#1e1b4b;--accent-m:rgba(99,102,241,.25);
+  --danger-l:#2c0a0a;--danger-m:#7f1d1d;
+  --warn-l:#1c1003;--ok-l:#052e16;
+  background:#0b0f19;color:#f1f5f9;
+}
+html.dark body .topbar,
+html.dark body .settings-card,html.dark body .surface-card,
+html.dark body .card,html.dark body .metric-card,html.dark body .chart-card,
+html.dark body .stat-card,html.dark body .section-card,
+html.dark body .appt-card,html.dark body .session-card,
+html.dark body .patient-card,html.dark body .review-card,
+html.dark body .resource-card,html.dark body .res-card,
+html.dark body .msg-sidebar,html.dark body .chat-area,
+html.dark body .profile-card,html.dark body .modal,
+html.dark body .drawer,html.dark body .bg-white,
+html.dark body .filter-bar{
+  background:var(--surface)!important;
+  border-color:var(--border)!important;
+  color:var(--text-1)!important;
+}
+html.dark body .topbar{border-bottom-color:var(--border)!important}
+html.dark body .text-slate-900,html.dark body .text-slate-800{color:var(--text-1)!important}
+html.dark body .text-slate-500,html.dark body .text-slate-400{color:var(--text-2)!important}
+html.dark body .border-slate-100,html.dark body .border-slate-200{border-color:var(--border)!important}
+html.dark body thead th{background:#0d1424;color:var(--text-3);border-color:var(--border)}
+html.dark body tbody tr{border-color:var(--border)}
+html.dark body tbody tr:hover{background:#141d2e}
+html.dark body input,html.dark body textarea,html.dark body select,
+html.dark body .s-input,html.dark body .s-select,
+html.dark body .search-box,html.dark body .search-res,
+html.dark body .form-field,html.dark body .compose-input{
+  background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important;
+}
+html.dark body input::placeholder,html.dark body textarea::placeholder{color:var(--text-3)!important}
+html.dark body .icon-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .icon-btn:hover{background:var(--border)}
+html.dark body .range-btn{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .range-btn.active{background:var(--accent)!important;color:#fff!important}
+html.dark body .cat-chip{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .cat-chip.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+html.dark body .assign-select{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important}
+html.dark body .setting-row{border-color:var(--border)!important}
+html.dark body .danger-zone{background:#1a0a0a!important;border-color:#7f1d1d!important}
+html.dark body .thread-item{border-color:var(--border)!important}
+html.dark body .thread-item:hover,html.dark body .thread-item.active{background:#263148!important}
+html.dark body .bubble-in{background:#263148!important;color:var(--text-1)!important}
+html.dark body .mc{background:var(--surface)!important;border-color:var(--border)!important}
+html.dark body .quick-card,html.dark body .log-item{background:var(--surface);border-color:var(--border)}
+html.dark body .filter-chip{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .calendar-day{background:var(--surface);border-color:var(--border)}
+html.dark body .calendar-day:hover{background:#141d2e}
+html.dark body .time-slot,html.dark body .slot-btn{background:var(--surface);border-color:var(--border)}
+html.dark body .vt-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .vt-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .panel{background:var(--surface);border-color:var(--border)}
+html.dark body .profile-section,html.dark body .info-row{border-color:var(--border)}
+html.dark body .log-entry{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item:hover,html.dark body .queue-item.active{background:#141d2e}
+html.dark body .review-action-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .modal-bg,html.dark body .modal-overlay{background:rgba(0,0,0,.7)}
+html.dark body .modal,html.dark body .modal-inner,html.dark body .assign-modal-inner{
+  background:var(--surface)!important;border-color:var(--border)!important;
+}
+html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--text-1)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" role="navigation" aria-label="Therapist navigation">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Therapist Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="4_therapist_dashboard.html#patients" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+    <a href="therapist_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+    <a href="therapist_reviews.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+    <div class="nav-section">Tools</div>
+    <a href="therapist_messages.html" class="nav-item active" aria-current="page"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">3</span></a>
+    <a href="therapist_analytics.html" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+    <a href="therapist_resources.html" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+    <div class="nav-section">Account</div>
+    <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+    <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto;color:rgba(255,255,255,.38)"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user" onclick="window.location.href='therapist_profile.html'">
+      <div class="sb-avatar">IK</div>
+      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="tb-title">Messages</div>
+      <div class="tb-sub">3 unread conversations</div>
+    </div>
+    <div class="tb-right">
+      <a href="4_therapist_dashboard.html" class="icon-btn" title="Dashboard"><i class="ti ti-layout-dashboard"></i></a>
+      <a href="therapist_profile.html" class="icon-btn" title="Profile"><i class="ti ti-user-circle"></i></a>
+    </div>
+  </header>
+
+  <!-- WORKSPACE -->
+  <div class="msg-workspace">
+
+    <!-- LEFT: Thread List -->
+    <div class="msg-sidebar">
+      <div class="ms-head">
+        <div class="ms-head-title">Patient Threads</div>
+        <div class="ts-wrap">
+          <i class="ti ti-search"></i>
+          <input type="text" class="thread-search" placeholder="Search messages…" id="threadSearch" oninput="filterThreads(this.value)"/>
+        </div>
+      </div>
+      <div class="thread-list" id="threadList"></div>
+    </div>
+
+    <!-- RIGHT: Chat Area -->
+    <div class="chat-area" id="chatArea">
+      <div class="chat-placeholder" id="chatPlaceholder">
+        <i class="ti ti-messages"></i>
+        <p>Select a conversation to start messaging</p>
+      </div>
+      <div id="chatMain" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none">
+        <!-- crisis banner injected here -->
+        <div id="crisisbanner"></div>
+        <div class="chat-header" id="chatHeader"></div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-wrap">
+          <button class="attach-btn" title="Attach file"><i class="ti ti-paperclip"></i></button>
+          <textarea class="chat-input" id="chatInput" placeholder="Write a clinical note or message…" rows="1"
+            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" onclick="sendMessage()" title="Send message"><i class="ti ti-send"></i></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="alert"><i id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+/* ── DARK MODE APPLY ── */
+(function(){
+  const t = localStorage.getItem('mhj_theme');
+  if(t === 'dark') document.documentElement.classList.add('dark');
+})();
+
+/* ── DATA ── */
+const THREADS = [
+  {
+    id:'t1', patientId:'p3', name:'Fatima Noor', initials:'FN',
+    avBg:'#fce7f3', avColor:'#9d174d', crisis:true, unread:2,
+    lastMsg:'I don\'t feel safe right now. Can we talk?', lastTime:'9:14 AM',
+    status:'Crisis patient — mood 2/10',
+    messages:[
+      {from:'patient', text:'Dr. Khan, I had a really bad night. I couldn\'t sleep at all.', time:'8:45 AM'},
+      {from:'patient', text:'I\'ve been having thoughts I shouldn\'t have. I\'m scared.', time:'8:52 AM'},
+      {from:'therapist', text:'Fatima, I\'m here with you. Thank you for reaching out — that took courage. Can you tell me more about what you\'re experiencing right now?', time:'9:00 AM'},
+      {from:'patient', text:'I don\'t feel safe right now. Can we talk?', time:'9:14 AM'},
+    ]
+  },
+  {
+    id:'t2', patientId:'p1', name:'Sara Ahmed', initials:'SA',
+    avBg:'#dbeafe', avColor:'#1d4ed8', crisis:true, unread:1,
+    lastMsg:'The breathing exercises helped a little. Thank you.', lastTime:'Yesterday',
+    status:'Crisis patient — panic disorder',
+    messages:[
+      {from:'therapist', text:'Sara, how are you feeling after this morning\'s episode? I want to check in before our session.', time:'10:30 AM'},
+      {from:'patient', text:'I\'m exhausted. The panic attack at work was humiliating. My manager saw.', time:'10:45 AM'},
+      {from:'therapist', text:'That sounds incredibly difficult. Your feelings are completely valid. We\'ll use our session time today to process this together. Please try the 4-7-8 breathing if you feel another wave coming.', time:'11:00 AM'},
+      {from:'patient', text:'The breathing exercises helped a little. Thank you.', time:'Yesterday'},
+    ]
+  },
+  {
+    id:'t3', patientId:'p2', name:'Ali Khan', initials:'AK',
+    avBg:'#dcfce7', avColor:'#15803d', crisis:false, unread:0,
+    lastMsg:'Could you recommend something for financial anxiety?', lastTime:'Apr 24',
+    status:'Active patient — anxiety, family conflict',
+    messages:[
+      {from:'patient', text:'Dr. Khan, I had another argument with my father about money. It really set me back.', time:'Apr 23'},
+      {from:'therapist', text:'I understand, Ali. Family financial conflicts are among the most stressful triggers. Let\'s talk about this in our next session — I\'ll prepare some specific CBT exercises for financial anxiety.', time:'Apr 23'},
+      {from:'patient', text:'Could you recommend something for financial anxiety?', time:'Apr 24'},
+    ]
+  },
+  {
+    id:'t4', patientId:'p5', name:'Hassan Malik', initials:'HM',
+    avBg:'#ede9fe', avColor:'#5b21b6', crisis:false, unread:0,
+    lastMsg:'I\'ve started using the sleep hygiene checklist you sent.', lastTime:'Apr 19',
+    status:'Active patient — social anxiety, sleep disorder',
+    messages:[
+      {from:'therapist', text:'Hassan, I\'ve assigned you the Sleep Hygiene worksheet. Please review it before Friday.', time:'Apr 18'},
+      {from:'patient', text:'I\'ve started using the sleep hygiene checklist you sent. Managed 6 hours last night — first time in weeks!', time:'Apr 19'},
+      {from:'therapist', text:'That\'s wonderful progress, Hassan! A full sleep cycle makes such a difference for anxiety management. Keep tracking your sleep this week.', time:'Apr 19'},
+    ]
+  },
+  {
+    id:'t5', patientId:'p4', name:'Zainab Raza', initials:'ZR',
+    avBg:'#fef3c7', avColor:'#b45309', crisis:false, unread:0,
+    lastMsg:'I\'m actually feeling pretty good this week!', lastTime:'Apr 23',
+    status:'Stable patient — academic stress',
+    messages:[
+      {from:'patient', text:'I\'m actually feeling pretty good this week! Finished my thesis chapter on time.', time:'Apr 23'},
+      {from:'therapist', text:'Zainab, that\'s excellent news! Completing that chapter is a significant milestone. How is your mood holding up alongside the workload?', time:'Apr 23'},
+    ]
+  }
+];
+
+let activeThread = null;
+let toastTimer;
+
+/* ── RENDER THREADS ── */
+function renderThreads(filter='') {
+  const list = document.getElementById('threadList');
+  const lc = filter.toLowerCase();
+  list.innerHTML = THREADS
+    .filter(t => t.name.toLowerCase().includes(lc) || t.lastMsg.toLowerCase().includes(lc))
+    .map(t => `
+      <div class="thread-item ${t.unread ? 'unread' : ''} ${activeThread===t.id ? 'active' : ''}"
+           onclick="openThread('${t.id}')" data-id="${t.id}">
+        <div class="t-av" style="background:${t.avBg};color:${t.avColor}">
+          ${t.initials}
+          ${t.unread ? '<div class="t-unread-dot"></div>' : ''}
+        </div>
+        <div class="ti-body">
+          <div class="ti-row">
+            <span class="ti-name">${t.name}${t.crisis ? '<span class="ti-crisis">CRISIS</span>' : ''}</span>
+            <span class="ti-time">${t.lastTime}</span>
+          </div>
+          <div class="ti-preview ${t.unread ? 'unread-preview' : ''}">${t.lastMsg}</div>
+        </div>
+      </div>
+    `).join('');
+}
+
+function filterThreads(val) { renderThreads(val); }
+
+/* ── OPEN THREAD ── */
+function openThread(id) {
+  activeThread = id;
+  const thread = THREADS.find(t => t.id === id);
+  if(!thread) return;
+
+  // Mark as read
+  thread.unread = 0;
+  renderThreads(document.getElementById('threadSearch').value);
+
+  document.getElementById('chatPlaceholder').style.display = 'none';
+  const cm = document.getElementById('chatMain');
+  cm.style.display = 'flex';
+  cm.style.flexDirection = 'column';
+  cm.style.overflow = 'hidden';
+  cm.style.flex = '1';
+
+  // Crisis banner
+  document.getElementById('crisisbanner').innerHTML = thread.crisis
+    ? `<div class="crisis-banner"><i class="ti ti-alert-triangle"></i>Crisis patient — review entry and activate protocol if necessary<button onclick="showToast('Emergency protocol initiated. Supervisor notified.','err')">Activate Protocol</button></div>`
+    : '';
+
+  // Header
+  document.getElementById('chatHeader').innerHTML = `
+    <div class="ch-av" style="background:${thread.avBg};color:${thread.avColor}">${thread.initials}</div>
+    <div>
+      <div class="ch-name">${thread.name}</div>
+      <div class="ch-status">${thread.status}</div>
+    </div>
+    <div class="ch-actions">
+      <button class="ch-btn" onclick="showToast('Launching video session with ${thread.name}…','ok')"><i class="ti ti-video"></i>Video Call</button>
+      <button class="ch-btn" onclick="window.location.href='therapist_reviews.html'"><i class="ti ti-notebook"></i>Journal</button>
+      ${thread.crisis ? `<button class="ch-btn danger" onclick="showToast('Crisis protocol activated for ${thread.name}. Notifications sent.','err')"><i class="ti ti-alert-triangle"></i>Crisis</button>` : ''}
+    </div>
+  `;
+
+  renderMessages(thread);
+}
+
+/* ── RENDER MESSAGES ── */
+function renderMessages(thread) {
+  const container = document.getElementById('chatMessages');
+  const now = new Date();
+  container.innerHTML = `<div class="sys-msg">Conversation started — ${now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>`;
+  thread.messages.forEach(m => {
+    const isOut = m.from === 'therapist';
+    container.innerHTML += `
+      <div class="bubble-wrap ${isOut ? 'out' : ''}">
+        ${!isOut ? `<div class="b-av" style="background:${thread.avBg};color:${thread.avColor}">${thread.initials}</div>` : ''}
+        <div>
+          <div class="bubble ${isOut ? 'bubble-out' : 'bubble-in'}">${m.text}</div>
+          <div class="b-time">${m.time}</div>
+        </div>
+        ${isOut ? `<div class="b-av" style="background:linear-gradient(135deg,#a5b4fc,#818cf8);color:#1e1b4b">IK</div>` : ''}
+      </div>
+    `;
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+/* ── SEND MESSAGE ── */
+const AUTO_REPLIES = [
+  'Thank you for sharing that with me. I hear you.',
+  'That takes real courage to express. Let\'s explore this further in our next session.',
+  'I understand. Your feelings are valid. Have you tried the grounding exercises we discussed?',
+  'I\'m reviewing your recent journal entries alongside this. I\'ll have resources ready for you.',
+  'Please remember your coping toolkit for tonight. I\'ll follow up first thing tomorrow.',
+];
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text || !activeThread) return;
+
+  const thread = THREADS.find(t => t.id === activeThread);
+  const timeStr = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  thread.messages.push({from:'therapist', text, time:timeStr});
+  thread.lastMsg = text.length > 48 ? text.slice(0,48)+'…' : text;
+  thread.lastTime = 'Just now';
+
+  input.value = '';
+  input.style.height = 'auto';
+  renderMessages(thread);
+  renderThreads(document.getElementById('threadSearch').value);
+
+  // Simulate patient reply
+  setTimeout(() => {
+    const reply = AUTO_REPLIES[Math.floor(Math.random()*AUTO_REPLIES.length)];
+    const replyTime = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    thread.messages.push({from:'patient', text:reply, time:replyTime});
+    thread.lastMsg = reply.length > 48 ? reply.slice(0,48)+'…' : reply;
+    thread.lastTime = 'Just now';
+    renderMessages(thread);
+    renderThreads(document.getElementById('threadSearch').value);
+  }, 1400 + Math.random()*1000);
+}
+
+function handleKey(e) {
+  if(e.key === 'Enter' && !e.shiftKey){e.preventDefault();sendMessage();}
+}
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = type==='ok' ? 'ti ti-circle-check' : 'ti ti-alert-circle';
+  t.className = 'toast t-' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+/* ── INIT ── */
+renderThreads();
+// Auto-open first (crisis) thread
+setTimeout(() => openThread('t1'), 100);
+</script>
+</body>
+</html>

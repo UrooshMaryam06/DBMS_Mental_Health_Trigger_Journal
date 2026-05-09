@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  if(localStorage.getItem('mhj_theme')==='dark'){
+    document.documentElement.classList.add('dark');
+  }else{
+    document.documentElement.classList.remove('dark');
+  }
+})();
+</script>
+<title>MH Journal — Therapist Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--surface:#ffffff;--border:#e2e8f0;--border-d:#cbd5e1;
+  --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --accent:#4f46e5;--accent-l:#eef2ff;--accent-m:#c7d2fe;--accent-d:#3730a3;
+  --sidebar:#0f172a;--sidebar-hover:rgba(99,102,241,.14);--sidebar-active:rgba(99,102,241,.18);
+  --danger:#dc2626;--danger-l:#fef2f2;--danger-m:#fca5a5;
+  --warn:#d97706;--warn-l:#fffbeb;--ok:#16a34a;--ok-l:#f0fdf4;
+  --radius:12px;--shadow-sm:0 1px 3px rgba(0,0,0,.07);--shadow-md:0 4px 16px rgba(0,0,0,.09);--shadow-lg:0 12px 40px rgba(0,0,0,.13);
+}
+
+/* ── DARK THEME ── */
+  background:#0b0f19!important;color:#f1f5f9!important;
+  --bg:#0b0f19;--surface:#1e293b;--border:#334155;--border-d:#475569;
+  --text-1:#f1f5f9;--text-2:#94a3b8;--text-3:#64748b;
+}
+
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);overflow-x:hidden;line-height:1.5}
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:244px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:30;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:11px;padding:22px 20px 20px;border-bottom:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(79,70,229,.5)}
+.sb-logo i{font-size:18px;color:#fff}
+.sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.32);margin-top:2px;font-weight:500}
+.sb-nav{padding:14px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:14px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .14s,color .14s;color:rgba(255,255,255,.52);font-size:13px;font-weight:500;white-space:nowrap}
+.nav-item:hover{background:var(--sidebar-hover);color:rgba(255,255,255,.88)}
+.nav-item.active{background:var(--sidebar-active);color:#c7d2fe}
+.nav-item i{font-size:17px;color:rgba(255,255,255,.3);transition:color .14s;flex-shrink:0}
+.nav-item:hover i,.nav-item.active i{color:#a5b4fc}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.sb-foot{padding:14px 20px;border-top:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600;color:#fff}
+.sb-role{font-size:11px;color:rgba(255,255,255,.32);margin-top:1px}
+
+.main{margin-left:244px;flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:14px}
+.tb-title{font-size:15px;font-weight:700;color:var(--text-1);letter-spacing:-.02em}
+.tb-sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:9px}
+.save-all-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .14s}
+.save-all-btn:hover{background:var(--accent-d)}
+
+.content{padding:26px 28px 60px;flex:1;max-width:780px}
+
+/* SETTINGS CARDS */
+.settings-card{background:var(--surface);border-radius:var(--radius);border:.5px solid var(--border);margin-bottom:16px;box-shadow:var(--shadow-sm);overflow:hidden}
+.sc-head{padding:16px 20px;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:10px}
+.sc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-icon i{font-size:16px}
+.sc-label{font-size:14px;font-weight:700;color:var(--text-1)}
+.sc-desc{font-size:12px;color:var(--text-3);margin-top:1px}
+.setting-row{padding:14px 20px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.setting-row:last-child{border-bottom:none}
+.sr-info{flex:1}
+.sr-label{font-size:13px;font-weight:600;color:var(--text-1)}
+.sr-sub{font-size:12px;color:var(--text-3);margin-top:2px;line-height:1.5}
+.sr-badge{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-left:7px;vertical-align:middle}
+.rb-recommended{background:var(--ok-l);color:var(--ok)}
+
+/* TOGGLE SWITCH */
+.toggle-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.toggle{width:44px;height:24px;border-radius:12px;background:#cbd5e1;cursor:pointer;position:relative;transition:background .2s;border:none;padding:0;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s cubic-bezier(.4,0,.2,1)}
+.toggle.on .toggle-thumb{transform:translateX(20px)}
+.toggle-label{font-size:12px;font-weight:600;color:var(--text-3)}
+.toggle.on + .toggle-label{color:var(--accent)}
+
+/* DARK MODE TOGGLE (special) */
+.dark-toggle-row{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.dm-preview{display:flex;gap:8px;align-items:center}
+.dm-swatch{width:32px;height:32px;border-radius:8px;border:2px solid var(--border);flex-shrink:0;transition:all .2s}
+.dm-swatch.light-sw{background:#f1f5f9}
+.dm-swatch.dark-sw{background:#0f172a}
+
+/* INPUTS */
+.s-input,.s-select{border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);outline:none;transition:border-color .14s;width:100%}
+.s-input:focus,.s-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.08)}
+.s-select{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 20px 0}
+.field{margin-bottom:14px}
+.field-label{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px}
+
+/* AVAILABILITY GRID */
+.avail-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:14px 20px}
+.day-col{display:flex;flex-direction:column;gap:4px;align-items:center}
+.day-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin-bottom:3px}
+.day-slot{width:100%;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--text-3);transition:all .14s;display:flex;align-items:center;justify-content:center}
+.day-slot:hover{border-color:var(--accent);color:var(--accent)}
+.day-slot.on{background:var(--accent-l);border-color:var(--accent-m);color:var(--accent)}
+
+/* EMERGENCY CONTACTS */
+.ec-list{padding:0 20px 14px;display:flex;flex-direction:column;gap:8px}
+.ec-item{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:9px;padding:10px 13px;border:.5px solid var(--border)}
+.ec-icon{width:28px;height:28px;border-radius:7px;background:var(--danger-l);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ec-icon i{font-size:14px;color:var(--danger)}
+.ec-info{flex:1}
+.ec-name{font-size:13px;font-weight:600;color:var(--text-1)}
+.ec-detail{font-size:11px;color:var(--text-3)}
+.ec-remove{border:none;background:transparent;color:var(--text-3);cursor:pointer;padding:4px;border-radius:5px;font-size:13px;transition:color .14s}
+.ec-remove:hover{color:var(--danger)}
+.add-ec-btn{margin:0 20px 14px;border:1.5px dashed var(--border);border-radius:9px;padding:9px;background:transparent;width:calc(100% - 40px);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .14s}
+.add-ec-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* DANGER ZONE */
+.danger-zone{background:#fff5f5;border:.5px solid #fca5a5;border-radius:var(--radius);padding:18px 20px;margin-bottom:0}
+.dz-title{font-size:13px;font-weight:700;color:var(--danger);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.dz-desc{font-size:12px;color:#7f1d1d;line-height:1.6;margin-bottom:13px}
+.dz-btn{border:1.5px solid var(--danger);background:transparent;color:var(--danger);border-radius:9px;padding:8px 16px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .14s}
+.dz-btn:hover{background:var(--danger);color:#fff}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:16px;flex-shrink:0}
+.t-ok i{color:#4ade80}.t-err i{color:#f87171}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.content>*{animation:fadeUp .3s ease both}
+.content>*:nth-child(1){animation-delay:.04s}
+.content>*:nth-child(2){animation-delay:.09s}
+.content>*:nth-child(3){animation-delay:.14s}
+.content>*:nth-child(4){animation-delay:.18s}
+.content>*:nth-child(5){animation-delay:.22s}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (driven by mhj_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body{
+  --bg:#0b0f19;--surface:#1e293b;--border:#334155;--border-d:#475569;
+  --text-1:#f1f5f9;--text-2:#94a3b8;--text-3:#64748b;
+  --accent-l:#1e1b4b;--accent-m:rgba(99,102,241,.25);
+  --danger-l:#2c0a0a;--danger-m:#7f1d1d;
+  --warn-l:#1c1003;--ok-l:#052e16;
+  background:#0b0f19;color:#f1f5f9;
+}
+html.dark body .topbar,
+html.dark body .settings-card,html.dark body .surface-card,
+html.dark body .card,html.dark body .metric-card,html.dark body .chart-card,
+html.dark body .stat-card,html.dark body .section-card,
+html.dark body .appt-card,html.dark body .session-card,
+html.dark body .patient-card,html.dark body .review-card,
+html.dark body .resource-card,html.dark body .res-card,
+html.dark body .msg-sidebar,html.dark body .chat-area,
+html.dark body .profile-card,html.dark body .modal,
+html.dark body .drawer,html.dark body .bg-white,
+html.dark body .filter-bar{
+  background:var(--surface)!important;
+  border-color:var(--border)!important;
+  color:var(--text-1)!important;
+}
+html.dark body .topbar{border-bottom-color:var(--border)!important}
+html.dark body .text-slate-900,html.dark body .text-slate-800{color:var(--text-1)!important}
+html.dark body .text-slate-500,html.dark body .text-slate-400{color:var(--text-2)!important}
+html.dark body .border-slate-100,html.dark body .border-slate-200{border-color:var(--border)!important}
+html.dark body thead th{background:#0d1424;color:var(--text-3);border-color:var(--border)}
+html.dark body tbody tr{border-color:var(--border)}
+html.dark body tbody tr:hover{background:#141d2e}
+html.dark body input,html.dark body textarea,html.dark body select,
+html.dark body .s-input,html.dark body .s-select,
+html.dark body .search-box,html.dark body .search-res,
+html.dark body .form-field,html.dark body .compose-input{
+  background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important;
+}
+html.dark body input::placeholder,html.dark body textarea::placeholder{color:var(--text-3)!important}
+html.dark body .icon-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .icon-btn:hover{background:var(--border)}
+html.dark body .range-btn{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .range-btn.active{background:var(--accent)!important;color:#fff!important}
+html.dark body .cat-chip{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .cat-chip.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+html.dark body .assign-select{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important}
+html.dark body .setting-row{border-color:var(--border)!important}
+html.dark body .danger-zone{background:#1a0a0a!important;border-color:#7f1d1d!important}
+html.dark body .thread-item{border-color:var(--border)!important}
+html.dark body .thread-item:hover,html.dark body .thread-item.active{background:#263148!important}
+html.dark body .bubble-in{background:#263148!important;color:var(--text-1)!important}
+html.dark body .mc{background:var(--surface)!important;border-color:var(--border)!important}
+html.dark body .quick-card,html.dark body .log-item{background:var(--surface);border-color:var(--border)}
+html.dark body .filter-chip{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .calendar-day{background:var(--surface);border-color:var(--border)}
+html.dark body .calendar-day:hover{background:#141d2e}
+html.dark body .time-slot,html.dark body .slot-btn{background:var(--surface);border-color:var(--border)}
+html.dark body .vt-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .vt-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .panel{background:var(--surface);border-color:var(--border)}
+html.dark body .profile-section,html.dark body .info-row{border-color:var(--border)}
+html.dark body .log-entry{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item:hover,html.dark body .queue-item.active{background:#141d2e}
+html.dark body .review-action-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .modal-bg,html.dark body .modal-overlay{background:rgba(0,0,0,.7)}
+html.dark body .modal,html.dark body .modal-inner,html.dark body .assign-modal-inner{
+  background:var(--surface)!important;border-color:var(--border)!important;
+}
+html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--text-1)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" role="navigation">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Therapist Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="4_therapist_dashboard.html#patients" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+    <a href="therapist_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+    <a href="therapist_reviews.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+    <div class="nav-section">Tools</div>
+    <a href="therapist_messages.html" class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">3</span></a>
+    <a href="therapist_analytics.html" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+    <a href="therapist_resources.html" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+    <div class="nav-section">Account</div>
+    <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+    <a href="therapist_settings.html" class="nav-item active" aria-current="page"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto;color:rgba(255,255,255,.38)"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user" onclick="window.location.href='therapist_profile.html'">
+      <div class="sb-avatar">IK</div>
+      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="tb-title">Settings</div>
+      <div class="tb-sub">Manage your clinical preferences and account</div>
+    </div>
+    <div class="tb-right">
+      <button class="save-all-btn" onclick="saveAll()"><i class="ti ti-device-floppy"></i>Save All Changes</button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- 1. APPEARANCE -->
+    <div class="settings-card">
+      <div class="sc-head">
+        <div class="sc-icon" style="background:var(--accent-l)"><i class="ti ti-palette" style="color:var(--accent)"></i></div>
+        <div>
+          <div class="sc-label">Appearance</div>
+          <div class="sc-desc">Control how MH Journal looks across all therapist pages</div>
+        </div>
+      </div>
+
+      <!-- DARK MODE ROW (THE CRITICAL TOGGLE) -->
+      <div class="dark-toggle-row">
+        <div class="sr-info">
+          <div class="sr-label">Dark Mode <span class="sr-badge rb-recommended">SYNCED ACROSS ALL PAGES</span></div>
+          <div class="sr-sub">When enabled, all therapist pages — Dashboard, Messages, Analytics, Resources, Profile — switch to a dark clinical theme. Persisted in your browser.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div class="dm-preview">
+            <div class="dm-swatch light-sw" title="Light mode"></div>
+            <button class="toggle" id="darkModeToggle" onclick="toggleDarkMode()" role="switch" aria-checked="false" aria-label="Toggle dark mode">
+              <div class="toggle-thumb"></div>
+            </button>
+            <div class="dm-swatch dark-sw" title="Dark mode"></div>
+          </div>
+          <div class="toggle-label" id="darkModeLabel">Light</div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Compact Sidebar</div>
+          <div class="sr-sub">Collapse the sidebar to icons only for more screen real estate.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle" id="t-compact" onclick="toggleSetting(this,'compact')" role="switch" aria-checked="false"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">Off</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">High Contrast Mode</div>
+          <div class="sr-sub">Increase text and border contrast for improved readability.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle" id="t-contrast" onclick="toggleSetting(this,'contrast')" role="switch" aria-checked="false"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">Off</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. NOTIFICATIONS -->
+    <div class="settings-card">
+      <div class="sc-head">
+        <div class="sc-icon" style="background:var(--danger-l)"><i class="ti ti-bell" style="color:var(--danger)"></i></div>
+        <div>
+          <div class="sc-label">Notification Preferences</div>
+          <div class="sc-desc">Control when and how you receive clinical alerts</div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Crisis Entry Alerts <span class="sr-badge rb-recommended">RECOMMENDED ON</span></div>
+          <div class="sr-sub">Receive immediate in-app and email notification when a patient logs a crisis-level entry (mood ≤ 3 or self-harm flag active).</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-crisis" onclick="toggleSetting(this,'crisis_notif')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Emergency Email for High-Risk Flags</div>
+          <div class="sr-sub">When a patient triggers a high-risk alert (self-harm ideation, suicidal language detected), an emergency email is sent to your registered address and clinical supervisor.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-email-crisis" onclick="toggleSetting(this,'email_crisis')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Appointment Reminders</div>
+          <div class="sr-sub">Get notified 30 minutes before each scheduled session starts.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-appt-remind" onclick="toggleSetting(this,'appt_remind')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Patient Message Notifications</div>
+          <div class="sr-sub">Show badge and sound alert when a patient sends a new message.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-msg-notif" onclick="toggleSetting(this,'msg_notif')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Weekly Caseload Summary Email</div>
+          <div class="sr-sub">Receive a weekly digest every Sunday at 8 AM with caseload analytics, session attendance, and flagged patients.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle" id="t-weekly" onclick="toggleSetting(this,'weekly_summary')" role="switch" aria-checked="false"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">Off</span>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <div class="field-label">Emergency Notification Email</div>
+          <input class="s-input" type="email" value="dr.imran.khan@mhclinic.pk" placeholder="Clinical email address"/>
+        </div>
+        <div class="field">
+          <div class="field-label">Supervisor CC Email</div>
+          <input class="s-input" type="email" value="dr.supervisor@mhclinic.pk" placeholder="Supervisor email address"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. AVAILABILITY CALENDAR -->
+    <div class="settings-card">
+      <div class="sc-head">
+        <div class="sc-icon" style="background:var(--ok-l)"><i class="ti ti-calendar" style="color:var(--ok)"></i></div>
+        <div>
+          <div class="sc-label">Availability Calendar</div>
+          <div class="sc-desc">Set your weekly availability for patient session booking</div>
+        </div>
+      </div>
+      <div class="avail-grid" id="availGrid"></div>
+      <div class="setting-row" style="border-top:.5px solid var(--border)">
+        <div class="sr-info">
+          <div class="sr-label">Allow Emergency Session Requests</div>
+          <div class="sr-sub">Patients flagged as crisis can request an unscheduled emergency session outside your regular hours.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-emergency-sess" onclick="toggleSetting(this,'emergency_sess')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Buffer Time Between Sessions</div>
+          <div class="sr-sub">Automatically block time between sessions for notes and recovery.</div>
+        </div>
+        <select class="s-select" style="max-width:200px;margin-right:20px">
+          <option>10 minutes</option>
+          <option selected>15 minutes</option>
+          <option>20 minutes</option>
+          <option>30 minutes</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 4. EMERGENCY CONTACTS -->
+    <div class="settings-card">
+      <div class="sc-head">
+        <div class="sc-icon" style="background:var(--danger-l)"><i class="ti ti-phone-call" style="color:var(--danger)"></i></div>
+        <div>
+          <div class="sc-label">Crisis Emergency Contacts</div>
+          <div class="sc-desc">Auto-notified when a patient triggers a high-risk flag</div>
+        </div>
+      </div>
+      <div class="ec-list" id="ecList"></div>
+      <button class="add-ec-btn" onclick="addContact()"><i class="ti ti-plus"></i>Add Emergency Contact</button>
+    </div>
+
+    <!-- 5. CLINICAL PREFERENCES -->
+    <div class="settings-card">
+      <div class="sc-head">
+        <div class="sc-icon" style="background:var(--warn-l)"><i class="ti ti-stethoscope" style="color:var(--warn)"></i></div>
+        <div>
+          <div class="sc-label">Clinical Preferences</div>
+          <div class="sc-desc">Adjust how patient data is displayed and managed</div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Auto-Flag Crisis Entries for Review</div>
+          <div class="sr-sub">Journal entries with mood ≤ 3 or self-harm keywords are automatically added to your pending review queue.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-autoflag" onclick="toggleSetting(this,'autoflag')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Show Patient Mood Trends on Dashboard</div>
+          <div class="sr-sub">Display a 7-day mood trend sparkline next to each patient in the caseload table.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-moodtrend" onclick="toggleSetting(this,'moodtrend')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Session Notes Auto-Save</div>
+          <div class="sr-sub">Session notes are automatically saved every 60 seconds during active sessions.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="t-autosave" onclick="toggleSetting(this,'autosave')" role="switch" aria-checked="true"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">On</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Default Session Duration</div>
+        </div>
+        <select class="s-select" style="max-width:200px;margin-right:20px">
+          <option>30 minutes</option>
+          <option selected>50 minutes</option>
+          <option>60 minutes</option>
+          <option>90 minutes</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 6. SECURITY -->
+    <div class="settings-card">
+      <div class="sc-head">
+        <div class="sc-icon" style="background:#f0fdf4"><i class="ti ti-shield-check" style="color:var(--ok)"></i></div>
+        <div>
+          <div class="sc-label">Security & Privacy</div>
+          <div class="sc-desc">Protect your account and patient data</div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Two-Factor Authentication <span class="sr-badge rb-recommended">RECOMMENDED</span></div>
+          <div class="sr-sub">Require a verification code from your authenticator app on each login.</div>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle" id="t-2fa" onclick="toggleSetting(this,'2fa')" role="switch" aria-checked="false"><div class="toggle-thumb"></div></button>
+          <span class="toggle-label">Off</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Auto-Lock After Inactivity</div>
+          <div class="sr-sub">Automatically lock the portal after a period of inactivity.</div>
+        </div>
+        <select class="s-select" style="max-width:200px;margin-right:20px">
+          <option>5 minutes</option>
+          <option selected>15 minutes</option>
+          <option>30 minutes</option>
+          <option>Never</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div class="sr-info">
+          <div class="sr-label">Change Password</div>
+          <div class="sr-sub">Update your account password. You will be signed out after changing.</div>
+        </div>
+        <button class="dz-btn" style="font-size:12px;padding:7px 14px" onclick="showToast('Password reset email sent to dr.imran.khan@mhclinic.pk','ok')">Change Password</button>
+      </div>
+    </div>
+
+    <!-- 7. DANGER ZONE -->
+    <div class="danger-zone">
+      <div class="dz-title"><i class="ti ti-alert-triangle"></i>Danger Zone</div>
+      <div class="dz-desc">These actions are irreversible. Deactivating your account will remove your access and transfer all active patients to your clinical supervisor. Your session notes and records will be archived per clinical retention policy.</div>
+      <button class="dz-btn" onclick="confirmDeactivate()">Deactivate Therapist Account</button>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<div class="toast" id="toast" role="alert"><i id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+/* ── DARK MODE: READ + APPLY ── */
+let isDark = localStorage.getItem('mhj_theme') === 'dark';
+let toastTimer;
+
+function applyDarkMode() {
+  if(isDark) {
+    document.documentElement.classList.add('dark');
+    localStorage.setItem('mhj_theme', 'dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('mhj_theme', 'light');
+  }
+  const btn = document.getElementById('darkModeToggle');
+  const lbl = document.getElementById('darkModeLabel');
+  if(isDark) {
+    btn.classList.add('on');
+    btn.setAttribute('aria-checked','true');
+    lbl.textContent = 'Dark';
+    lbl.style.color = 'var(--accent)';
+  } else {
+    btn.classList.remove('on');
+    btn.setAttribute('aria-checked','false');
+    lbl.textContent = 'Light';
+    lbl.style.color = 'var(--text-3)';
+  }
+}
+
+function toggleDarkMode() {
+  isDark = !isDark;
+  applyDarkMode();
+  showToast(isDark ? 'Dark mode enabled — all pages updated.' : 'Light mode enabled.', 'ok');
+}
+
+/* ── GENERIC TOGGLE ── */
+function toggleSetting(btn, key) {
+  const isOn = btn.classList.toggle('on');
+  btn.setAttribute('aria-checked', String(isOn));
+  const lbl = btn.nextElementSibling;
+  if(lbl) lbl.textContent = isOn ? 'On' : 'Off';
+  localStorage.setItem('mhj_pref_' + key, isOn ? '1' : '0');
+}
+
+/* ── AVAILABILITY GRID ── */
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const SLOTS = ['9 AM','10 AM','11 AM','2 PM','3 PM','4 PM'];
+const defaultOn = {Mon:['9 AM','10 AM','11 AM','2 PM','3 PM'],Tue:['9 AM','10 AM','11 AM'],Wed:['2 PM','3 PM','4 PM'],Thu:['9 AM','10 AM','11 AM','2 PM'],Fri:['9 AM','10 AM']};
+
+function buildAvailGrid() {
+  const grid = document.getElementById('availGrid');
+  grid.innerHTML = DAYS.map(day => `
+    <div class="day-col">
+      <div class="day-label">${day}</div>
+      ${SLOTS.map(slot => {
+        const on = defaultOn[day] && defaultOn[day].includes(slot);
+        return `<button class="day-slot ${on?'on':''}" onclick="this.classList.toggle('on')" title="${day} ${slot}">${slot}</button>`;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+/* ── EMERGENCY CONTACTS ── */
+let contacts = [
+  {name:'Dr. Zara Akhtar', role:'Clinical Supervisor', email:'z.akhtar@mhclinic.pk'},
+  {name:'Hospital Emergency Line', role:'Psychiatric Ward — 24/7', email:'+92-51-9201234'},
+];
+
+function renderContacts() {
+  document.getElementById('ecList').innerHTML = contacts.map((c,i) => `
+    <div class="ec-item">
+      <div class="ec-icon"><i class="ti ti-phone-call"></i></div>
+      <div class="ec-info">
+        <div class="ec-name">${c.name}</div>
+        <div class="ec-detail">${c.role} · ${c.email}</div>
+      </div>
+      <button class="ec-remove" onclick="removeContact(${i})" title="Remove"><i class="ti ti-trash"></i></button>
+    </div>
+  `).join('');
+}
+
+function removeContact(i) {
+  contacts.splice(i,1);
+  renderContacts();
+  showToast('Emergency contact removed.','ok');
+}
+
+function addContact() {
+  contacts.push({name:'New Contact', role:'Role / Department', email:'contact@example.com'});
+  renderContacts();
+  showToast('Contact added — please update their details.','ok');
+}
+
+/* ── SAVE ALL ── */
+function saveAll() {
+  // persist dark mode state
+  localStorage.setItem('mhj_theme', isDark ? 'dark' : 'light');
+  showToast('All settings saved successfully.','ok');
+}
+
+function confirmDeactivate() {
+  if(confirm('Are you absolutely sure? This action cannot be undone. All active patients will be transferred to your supervisor.')) {
+    showToast('Account deactivation request submitted. You will be contacted within 24 hours.','err');
+  }
+}
+
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = type==='ok' ? 'ti ti-circle-check' : 'ti ti-alert-circle';
+  t.className = 'toast t-' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3600);
+}
+
+/* ── INIT ── */
+applyDarkMode();
+buildAvailGrid();
+renderContacts();
+</script>
+</body>
+</html>

@@ -3,680 +3,662 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  if(localStorage.getItem('mhj_theme')==='dark'){
+    document.documentElement.classList.add('dark');
+  }else{
+    document.documentElement.classList.remove('dark');
+  }
+})();
+</script>
 <title>MH Journal — Therapist Appointments</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#f4f6f8;--surface:#fff;--border:#e2e7ed;
-    --text-1:#0f172a;--text-2:#64748b;--text-3:#94a3b8;
-    --accent:#4f46e5;--accent-l:#eef2ff;--accent-d:#3730a3;
-    --sidebar:#0f172a;--sidebar-act:rgba(99,102,241,.15);
-    --danger:#dc2626;--danger-l:#fef2f2;
-    --warn:#d97706;--warn-l:#fffbeb;
-    --ok:#16a34a;--ok-l:#f0fdf4;
-  }
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
-  .layout{display:flex;min-height:100vh}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f6f8;--surface:#fff;--border:#e2e7ed;
+  --text-1:#0f172a;--text-2:#64748b;--text-3:#94a3b8;
+  --accent:#4f46e5;--accent-l:#eef2ff;--accent-d:#3730a3;
+  --sidebar:#0f172a;--sidebar-act:rgba(99,102,241,.15);
+  --danger:#dc2626;--danger-l:#fef2f2;
+  --warn:#d97706;--warn-l:#fffbeb;
+  --ok:#16a34a;--ok-l:#f0fdf4;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1)}
+.layout{display:flex;min-height:100vh}
+/* SIDEBAR */
+.sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 24px;border-bottom:.5px solid rgba(255,255,255,.08)}
+.sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo i{font-size:17px;color:#fff}
+.sb-title{font-size:14px;font-weight:600;color:#fff}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
+.sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px}
+.nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);padding:12px 8px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.55);font-size:13px;font-weight:500}
+.nav-item:hover{background:var(--sidebar-act);color:#c7d2fe}
+.nav-item:hover i{color:#c7d2fe}
+.nav-item.active{background:var(--sidebar-act);color:#a5b4fc}
+.nav-item.active i{color:#a5b4fc}
+.nav-item i{font-size:17px;color:rgba(255,255,255,.35);transition:color .15s}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sb-foot{padding:16px 20px;border-top:.5px solid rgba(255,255,255,.08)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b}
+.sb-uname{font-size:13px;font-weight:500;color:#fff}
+.sb-role{font-size:11px;color:rgba(255,255,255,.35)}
+/* MAIN */
+.main{margin-left:240px;flex:1}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
+.tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s;position:relative}
+.icon-btn:hover{background:#eef0f3}
+.icon-btn i{font-size:18px}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.crisis-pill{display:flex;align-items:center;gap:6px;background:var(--danger-l);border:1px solid #fca5a5;border-radius:20px;padding:6px 14px;font-size:12px;color:var(--danger);font-weight:600}
+.crisis-dot{width:7px;height:7px;border-radius:50%;background:var(--danger);animation:pulse 1.4s infinite}
+.content{padding:24px 28px}
+/* VIEW TABS */
+.view-tabs{display:flex;gap:4px;background:#eaecf0;border-radius:11px;padding:4px;width:fit-content;margin-bottom:22px}
+.vt-btn{padding:7px 20px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--text-2);transition:all .2s;display:flex;align-items:center;gap:7px}
+.vt-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 6px rgba(0,0,0,.1)}
+.vt-pill{background:var(--accent-l);color:var(--accent);font-size:11px;font-weight:700;padding:1px 8px;border-radius:20px}
+.vt-btn.active .vt-pill{background:var(--accent);color:#fff}
+.vt-warn{background:var(--warn-l);color:var(--warn);font-size:11px;font-weight:700;padding:1px 8px;border-radius:20px}
+.panel{display:none}.panel.active{display:block}
+/* UPCOMING PANEL */
+.up-grid{display:grid;grid-template-columns:1fr 308px;gap:20px;align-items:start}
+.appt-list{display:flex;flex-direction:column;gap:10px}
+.appt-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);padding:18px 20px;transition:box-shadow .2s}
+.appt-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.08)}
+.appt-card.crisis-card{border-left:3px solid var(--danger)}
+.appt-card.today-card{border-left:3px solid var(--accent)}
+.ac-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.ac-patient{display:flex;align-items:center;gap:10px}
+.p-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.p-name{font-size:14px;font-weight:600;color:var(--text-1)}
+.p-meta{font-size:11px;color:var(--text-3);margin-top:2px}
+.sbadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.sb-c{background:var(--ok-l);color:var(--ok)}
+.sb-p{background:var(--warn-l);color:var(--warn)}
+.sb-x{background:var(--danger-l);color:var(--danger)}
+.ac-info{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.chip{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-2)}
+.chip i{font-size:14px;color:var(--text-3)}
+.crisis-note{background:#fef2f2;border:.5px solid #fca5a5;border-radius:9px;padding:10px 13px;font-size:12px;color:#991b1b;line-height:1.6;margin-bottom:12px}
+.ac-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{padding:7px 14px;border-radius:9px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;border:none}
+.btn-join{background:var(--accent);color:#fff}
+.btn-join:hover{background:var(--accent-d)}
+.btn-red{background:var(--danger);color:#fff}
+.btn-red:hover{background:#b91c1c}
+.btn-ghost{background:var(--bg);color:var(--text-2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-notes{background:var(--accent-l);color:var(--accent);border:1px solid #c7d2fe}
+.btn-notes:hover{background:#e0e7ff}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-ok:hover{background:#15803d}
+.btn-rej{background:var(--danger-l);color:var(--danger);border:1px solid #fca5a5}
+.btn-rej:hover{background:#fee2e2}
+/* CALENDAR */
+.cal-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);padding:20px 22px;position:sticky;top:90px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-month{font-size:14px;font-weight:600;color:var(--text-1)}
+.cal-nav{display:flex;gap:4px}
+.cnb{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text-2);display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .15s}
+.cnb:hover{background:var(--bg)}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px}
+.cal-dow span{font-size:10px;font-weight:700;color:var(--text-3);padding:4px 0}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cd{width:100%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:var(--text-2);cursor:pointer;position:relative;transition:all .15s}
+.cd:hover{background:var(--bg)}
+.cd.today{background:var(--accent);color:#fff;font-weight:700}
+.cd.has-a::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.cd.today::after{background:#fff}
+.cd.has-c::after{background:var(--danger)}
+.cd.other{opacity:.3}
+.cd.sel:not(.today){background:var(--accent-l);color:var(--accent)}
+.cal-legend{display:flex;gap:10px;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border);flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-3)}
+.ldot{width:6px;height:6px;border-radius:50%}
+.cal-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.cst{background:var(--bg);border-radius:10px;padding:10px;text-align:center;border:.5px solid var(--border)}
+.cst-v{font-size:20px;font-weight:700;color:var(--text-1)}
+.cst-l{font-size:10px;color:var(--text-3);margin-top:2px}
+/* PENDING PANEL */
+.req-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.req-count{font-size:12px;font-weight:700;background:var(--warn-l);color:var(--warn);padding:3px 11px;border-radius:20px}
+.req-list{display:flex;flex-direction:column;gap:10px}
+.req-card{background:var(--surface);border-radius:14px;border:.5px solid var(--border);border-left:3px solid var(--warn);padding:18px 20px}
+.req-card.approved{border-left-color:var(--ok)}
+.req-card.rejected-card{border-left-color:var(--danger);opacity:.6}
+.req-note{background:var(--bg);border-radius:9px;padding:10px 13px;font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:12px;border:.5px solid var(--border)}
+.req-note strong{color:var(--text-1)}
+.res-ok{display:inline-flex;align-items:center;gap:5px;background:var(--ok-l);color:var(--ok);font-size:12px;font-weight:600;padding:6px 12px;border-radius:9px}
+.res-no{display:inline-flex;align-items:center;gap:5px;background:var(--danger-l);color:var(--danger);font-size:12px;font-weight:600;padding:6px 12px;border-radius:9px}
+/* MODALS */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(3px)}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border-radius:18px;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:scale(.95);transition:transform .2s;border:.5px solid var(--border)}
+.modal-bg.open .modal{transform:scale(1)}
+.modal-head{padding:20px 24px 16px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:15px;font-weight:600;color:var(--text-1);display:flex;align-items:center;gap:8px}
+.modal-title i{font-size:17px;color:var(--accent)}
+.modal-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-3)}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:20px 24px}
+.mf{margin-bottom:14px}
+.mf label{display:block;font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.mf textarea,.mf input,.mf select{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 13px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:var(--bg);outline:none;transition:border-color .15s;resize:none}
+.mf textarea:focus,.mf input:focus,.mf select:focus{border-color:var(--accent);background:var(--surface)}
+.modal-foot{padding:14px 24px;border-top:.5px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel{background:var(--bg);color:var(--text-2);border:1px solid var(--border)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-d)}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:0 8px 28px rgba(0,0,0,.18);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:16px}
+.t-ok i{color:#4ade80}.t-warn i{color:#fbbf24}.t-danger i{color:#f87171}
 
-  /* SIDEBAR */
-  .sidebar{width:240px;background:var(--sidebar);display:flex;flex-direction:column;padding:24px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:10}
-  .sb-brand{display:flex;align-items:center;gap:10px;padding:0 20px 28px;border-bottom:0.5px solid rgba(255,255,255,.08)}
-  .sb-logo{width:34px;height:34px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center}
-  .sb-logo i{font-size:17px;color:#fff}
-  .sb-title{font-size:14px;font-weight:600;color:#fff}
-  .sb-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:1px}
-  .sb-nav{padding:16px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
-  .nav-section{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);padding:12px 8px 6px}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .15s;color:rgba(255,255,255,.55);font-size:13px;font-weight:500}
-  .nav-item:hover{background:var(--sidebar-act);color:#c7d2fe}
-  .nav-item:hover i{color:#c7d2fe}
-  .nav-item.active{background:var(--sidebar-act);color:#a5b4fc}
-  .nav-item.active i{color:#a5b4fc}
-  .nav-item i{font-size:17px;color:rgba(255,255,255,.35);transition:color .15s}
-  .nav-badge{margin-left:auto;background:#dc2626;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
-  .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.08)}
-  .sb-user{display:flex;align-items:center;gap:10px}
-  .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b}
-  .sb-uname{font-size:13px;font-weight:500;color:#fff}
-  .sb-role{font-size:11px;color:rgba(255,255,255,.35)}
-
-  /* MAIN */
-  .main{margin-left:240px;flex:1}
-  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
-  .tb-left{display:flex;flex-direction:column}
-  .tb-title{font-size:16px;font-weight:600;color:var(--text-1)}
-  .tb-sub{font-size:12px;color:var(--text-2);margin-top:1px}
-  .tb-right{display:flex;align-items:center;gap:10px}
-  .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:background .15s;position:relative}
-  .icon-btn:hover{background:#eef0f3}
-  .icon-btn i{font-size:18px}
-  .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
-
-  .content{padding:26px 28px}
-
-  /* STATUS TABS */
-  .status-tabs{display:flex;gap:4px;background:#eef0f4;border-radius:11px;padding:4px;width:fit-content;margin-bottom:22px}
-  .st-btn{padding:7px 18px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--text-2);transition:all .2s;display:flex;align-items:center;gap:6px}
-  .st-btn.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-  .st-btn .count{font-size:11px;background:var(--accent-l);color:var(--accent);padding:1px 7px;border-radius:20px;font-weight:700}
-  .st-btn.active .count{background:var(--accent);color:#fff}
-
-  /* LAYOUT GRID */
-  .appt-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
-
-  /* APPOINTMENT CARDS */
-  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .section-title{font-size:14px;font-weight:600;color:var(--text-1)}
-  .section-count{font-size:12px;color:var(--text-3)}
-
-  .appt-list{display:flex;flex-direction:column;gap:10px}
-
-  .appt-card{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:18px 20px;transition:box-shadow .2s}
-  .appt-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
-  .appt-card.pending-card{border-left:3px solid var(--warn)}
-  .appt-card.confirmed-card{border-left:3px solid var(--ok)}
-  .appt-card.crisis-card{border-left:3px solid var(--danger)}
-
-  .ac-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
-  .ac-patient{display:flex;align-items:center;gap:10px}
-  .ac-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-  .ac-name{font-size:14px;font-weight:600;color:var(--text-1)}
-  .ac-id{font-size:11px;color:var(--text-3);margin-top:1px}
-  .ac-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
-  .badge-pending{background:var(--warn-l);color:var(--warn)}
-  .badge-confirmed{background:var(--ok-l);color:var(--ok)}
-  .badge-cancelled{background:#f1f5f9;color:var(--text-3)}
-  .badge-crisis{background:var(--danger-l);color:var(--danger)}
-
-  .ac-meta{display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap}
-  .ac-meta-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-2)}
-  .ac-meta-item i{font-size:14px;color:var(--text-3)}
-
-  .ac-note{background:var(--bg);border-radius:9px;padding:10px 13px;font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:12px;border:0.5px solid var(--border)}
-  .ac-note strong{color:var(--text-1);font-weight:600}
-
-  .ac-actions{display:flex;align-items:center;gap:8px}
-  .btn-sm{padding:7px 14px;border-radius:9px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;border:none}
-  .btn-confirm{background:var(--ok);color:#fff}
-  .btn-confirm:hover{background:#15803d}
-  .btn-reject{background:var(--danger-l);color:var(--danger);border:1px solid #fca5a5}
-  .btn-reject:hover{background:#fee2e2}
-  .btn-join{background:var(--accent);color:#fff}
-  .btn-join:hover{background:var(--accent-d)}
-  .btn-reschedule{background:var(--bg);color:var(--text-2);border:1px solid var(--border)}
-  .btn-reschedule:hover{background:#e8eef4}
-  .btn-notes{background:var(--accent-l);color:var(--accent);border:1px solid #c7d2fe}
-  .btn-notes:hover{background:#e0e7ff}
-
-  /* SIDEBAR PANEL - daily schedule */
-  .schedule-panel{background:var(--surface);border-radius:14px;border:0.5px solid var(--border);padding:18px 20px;position:sticky;top:90px}
-  .sp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-  .sp-title{font-size:14px;font-weight:600;color:var(--text-1)}
-  .sp-date{font-size:12px;color:var(--text-3)}
-  .timeline{display:flex;flex-direction:column;gap:0}
-  .tl-slot{display:flex;gap:12px;padding:8px 0;position:relative}
-  .tl-slot:not(:last-child)::after{content:'';position:absolute;left:37px;top:32px;bottom:0;width:1px;background:var(--border)}
-  .tl-time{font-size:11px;color:var(--text-3);min-width:44px;font-weight:500;padding-top:2px;text-align:right}
-  .tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);background:var(--surface);flex-shrink:0;margin-top:3px;z-index:1}
-  .tl-dot.active{border-color:var(--accent);background:var(--accent)}
-  .tl-dot.done{border-color:var(--ok);background:var(--ok)}
-  .tl-dot.pending-dot{border-color:var(--warn);background:var(--warn)}
-  .tl-dot.empty{background:transparent}
-  .tl-block{flex:1;min-width:0}
-  .tl-name{font-size:13px;font-weight:600;color:var(--text-1)}
-  .tl-type{font-size:11px;color:var(--text-3)}
-  .tl-empty{font-size:12px;color:var(--text-3);font-style:italic}
-
-  .sp-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:18px;padding-top:18px;border-top:0.5px solid var(--border)}
-  .sp-stat{text-align:center}
-  .sp-stat-val{font-size:22px;font-weight:700;color:var(--text-1)}
-  .sp-stat-label{font-size:10px;color:var(--text-3);font-weight:500;margin-top:1px}
-
-  /* TOAST */
-  .toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
-  .toast.show{transform:translateY(0);opacity:1}
-  .toast i{font-size:16px}
-  .toast.success-toast i{color:#4ade80}
-  .toast.danger-toast i{color:#f87171}
-
-  /* MODAL */
-  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(3px)}
-  .modal-overlay.open{opacity:1;pointer-events:all}
-  .modal{background:var(--surface);border-radius:18px;padding:28px;width:440px;max-width:90vw;transform:scale(.96);transition:transform .2s;border:0.5px solid var(--border)}
-  .modal-overlay.open .modal{transform:scale(1)}
-  .modal-title{font-size:16px;font-weight:600;color:var(--text-1);margin-bottom:6px;display:flex;align-items:center;gap:8px}
-  .modal-sub{font-size:13px;color:var(--text-2);margin-bottom:20px;line-height:1.5}
-  .modal-field{margin-bottom:14px}
-  .modal-field label{display:block;font-size:11px;font-weight:600;color:var(--text-2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
-  .modal-field textarea,.modal-field select,.modal-field input{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);outline:none;resize:none;transition:border-color .15s}
-  .modal-field textarea:focus,.modal-field select:focus,.modal-field input:focus{border-color:var(--accent)}
-  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
-  .btn-cancel{background:var(--bg);color:var(--text-2);border:1px solid var(--border);padding:9px 18px;border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer}
-  .btn-primary{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer}
-  .btn-danger-fill{background:var(--danger);color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer}
-
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (driven by mhj_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body{
+  --bg:#0b0f19;--surface:#1e293b;--border:#334155;--border-d:#475569;
+  --text-1:#f1f5f9;--text-2:#94a3b8;--text-3:#64748b;
+  --accent-l:#1e1b4b;--accent-m:rgba(99,102,241,.25);
+  --danger-l:#2c0a0a;--danger-m:#7f1d1d;
+  --warn-l:#1c1003;--ok-l:#052e16;
+  background:#0b0f19;color:#f1f5f9;
+}
+html.dark body .topbar,
+html.dark body .settings-card,html.dark body .surface-card,
+html.dark body .card,html.dark body .metric-card,html.dark body .chart-card,
+html.dark body .stat-card,html.dark body .section-card,
+html.dark body .appt-card,html.dark body .session-card,
+html.dark body .patient-card,html.dark body .review-card,
+html.dark body .resource-card,html.dark body .res-card,
+html.dark body .msg-sidebar,html.dark body .chat-area,
+html.dark body .profile-card,html.dark body .modal,
+html.dark body .drawer,html.dark body .bg-white,
+html.dark body .filter-bar{
+  background:var(--surface)!important;
+  border-color:var(--border)!important;
+  color:var(--text-1)!important;
+}
+html.dark body .topbar{border-bottom-color:var(--border)!important}
+html.dark body .text-slate-900,html.dark body .text-slate-800{color:var(--text-1)!important}
+html.dark body .text-slate-500,html.dark body .text-slate-400{color:var(--text-2)!important}
+html.dark body .border-slate-100,html.dark body .border-slate-200{border-color:var(--border)!important}
+html.dark body thead th{background:#0d1424;color:var(--text-3);border-color:var(--border)}
+html.dark body tbody tr{border-color:var(--border)}
+html.dark body tbody tr:hover{background:#141d2e}
+html.dark body input,html.dark body textarea,html.dark body select,
+html.dark body .s-input,html.dark body .s-select,
+html.dark body .search-box,html.dark body .search-res,
+html.dark body .form-field,html.dark body .compose-input{
+  background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important;
+}
+html.dark body input::placeholder,html.dark body textarea::placeholder{color:var(--text-3)!important}
+html.dark body .icon-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .icon-btn:hover{background:var(--border)}
+html.dark body .range-btn{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .range-btn.active{background:var(--accent)!important;color:#fff!important}
+html.dark body .cat-chip{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .cat-chip.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+html.dark body .assign-select{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important}
+html.dark body .setting-row{border-color:var(--border)!important}
+html.dark body .danger-zone{background:#1a0a0a!important;border-color:#7f1d1d!important}
+html.dark body .thread-item{border-color:var(--border)!important}
+html.dark body .thread-item:hover,html.dark body .thread-item.active{background:#263148!important}
+html.dark body .bubble-in{background:#263148!important;color:var(--text-1)!important}
+html.dark body .mc{background:var(--surface)!important;border-color:var(--border)!important}
+html.dark body .quick-card,html.dark body .log-item{background:var(--surface);border-color:var(--border)}
+html.dark body .filter-chip{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .calendar-day{background:var(--surface);border-color:var(--border)}
+html.dark body .calendar-day:hover{background:#141d2e}
+html.dark body .time-slot,html.dark body .slot-btn{background:var(--surface);border-color:var(--border)}
+html.dark body .vt-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .vt-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .panel{background:var(--surface);border-color:var(--border)}
+html.dark body .profile-section,html.dark body .info-row{border-color:var(--border)}
+html.dark body .log-entry{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item:hover,html.dark body .queue-item.active{background:#141d2e}
+html.dark body .review-action-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .modal-bg,html.dark body .modal-overlay{background:rgba(0,0,0,.7)}
+html.dark body .modal,html.dark body .modal-inner,html.dark body .assign-modal-inner{
+  background:var(--surface)!important;border-color:var(--border)!important;
+}
+html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--text-1)}
 </style>
 </head>
 <body>
 <div class="layout">
-  <!-- SIDEBAR -->
-  <nav class="sidebar">
-    <div class="sb-brand">
-      <div class="sb-logo"><i class="ti ti-brain"></i></div>
-      <div>
-        <div class="sb-title">Serenity MH</div>
-        <div class="sb-sub">Therapist Portal</div>
-      </div>
-    </div>
-    <div class="sb-nav">
-      <div class="nav-section">Clinical</div>
-      <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
-      <a href="#" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
-      <a href="therapist_appointments.html" class="nav-item active"><i class="ti ti-calendar"></i>Appointments</a>
-      <a href="therapist_reviews.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
-      <div class="nav-section">Resources</div>
-      <a href="#" class="nav-item"><i class="ti ti-books"></i>Resources</a>
-      <a href="#" class="nav-item"><i class="ti ti-message-2"></i>Messages</a>
-      <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
-      <div class="nav-section">Account</div>
-      <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
-      <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-      <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
-    </div>
-    <div class="sb-foot">
-      <div class="sb-user">
-        <div class="sb-avatar">DR</div>
-        <div>
-          <div class="sb-uname">Dr. Reyes</div>
-          <div class="sb-role">Licensed Therapist</div>
-        </div>
-      </div>
-    </div>
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Therapist Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="#" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+    <a href="therapist_appointments.html" class="nav-item active"><i class="ti ti-calendar"></i>Appointments</a>
+    <a href="therapist_reviews.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+    <div class="nav-section">Tools</div>
+    <a href="#" class="nav-item"><i class="ti ti-books"></i>Resources</a>
+    <a href="#" class="nav-item"><i class="ti ti-message-2"></i>Messages</a>
+    <a href="#" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+    <div class="nav-section">Account</div>
+    <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
+    <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
   </nav>
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-avatar">IK</div>
+      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+    </div>
+  </div>
+</aside>
 
-  <div class="main">
-    <div class="topbar">
-      <div class="tb-left">
-        <div class="tb-title">Appointment Queue</div>
-        <div class="tb-sub">Clinical schedule & session management</div>
-      </div>
-      <div class="tb-right">
-        <a href="#" class="icon-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></a>
-        <a href="#" class="icon-btn"><i class="ti ti-message-2"></i></a>
-      </div>
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title">Appointments</div>
+      <div class="tb-sub">Tuesday, Apr 27, 2026 · 4 sessions today</div>
+    </div>
+    <div class="tb-right">
+      <div class="crisis-pill"><div class="crisis-dot"></div>2 crisis flags</div>
+      <a href="#" class="icon-btn"><i class="ti ti-bell"></i><div class="notif-dot"></div></a>
+      <a href="#" class="icon-btn"><i class="ti ti-message-2"></i></a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="view-tabs">
+      <button class="vt-btn active" onclick="switchPanel('upcoming',this)"><i class="ti ti-calendar-event"></i>Upcoming Sessions<span class="vt-pill">6</span></button>
+      <button class="vt-btn" onclick="switchPanel('pending',this)"><i class="ti ti-clock-hour-4"></i>Pending Requests<span class="vt-warn">3</span></button>
     </div>
 
-    <div class="content">
-      <!-- STATUS FILTER TABS -->
-      <div class="status-tabs">
-        <button class="st-btn active" onclick="filterAppts('all', this)">All Sessions <span class="count" id="cnt-all">8</span></button>
-        <button class="st-btn" onclick="filterAppts('pending', this)">Pending <span class="count" id="cnt-pending">3</span></button>
-        <button class="st-btn" onclick="filterAppts('confirmed', this)">Confirmed <span class="count" id="cnt-confirmed">4</span></button>
-        <button class="st-btn" onclick="filterAppts('cancelled', this)">Cancelled <span class="count" id="cnt-cancelled">1</span></button>
-      </div>
-
-      <div class="appt-grid">
-        <!-- APPOINTMENT CARDS COLUMN -->
+    <!-- UPCOMING PANEL -->
+    <div class="panel active" id="panel-upcoming">
+      <div class="up-grid">
         <div>
-          <div class="section-head">
-            <div class="section-title">Sessions — Today & Upcoming</div>
-            <div class="section-count" id="filter-label">Showing all 8 sessions</div>
-          </div>
-
-          <div class="appt-list" id="appt-list">
-
-            <!-- PENDING -->
-            <div class="appt-card pending-card" data-status="pending">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#fef3c7;color:#92400e">SA</div>
-                  <div>
-                    <div class="ac-name">Sara A.</div>
-                    <div class="ac-id">Patient #P-0042 · CBT Session</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-pending"><i class="ti ti-clock"></i> Pending Approval</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> Today, May 9 · 10:00 AM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 50 min</span>
-                <span class="ac-meta-item"><i class="ti ti-video"></i> Video Call</span>
-              </div>
-              <div class="ac-note"><strong>Patient note:</strong> "I've been having a very difficult week with anxiety spikes — really need to talk. Please confirm ASAP."</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-confirm" onclick="confirmAppt(this)"><i class="ti ti-check"></i> Confirm</button>
-                <button class="btn-sm btn-reject" onclick="openRejectModal(this)"><i class="ti ti-x"></i> Decline</button>
-                <button class="btn-sm btn-reschedule" onclick="openRescheduleModal(this)"><i class="ti ti-calendar-event"></i> Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card confirmed-card" data-status="confirmed">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#e0e7ff;color:#3730a3">JM</div>
-                  <div>
-                    <div class="ac-name">James M.</div>
-                    <div class="ac-id">Patient #P-0031 · Trauma-Focused</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-confirmed"><i class="ti ti-circle-check"></i> Confirmed</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> Today, May 9 · 11:00 AM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 60 min</span>
-                <span class="ac-meta-item"><i class="ti ti-building"></i> In-Person</span>
-              </div>
-              <div class="ac-note"><strong>Clinical note:</strong> Session 7 of 12. Focus on EMDR Phase 3. Patient showed significant progress last session with reduced PTSD scores.</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-join"><i class="ti ti-door-enter"></i> Start Session</button>
-                <button class="btn-sm btn-notes" onclick="openNotesModal(this)"><i class="ti ti-notes"></i> Session Notes</button>
-                <button class="btn-sm btn-reschedule" onclick="openRescheduleModal(this)"><i class="ti ti-calendar-event"></i> Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card crisis-card" data-status="pending">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#fef2f2;color:#991b1b">LK</div>
-                  <div>
-                    <div class="ac-name">Lena K. <span class="ac-badge badge-crisis" style="font-size:10px;padding:2px 7px;"><i class="ti ti-alert-triangle"></i> Crisis Flag</span></div>
-                    <div class="ac-id">Patient #P-0019 · Crisis Intervention</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-pending"><i class="ti ti-clock"></i> Pending</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> Today, May 9 · 2:00 PM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 90 min</span>
-                <span class="ac-meta-item"><i class="ti ti-video"></i> Emergency Video</span>
-              </div>
-              <div class="ac-note" style="background:#fef2f2;border-color:#fca5a5;"><strong style="color:#991b1b;">⚠ Crisis journal entry detected:</strong> System flagged high-risk entry (mood score 2/10) submitted 2 hours ago. Immediate session recommended.</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-confirm" onclick="confirmAppt(this)"><i class="ti ti-check"></i> Confirm Urgently</button>
-                <button class="btn-sm btn-join" style="background:#dc2626;"><i class="ti ti-phone"></i> Call Now</button>
-                <button class="btn-sm btn-notes" onclick="openNotesModal(this)"><i class="ti ti-notes"></i> View Journal</button>
-              </div>
-            </div>
-
-            <div class="appt-card confirmed-card" data-status="confirmed">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#f0fdf4;color:#166534">MO</div>
-                  <div>
-                    <div class="ac-name">Mark O.</div>
-                    <div class="ac-id">Patient #P-0055 · Anxiety Management</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-confirmed"><i class="ti ti-circle-check"></i> Confirmed</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> Tomorrow, May 10 · 9:00 AM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 50 min</span>
-                <span class="ac-meta-item"><i class="ti ti-video"></i> Video Call</span>
-              </div>
-              <div class="ac-note"><strong>Clinical note:</strong> Bi-weekly check-in. Review exposure hierarchy progress and assign new homework for workplace anxiety triggers.</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-join"><i class="ti ti-video"></i> Join Session</button>
-                <button class="btn-sm btn-notes" onclick="openNotesModal(this)"><i class="ti ti-notes"></i> Session Notes</button>
-                <button class="btn-sm btn-reschedule" onclick="openRescheduleModal(this)"><i class="ti ti-calendar-event"></i> Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card pending-card" data-status="pending">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#fdf4ff;color:#7e22ce">PN</div>
-                  <div>
-                    <div class="ac-name">Priya N.</div>
-                    <div class="ac-id">Patient #P-0067 · DBT Session</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-pending"><i class="ti ti-clock"></i> Pending Approval</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> May 11 · 3:30 PM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 50 min</span>
-                <span class="ac-meta-item"><i class="ti ti-video"></i> Video Call</span>
-              </div>
-              <div class="ac-note"><strong>Patient note:</strong> "Requesting extra session this week — had a difficult episode and need to practice distress tolerance skills."</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-confirm" onclick="confirmAppt(this)"><i class="ti ti-check"></i> Confirm</button>
-                <button class="btn-sm btn-reject" onclick="openRejectModal(this)"><i class="ti ti-x"></i> Decline</button>
-                <button class="btn-sm btn-reschedule" onclick="openRescheduleModal(this)"><i class="ti ti-calendar-event"></i> Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card confirmed-card" data-status="confirmed">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#fff7ed;color:#9a3412">BT</div>
-                  <div>
-                    <div class="ac-name">Ben T.</div>
-                    <div class="ac-id">Patient #P-0028 · Couples Therapy</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-confirmed"><i class="ti ti-circle-check"></i> Confirmed</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> May 12 · 1:00 PM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 75 min</span>
-                <span class="ac-meta-item"><i class="ti ti-building"></i> In-Person</span>
-              </div>
-              <div class="ac-note"><strong>Clinical note:</strong> Session 3. Working on communication patterns and active listening exercises. Partner will also attend.</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-join"><i class="ti ti-door-enter"></i> Start Session</button>
-                <button class="btn-sm btn-notes" onclick="openNotesModal(this)"><i class="ti ti-notes"></i> Session Notes</button>
-                <button class="btn-sm btn-reschedule" onclick="openRescheduleModal(this)"><i class="ti ti-calendar-event"></i> Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card" data-status="cancelled" style="opacity:.7">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#f1f5f9;color:#64748b">HZ</div>
-                  <div>
-                    <div class="ac-name">Hana Z.</div>
-                    <div class="ac-id">Patient #P-0039 · CBT Session</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-cancelled"><i class="ti ti-circle-x"></i> Cancelled</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> May 9 · 4:00 PM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 50 min</span>
-                <span class="ac-meta-item"><i class="ti ti-video"></i> Video Call</span>
-              </div>
-              <div class="ac-note"><strong>Cancellation reason:</strong> Patient reported a family emergency. Rescheduling requested for next week.</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-reschedule" onclick="openRescheduleModal(this)"><i class="ti ti-calendar-event"></i> Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card confirmed-card" data-status="confirmed">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="ac-avatar" style="background:#ecfdf5;color:#065f46">TA</div>
-                  <div>
-                    <div class="ac-name">Tara A.</div>
-                    <div class="ac-id">Patient #P-0081 · Intake Assessment</div>
-                  </div>
-                </div>
-                <span class="ac-badge badge-confirmed"><i class="ti ti-circle-check"></i> Confirmed</span>
-              </div>
-              <div class="ac-meta">
-                <span class="ac-meta-item"><i class="ti ti-calendar"></i> May 13 · 10:30 AM</span>
-                <span class="ac-meta-item"><i class="ti ti-clock"></i> 90 min</span>
-                <span class="ac-meta-item"><i class="ti ti-video"></i> Video Call</span>
-              </div>
-              <div class="ac-note"><strong>Clinical note:</strong> New patient intake. Complete PHQ-9, GAD-7 screening forms and build initial treatment plan.</div>
-              <div class="ac-actions">
-                <button class="btn-sm btn-join"><i class="ti ti-video"></i> Join Session</button>
-                <button class="btn-sm btn-notes" onclick="openNotesModal(this)"><i class="ti ti-clipboard"></i> Intake Form</button>
-              </div>
-            </div>
-
-          </div><!-- /appt-list -->
-        </div>
-
-        <!-- TODAY'S SCHEDULE PANEL -->
-        <div class="schedule-panel">
-          <div class="sp-head">
-            <div class="sp-title">Today's Schedule</div>
-            <div class="sp-date">Friday, May 9</div>
-          </div>
-
-          <div class="timeline">
-            <div class="tl-slot">
-              <div class="tl-time">9 AM</div>
-              <div class="tl-dot done"></div>
-              <div class="tl-block">
-                <div class="tl-empty">Available</div>
-              </div>
-            </div>
-            <div class="tl-slot">
-              <div class="tl-time">10 AM</div>
-              <div class="tl-dot pending-dot"></div>
-              <div class="tl-block">
-                <div class="tl-name">Sara A.</div>
-                <div class="tl-type">CBT · Pending</div>
-              </div>
-            </div>
-            <div class="tl-slot">
-              <div class="tl-time">11 AM</div>
-              <div class="tl-dot active"></div>
-              <div class="tl-block">
-                <div class="tl-name">James M.</div>
-                <div class="tl-type">Trauma-Focused · Confirmed</div>
-              </div>
-            </div>
-            <div class="tl-slot">
-              <div class="tl-time">12 PM</div>
-              <div class="tl-dot"></div>
-              <div class="tl-block"><div class="tl-empty">Lunch Break</div></div>
-            </div>
-            <div class="tl-slot">
-              <div class="tl-time">1 PM</div>
-              <div class="tl-dot"></div>
-              <div class="tl-block"><div class="tl-empty">Available</div></div>
-            </div>
-            <div class="tl-slot">
-              <div class="tl-time">2 PM</div>
-              <div class="tl-dot" style="border-color:#dc2626;background:#dc2626"></div>
-              <div class="tl-block">
-                <div class="tl-name">Lena K. ⚠</div>
-                <div class="tl-type">Crisis · Pending</div>
-              </div>
-            </div>
-            <div class="tl-slot">
-              <div class="tl-time">3 PM</div>
-              <div class="tl-dot"></div>
-              <div class="tl-block"><div class="tl-empty">Available</div></div>
-            </div>
-            <div class="tl-slot">
-              <div class="tl-time">4 PM</div>
-              <div class="tl-dot" style="border-color:#94a3b8;background:#f1f5f9"></div>
-              <div class="tl-block">
-                <div class="tl-name" style="color:#94a3b8">Hana Z.</div>
-                <div class="tl-type">Cancelled</div>
-              </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:14px;font-weight:600;color:var(--text-1)">Today &amp; This Week</div>
+            <div style="display:flex;gap:8px">
+              <div style="display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:9px;padding:7px 12px;background:var(--surface)"><i class="ti ti-search" style="font-size:14px;color:var(--text-3)"></i><input type="text" placeholder="Search patient…" oninput="filterSessions(this.value)" style="border:none;background:transparent;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);width:120px"/></div>
+              <select onchange="filterStatus(this.value)" style="border:1px solid var(--border);border-radius:9px;padding:7px 12px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text-2);outline:none;cursor:pointer">
+                <option value="all">All Statuses</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="crisis">Crisis</option>
+              </select>
             </div>
           </div>
 
-          <div class="sp-stats">
-            <div class="sp-stat">
-              <div class="sp-stat-val" style="color:var(--ok)">4</div>
-              <div class="sp-stat-label">Confirmed</div>
+          <div class="appt-list" id="session-list">
+
+            <div class="appt-card crisis-card" data-status="crisis" data-name="fatima noor">
+              <div class="ac-top">
+                <div class="ac-patient">
+                  <div class="p-av" style="background:#fce7f3;color:#9d174d">FN</div>
+                  <div><div class="p-name">Fatima Noor <span class="sbadge sb-x" style="font-size:10px;padding:2px 7px;margin-left:4px"><i class="ti ti-alert-triangle"></i>CRISIS</span></div><div class="p-meta">Week 3 · Crisis Follow-Up</div></div>
+                </div>
+                <span class="sbadge sb-x"><i class="ti ti-alert-circle"></i>Urgent Today</span>
+              </div>
+              <div class="ac-info">
+                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
+                <span class="chip"><i class="ti ti-clock"></i>2:00 PM · 60 min</span>
+                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+                <span class="chip" style="color:var(--danger)"><i class="ti ti-heart-broken" style="color:var(--danger)"></i>Mood: 2/10</span>
+              </div>
+              <div class="crisis-note"><strong>⚠ Crisis:</strong> Patient logged suicidal ideation at 9:14 AM. Mood critically low. Emergency session confirmed.</div>
+              <div class="ac-actions">
+                <button class="btn btn-red" onclick="joinSession('Fatima Noor')"><i class="ti ti-video"></i>Join Emergency Session</button>
+                <button class="btn btn-notes" onclick="openNotes('Fatima Noor')"><i class="ti ti-notes"></i>Session Notes</button>
+                <button class="btn btn-ghost" onclick="showToast('Initiating call to Fatima Noor…','warn')"><i class="ti ti-phone"></i>Call Now</button>
+              </div>
             </div>
-            <div class="sp-stat">
-              <div class="sp-stat-val" style="color:var(--warn)">3</div>
-              <div class="sp-stat-label">Pending</div>
+
+            <div class="appt-card today-card" data-status="confirmed" data-name="sara ahmed">
+              <div class="ac-top">
+                <div class="ac-patient">
+                  <div class="p-av" style="background:#e0f2fe;color:#0369a1">SA</div>
+                  <div><div class="p-name">Sara Ahmed</div><div class="p-meta">Week 12 · CBT — Anxiety Management</div></div>
+                </div>
+                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
+              </div>
+              <div class="ac-info">
+                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
+                <span class="chip"><i class="ti ti-clock"></i>10:00 AM · 50 min</span>
+                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+              </div>
+              <div class="ac-actions">
+                <button class="btn btn-join" onclick="joinSession('Sara Ahmed')"><i class="ti ti-video"></i>Join Session</button>
+                <button class="btn btn-notes" onclick="openNotes('Sara Ahmed')"><i class="ti ti-notes"></i>Session Notes</button>
+                <button class="btn btn-ghost" onclick="openReschedule('Sara Ahmed')"><i class="ti ti-calendar-event"></i>Reschedule</button>
+                <button class="btn btn-ghost" onclick="cancelSess('Sara Ahmed')"><i class="ti ti-x"></i>Cancel</button>
+              </div>
             </div>
-            <div class="sp-stat">
-              <div class="sp-stat-val" style="color:var(--danger)">1</div>
-              <div class="sp-stat-label">Crisis</div>
+
+            <div class="appt-card today-card" data-status="confirmed" data-name="ali khan">
+              <div class="ac-top">
+                <div class="ac-patient">
+                  <div class="p-av" style="background:#dcfce7;color:#15803d">AK</div>
+                  <div><div class="p-name">Ali Khan</div><div class="p-meta">Week 6 · Cognitive Therapy</div></div>
+                </div>
+                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
+              </div>
+              <div class="ac-info">
+                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
+                <span class="chip"><i class="ti ti-clock"></i>11:30 AM · 50 min</span>
+                <span class="chip"><i class="ti ti-building"></i>In-Person · Room 3B</span>
+              </div>
+              <div class="ac-actions">
+                <button class="btn btn-ghost"><i class="ti ti-map-pin"></i>Room 3B</button>
+                <button class="btn btn-notes" onclick="openNotes('Ali Khan')"><i class="ti ti-notes"></i>Session Notes</button>
+                <button class="btn btn-ghost" onclick="openReschedule('Ali Khan')"><i class="ti ti-calendar-event"></i>Reschedule</button>
+                <button class="btn btn-ghost" onclick="cancelSess('Ali Khan')"><i class="ti ti-x"></i>Cancel</button>
+              </div>
             </div>
+
+            <div class="appt-card today-card" data-status="confirmed" data-name="zainab raza">
+              <div class="ac-top">
+                <div class="ac-patient">
+                  <div class="p-av" style="background:#fef3c7;color:#b45309">ZR</div>
+                  <div><div class="p-name">Zainab Raza</div><div class="p-meta">Week 18 · Progress Review</div></div>
+                </div>
+                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
+              </div>
+              <div class="ac-info">
+                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
+                <span class="chip"><i class="ti ti-clock"></i>4:00 PM · 50 min</span>
+                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+              </div>
+              <div class="ac-actions">
+                <button class="btn btn-join" onclick="joinSession('Zainab Raza')"><i class="ti ti-video"></i>Join Session</button>
+                <button class="btn btn-notes" onclick="openNotes('Zainab Raza')"><i class="ti ti-notes"></i>Session Notes</button>
+                <button class="btn btn-ghost" onclick="openReschedule('Zainab Raza')"><i class="ti ti-calendar-event"></i>Reschedule</button>
+              </div>
+            </div>
+
+            <div class="appt-card" data-status="confirmed" data-name="hassan malik">
+              <div class="ac-top">
+                <div class="ac-patient">
+                  <div class="p-av" style="background:#ede9fe;color:#5b21b6">HM</div>
+                  <div><div class="p-name">Hassan Malik</div><div class="p-meta">Week 8 · DBT Module 3</div></div>
+                </div>
+                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
+              </div>
+              <div class="ac-info">
+                <span class="chip"><i class="ti ti-calendar"></i>Tomorrow, Apr 28</span>
+                <span class="chip"><i class="ti ti-clock"></i>9:00 AM · 50 min</span>
+                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+              </div>
+              <div class="ac-actions">
+                <button class="btn btn-join" onclick="joinSession('Hassan Malik')"><i class="ti ti-video"></i>Join Session</button>
+                <button class="btn btn-notes" onclick="openNotes('Hassan Malik')"><i class="ti ti-notes"></i>Session Notes</button>
+                <button class="btn btn-ghost" onclick="openReschedule('Hassan Malik')"><i class="ti ti-calendar-event"></i>Reschedule</button>
+              </div>
+            </div>
+
+            <div class="appt-card" data-status="pending" data-name="omar sheikh">
+              <div class="ac-top">
+                <div class="ac-patient">
+                  <div class="p-av" style="background:#f0fdf4;color:#15803d">OS</div>
+                  <div><div class="p-name">Omar Sheikh</div><div class="p-meta">Week 2 · Grief Counseling</div></div>
+                </div>
+                <span class="sbadge sb-p"><i class="ti ti-clock"></i>Awaiting Confirm</span>
+              </div>
+              <div class="ac-info">
+                <span class="chip"><i class="ti ti-calendar"></i>Apr 29</span>
+                <span class="chip"><i class="ti ti-clock"></i>3:30 PM · 50 min</span>
+                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+              </div>
+              <div class="ac-actions">
+                <button class="btn btn-ok" onclick="quickApprove(this,'Omar Sheikh')"><i class="ti ti-check"></i>Confirm</button>
+                <button class="btn btn-notes" onclick="openNotes('Omar Sheikh')"><i class="ti ti-notes"></i>Notes</button>
+                <button class="btn btn-ghost" onclick="openReschedule('Omar Sheikh')"><i class="ti ti-calendar-event"></i>Reschedule</button>
+              </div>
+            </div>
+
+          </div><!-- /session-list -->
+        </div><!-- /left col -->
+
+        <!-- CALENDAR -->
+        <div class="cal-card">
+          <div class="cal-head">
+            <div class="cal-month" id="cal-label">April 2026</div>
+            <div class="cal-nav">
+              <button class="cnb" onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+              <button class="cnb" onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
+            </div>
+          </div>
+          <div class="cal-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+          <div class="cal-days" id="cal-days"></div>
+          <div class="cal-legend">
+            <span class="leg"><span class="ldot" style="background:var(--accent)"></span>Session</span>
+            <span class="leg"><span class="ldot" style="background:var(--danger)"></span>Crisis</span>
+            <span class="leg"><span class="ldot" style="background:var(--warn)"></span>Pending</span>
+          </div>
+          <div class="cal-stats">
+            <div class="cst"><div class="cst-v">4</div><div class="cst-l">Today</div></div>
+            <div class="cst"><div class="cst-v" style="color:var(--accent)">8</div><div class="cst-l">Week</div></div>
+            <div class="cst"><div class="cst-v" style="color:var(--danger)">2</div><div class="cst-l">Crisis</div></div>
           </div>
         </div>
-      </div><!-- /appt-grid -->
-    </div><!-- /content -->
-  </div><!-- /main -->
+      </div><!-- /up-grid -->
+    </div><!-- /panel-upcoming -->
+
+    <!-- PENDING REQUESTS PANEL -->
+    <div class="panel" id="panel-pending">
+      <div class="req-header">
+        <div style="font-size:15px;font-weight:600;color:var(--text-1)">Appointment Requests Awaiting Approval</div>
+        <div class="req-count" id="pend-count">3 pending</div>
+      </div>
+      <div class="req-list">
+
+        <div class="req-card" id="rcard-1">
+          <div class="ac-top">
+            <div class="ac-patient">
+              <div class="p-av" style="background:#f3e8ff;color:#6b21a8">LI</div>
+              <div><div class="p-name">Layla Ibrahim</div><div class="p-meta">New Patient · Anxiety &amp; Depression</div></div>
+            </div>
+            <span class="sbadge sb-p"><i class="ti ti-clock"></i>Pending</span>
+          </div>
+          <div class="ac-info">
+            <span class="chip"><i class="ti ti-calendar"></i>Requested: Apr 29 · 11:00 AM</span>
+            <span class="chip"><i class="ti ti-clock"></i>50 min</span>
+            <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+          </div>
+          <div class="req-note"><strong>Patient message:</strong> "I've been struggling with severe anxiety for 3 months after a job loss. I was referred by my GP. I'm hoping to begin CBT therapy as soon as possible."</div>
+          <div id="ract-1" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ok" onclick="approveReq(1,'Layla Ibrahim')"><i class="ti ti-check"></i>Approve &amp; Confirm</button>
+            <button class="btn btn-rej" onclick="rejectReq(1,'Layla Ibrahim')"><i class="ti ti-x"></i>Decline</button>
+            <button class="btn btn-ghost" onclick="openReschedule('Layla Ibrahim')"><i class="ti ti-calendar-event"></i>Suggest Other Time</button>
+          </div>
+        </div>
+
+        <div class="req-card" id="rcard-2">
+          <div class="ac-top">
+            <div class="ac-patient">
+              <div class="p-av" style="background:#f0fdf4;color:#15803d">OS</div>
+              <div><div class="p-name">Omar Sheikh</div><div class="p-meta">Week 2 · Extra Session Request</div></div>
+            </div>
+            <span class="sbadge sb-p"><i class="ti ti-clock"></i>Pending</span>
+          </div>
+          <div class="ac-info">
+            <span class="chip"><i class="ti ti-calendar"></i>Requested: Apr 29 · 3:30 PM</span>
+            <span class="chip"><i class="ti ti-clock"></i>50 min</span>
+            <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+          </div>
+          <div class="req-note"><strong>Patient message:</strong> "I had a particularly rough week dealing with my father's passing. I would appreciate an extra session before our next scheduled one on May 3rd."</div>
+          <div id="ract-2" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ok" onclick="approveReq(2,'Omar Sheikh')"><i class="ti ti-check"></i>Approve &amp; Confirm</button>
+            <button class="btn btn-rej" onclick="rejectReq(2,'Omar Sheikh')"><i class="ti ti-x"></i>Decline</button>
+            <button class="btn btn-ghost" onclick="openReschedule('Omar Sheikh')"><i class="ti ti-calendar-event"></i>Suggest Other Time</button>
+          </div>
+        </div>
+
+        <div class="req-card crisis-card" id="rcard-3">
+          <div class="ac-top">
+            <div class="ac-patient">
+              <div class="p-av" style="background:#fce7f3;color:#9d174d">NH</div>
+              <div><div class="p-name">Nadia Hassan <span class="sbadge sb-x" style="font-size:10px;padding:2px 7px;margin-left:4px"><i class="ti ti-alert-triangle"></i>CRISIS</span></div><div class="p-meta">Week 5 · Emergency Request</div></div>
+            </div>
+            <span class="sbadge sb-x"><i class="ti ti-alert-circle"></i>Crisis — Urgent</span>
+          </div>
+          <div class="ac-info">
+            <span class="chip"><i class="ti ti-calendar"></i>TODAY · Immediate</span>
+            <span class="chip"><i class="ti ti-clock"></i>ASAP</span>
+            <span class="chip"><i class="ti ti-video"></i>Video Call</span>
+          </div>
+          <div class="req-note" style="background:#fef2f2;border-color:#fca5a5"><strong style="color:var(--danger)">⚠ Crisis flag:</strong> System flagged journal entry (mood 1/10, self-harm keywords). Last contact: 3 days ago.</div>
+          <div id="ract-3" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-red" onclick="approveReq(3,'Nadia Hassan')"><i class="ti ti-check"></i>Approve Immediately</button>
+            <button class="btn btn-ghost" onclick="showToast('Calling Nadia Hassan now…','warn')"><i class="ti ti-phone"></i>Call Patient Now</button>
+          </div>
+        </div>
+
+      </div><!-- /req-list -->
+    </div><!-- /panel-pending -->
+  </div><!-- /content -->
+</main>
 </div><!-- /layout -->
 
-<!-- REJECT MODAL -->
-<div class="modal-overlay" id="reject-modal">
+<!-- NOTES MODAL -->
+<div class="modal-bg" id="notes-modal">
   <div class="modal">
-    <div class="modal-title"><i class="ti ti-x" style="color:var(--danger)"></i> Decline Appointment</div>
-    <div class="modal-sub">Please provide a reason for declining. The patient will be notified via the platform.</div>
-    <div class="modal-field">
-      <label>Reason for Decline</label>
-      <select id="reject-reason">
-        <option>Schedule conflict — please choose another time</option>
-        <option>Outside my specialization area</option>
-        <option>Patient capacity reached — recommend waitlist</option>
-        <option>Other (see note below)</option>
-      </select>
+    <div class="modal-head">
+      <div class="modal-title"><i class="ti ti-notes"></i>Session Notes — <span id="notes-name"></span></div>
+      <button class="modal-close" onclick="closeModal('notes-modal')"><i class="ti ti-x"></i></button>
     </div>
-    <div class="modal-field">
-      <label>Additional Note (optional)</label>
-      <textarea rows="3" placeholder="Add a personal message to the patient..."></textarea>
+    <div class="modal-body">
+      <div class="mf"><label>Session</label><input type="text" value="Apr 27, 2026 · Video Call · 50 min" readonly/></div>
+      <div class="mf"><label>Subjective (Patient's Report)</label><textarea rows="3" placeholder="What the patient described…"></textarea></div>
+      <div class="mf"><label>Objective (Clinical Observations)</label><textarea rows="3" placeholder="Affect, behavior, cognition…"></textarea></div>
+      <div class="mf"><label>Assessment</label><textarea rows="2" placeholder="Diagnosis update, progress…"></textarea></div>
+      <div class="mf"><label>Plan / Next Steps</label><textarea rows="2" placeholder="Homework, referrals, next goals…"></textarea></div>
+      <div class="mf"><label>Risk Level</label><select><option>Low — No concerns</option><option>Moderate — Monitor closely</option><option>High — Immediate follow-up required</option><option>Crisis — Activate safety protocol</option></select></div>
     </div>
-    <div class="modal-field">
-      <label>Suggest Alternative Time</label>
-      <input type="datetime-local"/>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('reject-modal')">Cancel</button>
-      <button class="btn-danger-fill" onclick="rejectAppt()">Send Decline Notice</button>
+    <div class="modal-foot">
+      <button class="btn btn-cancel" onclick="closeModal('notes-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNotes()"><i class="ti ti-device-floppy"></i>Save to Record</button>
     </div>
   </div>
 </div>
 
 <!-- RESCHEDULE MODAL -->
-<div class="modal-overlay" id="reschedule-modal">
+<div class="modal-bg" id="reschedule-modal">
   <div class="modal">
-    <div class="modal-title"><i class="ti ti-calendar-event" style="color:var(--accent)"></i> Reschedule Session</div>
-    <div class="modal-sub">Choose a new time slot. The patient will receive a reschedule notification.</div>
-    <div class="modal-field">
-      <label>New Date & Time</label>
-      <input type="datetime-local"/>
+    <div class="modal-head">
+      <div class="modal-title"><i class="ti ti-calendar-event"></i>Reschedule Session</div>
+      <button class="modal-close" onclick="closeModal('reschedule-modal')"><i class="ti ti-x"></i></button>
     </div>
-    <div class="modal-field">
-      <label>Session Type</label>
-      <select>
-        <option>Video Call</option>
-        <option>In-Person</option>
-        <option>Phone Call</option>
-      </select>
+    <div class="modal-body">
+      <div class="mf"><label>Patient</label><input type="text" id="rsch-name" readonly/></div>
+      <div class="mf"><label>New Date &amp; Time</label><input type="datetime-local"/></div>
+      <div class="mf"><label>Format</label><select><option>Video Call</option><option>In-Person</option><option>Phone</option></select></div>
+      <div class="mf"><label>Message to Patient</label><textarea rows="2" placeholder="Optional note about the change…"></textarea></div>
     </div>
-    <div class="modal-field">
-      <label>Note to Patient</label>
-      <textarea rows="2" placeholder="e.g. I've rescheduled us to a time that works better for our full session."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('reschedule-modal')">Cancel</button>
-      <button class="btn-primary" onclick="doReschedule()">Confirm Reschedule</button>
+    <div class="modal-foot">
+      <button class="btn btn-cancel" onclick="closeModal('reschedule-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmReschedule()"><i class="ti ti-send"></i>Send Reschedule Request</button>
     </div>
   </div>
 </div>
 
-<!-- SESSION NOTES MODAL -->
-<div class="modal-overlay" id="notes-modal">
-  <div class="modal">
-    <div class="modal-title"><i class="ti ti-notes" style="color:var(--accent)"></i> Session Notes</div>
-    <div class="modal-sub">These notes are private and will be stored in the clinical record.</div>
-    <div class="modal-field">
-      <label>SOAP Note — Subjective</label>
-      <textarea rows="2" placeholder="What the patient reports..."></textarea>
-    </div>
-    <div class="modal-field">
-      <label>Objective</label>
-      <textarea rows="2" placeholder="Observed behavior, affect, cognition..."></textarea>
-    </div>
-    <div class="modal-field">
-      <label>Assessment & Plan</label>
-      <textarea rows="3" placeholder="Diagnosis update, treatment progress, next steps..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('notes-modal')">Cancel</button>
-      <button class="btn-primary" onclick="saveNotes()"><i class="ti ti-device-floppy"></i> Save Notes</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <i class="ti ti-check"></i>
-  <span id="toast-msg">Action completed</span>
-</div>
+<div class="toast" id="toast"><i class="ti ti-circle-check" id="t-icon"></i><span id="t-msg">Done</span></div>
 
 <script>
-  // Filter appointments
-  function filterAppts(status, btn) {
-    document.querySelectorAll('.st-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const cards = document.querySelectorAll('.appt-card');
-    let visible = 0;
-    cards.forEach(c => {
-      const show = status === 'all' || c.dataset.status === status;
-      c.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    const statusLabel = status === 'all' ? `all ${visible}` : `${visible} ${status}`;
-    document.getElementById('filter-label').textContent = `Showing ${statusLabel} sessions`;
+// Panel switch
+function switchPanel(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.vt-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+// Filter sessions
+function filterSessions(q){document.querySelectorAll('#session-list .appt-card').forEach(c=>{c.style.display=c.dataset.name.includes(q.toLowerCase())?'':'none'})}
+function filterStatus(v){document.querySelectorAll('#session-list .appt-card').forEach(c=>{c.style.display=(v==='all'||c.dataset.status===v)?'':'none'})}
+// Quick approve from upcoming
+function quickApprove(btn,name){
+  const card=btn.closest('.appt-card');
+  card.querySelector('.sbadge').outerHTML='<span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>';
+  btn.outerHTML='<button class="btn btn-join" onclick="joinSession(\''+name+'\')"><i class="ti ti-video"></i>Join Session</button>';
+  showToast(name+' session confirmed!','ok');
+}
+// Pending approve/reject
+let pendCount=3;
+function approveReq(id,name){
+  document.getElementById('rcard-'+id).classList.add('approved');
+  const b=document.getElementById('rcard-'+id).querySelector('.sbadge:last-of-type');
+  if(b)b.className='sbadge sb-c',b.innerHTML='<i class="ti ti-circle-check"></i>Confirmed';
+  document.getElementById('ract-'+id).innerHTML='<div class="res-ok"><i class="ti ti-circle-check"></i>Approved — patient notified</div>';
+  pendCount=Math.max(0,pendCount-1);
+  document.getElementById('pend-count').textContent=pendCount+' pending';
+  showToast(name+' session approved!','ok');
+}
+function rejectReq(id,name){
+  document.getElementById('rcard-'+id).classList.add('rejected-card');
+  document.getElementById('ract-'+id).innerHTML='<div class="res-no"><i class="ti ti-x"></i>Declined — patient notified</div>';
+  pendCount=Math.max(0,pendCount-1);
+  document.getElementById('pend-count').textContent=pendCount+' pending';
+  showToast('Request from '+name+' declined.','warn');
+}
+// Join
+function joinSession(name){showToast('Launching video session with '+name+'…','ok')}
+function cancelSess(name){if(confirm('Cancel session with '+name+'?'))showToast('Session cancelled. Patient notified.','warn')}
+// Modals
+function openNotes(name){document.getElementById('notes-name').textContent=name;document.getElementById('notes-modal').classList.add('open')}
+function openReschedule(name){document.getElementById('rsch-name').value=name;document.getElementById('reschedule-modal').classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function saveNotes(){closeModal('notes-modal');showToast('Session notes saved.','ok')}
+function confirmReschedule(){const n=document.getElementById('rsch-name').value;closeModal('reschedule-modal');showToast('Reschedule sent to '+n+'.','ok')}
+document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open')}));
+// Toast
+let tt;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  document.getElementById('t-msg').textContent=msg;
+  document.getElementById('t-icon').className=type==='ok'?'ti ti-circle-check':type==='warn'?'ti ti-alert-triangle':'ti ti-alert-circle';
+  t.className='toast t-'+type+' show';
+  clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3400);
+}
+// Calendar
+const apd={3:[7,10,14,21,27,28,29],4:[1,5,8,12,15,22,27,28,29]};
+const crd={3:[],4:[27]};
+let cy=2026,cm=3;
+function renderCal(){
+  const mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-label').textContent=mn[cm]+' '+cy;
+  const g=document.getElementById('cal-days');g.innerHTML='';
+  const first=new Date(cy,cm,1).getDay(),days=new Date(cy,cm+1,0).getDate(),prev=new Date(cy,cm,0).getDate();
+  const now=new Date(),ta=apd[cm]||[],tc=crd[cm]||[];
+  for(let i=first-1;i>=0;i--){const d=document.createElement('div');d.className='cd other';d.textContent=prev-i;g.appendChild(d)}
+  for(let i=1;i<=days;i++){
+    const d=document.createElement('div');d.className='cd';d.textContent=i;
+    if(i===now.getDate()&&cm===now.getMonth()&&cy===now.getFullYear())d.classList.add('today');
+    if(ta.includes(i))d.classList.add('has-a');
+    if(tc.includes(i))d.classList.add('has-c');
+    d.onclick=()=>{document.querySelectorAll('.cd.sel').forEach(x=>x.classList.remove('sel'));d.classList.add('sel')};
+    g.appendChild(d);
   }
-
-  // Confirm appointment
-  function confirmAppt(btn) {
-    const card = btn.closest('.appt-card');
-    card.dataset.status = 'confirmed';
-    card.className = 'appt-card confirmed-card';
-    const badge = card.querySelector('.ac-badge');
-    badge.className = 'ac-badge badge-confirmed';
-    badge.innerHTML = '<i class="ti ti-circle-check"></i> Confirmed';
-    // Replace action buttons
-    const actions = card.querySelector('.ac-actions');
-    actions.innerHTML = `
-      <button class="btn-sm btn-join"><i class="ti ti-video"></i> Join Session</button>
-      <button class="btn-sm btn-notes" onclick="openNotesModal(this)"><i class="ti ti-notes"></i> Session Notes</button>
-      <button class="btn-sm btn-reschedule" onclick="openRescheduleModal(this)"><i class="ti ti-calendar-event"></i> Reschedule</button>`;
-    updateCounts();
-    showToast('Session confirmed! Patient has been notified.', 'success');
-  }
-
-  // Modals
-  function openRejectModal(btn) { document.getElementById('reject-modal').classList.add('open'); }
-  function openRescheduleModal(btn) { document.getElementById('reschedule-modal').classList.add('open'); }
-  function openNotesModal(btn) { document.getElementById('notes-modal').classList.add('open'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-  function rejectAppt() {
-    closeModal('reject-modal');
-    showToast('Decline notice sent. Alternative time suggested.', 'danger');
-  }
-  function doReschedule() {
-    closeModal('reschedule-modal');
-    showToast('Session rescheduled. Patient notified.', 'success');
-  }
-  function saveNotes() {
-    closeModal('notes-modal');
-    showToast('Clinical notes saved to record.', 'success');
-  }
-
-  // Close modal on backdrop click
-  document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-  });
-
-  // Update status counts
-  function updateCounts() {
-    const cards = document.querySelectorAll('.appt-card');
-    let pending = 0, confirmed = 0, cancelled = 0;
-    cards.forEach(c => {
-      if (c.dataset.status === 'pending') pending++;
-      else if (c.dataset.status === 'confirmed') confirmed++;
-      else if (c.dataset.status === 'cancelled') cancelled++;
-    });
-    document.getElementById('cnt-pending').textContent = pending;
-    document.getElementById('cnt-confirmed').textContent = confirmed;
-    document.getElementById('cnt-cancelled').textContent = cancelled;
-    document.getElementById('cnt-all').textContent = pending + confirmed + cancelled;
-  }
-
-  // Toast
-  let toastTimer;
-  function showToast(msg, type) {
-    const toast = document.getElementById('toast');
-    const icon = toast.querySelector('i');
-    document.getElementById('toast-msg').textContent = msg;
-    toast.className = `toast ${type === 'success' ? 'success-toast' : 'danger-toast'} show`;
-    icon.className = type === 'success' ? 'ti ti-check' : 'ti ti-x';
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
-  }
+  const rem=(first+days)%7;if(rem){for(let i=1;i<=7-rem;i++){const d=document.createElement('div');d.className='cd other';d.textContent=i;g.appendChild(d)}}
+}
+function changeMonth(dir){cm+=dir;if(cm>11){cm=0;cy++}if(cm<0){cm=11;cy--}renderCal()}
+renderCal();
 </script>
 </body>
 </html>

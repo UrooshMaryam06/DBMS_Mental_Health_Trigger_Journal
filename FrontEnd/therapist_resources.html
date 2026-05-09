@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script>
+(function(){
+  if(localStorage.getItem('mhj_theme')==='dark'){
+    document.documentElement.classList.add('dark');
+  }else{
+    document.documentElement.classList.remove('dark');
+  }
+})();
+</script>
+<title>MH Journal — Clinical Resources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css"/>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--surface:#ffffff;--border:#e2e8f0;--border-d:#cbd5e1;
+  --text-1:#0f172a;--text-2:#475569;--text-3:#94a3b8;
+  --accent:#4f46e5;--accent-l:#eef2ff;--accent-m:#c7d2fe;--accent-d:#3730a3;
+  --sidebar:#0f172a;--sidebar-hover:rgba(99,102,241,.14);--sidebar-active:rgba(99,102,241,.18);
+  --danger:#dc2626;--danger-l:#fef2f2;--danger-m:#fca5a5;
+  --warn:#d97706;--warn-l:#fffbeb;--ok:#16a34a;--ok-l:#f0fdf4;
+  --radius:12px;--shadow-sm:0 1px 3px rgba(0,0,0,.07);--shadow-md:0 4px 16px rgba(0,0,0,.09);--shadow-lg:0 12px 40px rgba(0,0,0,.13);
+}
+
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);overflow-x:hidden;line-height:1.5}
+.layout{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:244px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:30;overflow-y:auto}
+.sb-brand{display:flex;align-items:center;gap:11px;padding:22px 20px 20px;border-bottom:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(79,70,229,.5)}
+.sb-logo i{font-size:18px;color:#fff}
+.sb-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sb-sub{font-size:10px;color:rgba(255,255,255,.32);margin-top:2px;font-weight:500}
+.sb-nav{padding:14px 12px;flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-section{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:14px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;text-decoration:none;transition:background .14s,color .14s;color:rgba(255,255,255,.52);font-size:13px;font-weight:500;white-space:nowrap}
+.nav-item:hover{background:var(--sidebar-hover);color:rgba(255,255,255,.88)}
+.nav-item.active{background:var(--sidebar-active);color:#c7d2fe}
+.nav-item i{font-size:17px;color:rgba(255,255,255,.3);transition:color .14s;flex-shrink:0}
+.nav-item:hover i,.nav-item.active i{color:#a5b4fc}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.sb-foot{padding:14px 20px;border-top:.5px solid rgba(255,255,255,.07);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1e1b4b;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600;color:#fff}
+.sb-role{font-size:11px;color:rgba(255,255,255,.32);margin-top:1px}
+
+.main{margin-left:244px;flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;gap:14px}
+.tb-title{font-size:15px;font-weight:700;color:var(--text-1);letter-spacing:-.02em}
+.tb-sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.tb-right{display:flex;align-items:center;gap:9px}
+.icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);text-decoration:none;transition:all .14s;flex-shrink:0}
+.icon-btn:hover{background:#e8edf2;border-color:var(--border-d);color:var(--text-1)}
+.icon-btn i{font-size:18px}
+
+.content{padding:26px 28px;flex:1}
+
+/* FILTER BAR */
+.filter-bar{background:var(--surface);border-radius:var(--radius);border:.5px solid var(--border);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:var(--shadow-sm)}
+.search-res-wrap{position:relative;flex:1;min-width:200px;max-width:300px}
+.search-res{width:100%;border:1px solid var(--border);border-radius:9px;padding:8px 12px 8px 34px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);outline:none;transition:border-color .14s}
+.search-res:focus{border-color:var(--accent)}
+.sr-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--text-3);pointer-events:none}
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cat-chip{border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--text-2);font-family:'DM Sans',sans-serif;transition:all .14s;white-space:nowrap}
+.cat-chip:hover{border-color:var(--accent);color:var(--accent)}
+.cat-chip.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.res-count{font-size:12px;color:var(--text-3);margin-left:auto;font-weight:600;white-space:nowrap}
+
+/* RESOURCE GRID */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.res-card{background:var(--surface);border-radius:var(--radius);border:.5px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s;display:flex;flex-direction:column}
+.res-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.res-thumb{height:90px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;position:relative}
+.res-badge{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.rb-new{background:var(--accent);color:#fff}
+.rb-pop{background:var(--ok-l);color:var(--ok)}
+.res-body{padding:14px 16px;flex:1}
+.res-cat{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.res-title{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:5px;line-height:1.35}
+.res-desc{font-size:12px;color:var(--text-2);line-height:1.55;margin-bottom:10px}
+.res-meta{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-3)}
+.res-meta i{font-size:13px}
+.res-foot{padding:10px 16px;border-top:.5px solid var(--border);display:flex;gap:8px;flex-shrink:0}
+.rf-btn{flex:1;padding:7px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .14s;border:none}
+.rf-primary{background:var(--accent);color:#fff}
+.rf-primary:hover{background:var(--accent-d)}
+.rf-ghost{background:var(--bg);color:var(--text-2);border:1px solid var(--border)}
+.rf-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* NO RESULTS */
+.no-res{grid-column:1/-1;text-align:center;padding:48px 24px;color:var(--text-3)}
+.no-res i{font-size:36px;opacity:.4;display:block;margin-bottom:10px}
+.no-res p{font-size:14px;font-weight:500}
+
+/* ASSIGN MODAL */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:50;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(3px)}
+.overlay.open{opacity:1;pointer-events:all}
+.assign-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-60%) scale(.96);z-index:51;width:420px;max-width:96vw;transition:all .3s cubic-bezier(.4,0,.2,1);opacity:0;pointer-events:none}
+.assign-modal.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:all}
+.assign-modal-inner{background:var(--surface);border-radius:16px;border:.5px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden}
+.am-head{padding:18px 20px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.am-title{font-size:15px;font-weight:700;color:var(--text-1)}
+.am-close{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-3);transition:all .14s}
+.am-close:hover{background:var(--bg);color:var(--text-1)}
+.am-body{padding:20px}
+.am-res-name{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:4px}
+.am-res-cat{font-size:12px;color:var(--text-3);margin-bottom:16px}
+.am-label{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px}
+.assign-select{width:100%;border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-1);outline:none;cursor:pointer;transition:border-color .14s;margin-bottom:14px}
+.assign-select:focus{border-color:var(--accent)}
+.am-note{font-size:12px;color:var(--text-3);background:var(--accent-l);border-radius:8px;padding:10px 12px;line-height:1.55}
+.am-foot{padding:14px 20px;border-top:.5px solid var(--border);display:flex;gap:8px}
+.am-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;border:none;transition:all .14s;display:flex;align-items:center;justify-content:center;gap:6px}
+.am-primary{background:var(--accent);color:#fff}
+.am-primary:hover{background:var(--accent-d)}
+.am-ghost{background:var(--bg);color:var(--text-2);border:1px solid var(--border)}
+.am-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text-1);color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:9px;box-shadow:var(--shadow-lg);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:16px;flex-shrink:0}
+.t-ok i{color:#4ade80}.t-err i{color:#f87171}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+@media(max-width:1100px){.res-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.res-grid{grid-template-columns:1fr}}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL DARK MODE — html.dark (driven by mhj_theme key)
+═══════════════════════════════════════════════════════════ */
+html.dark body{
+  --bg:#0b0f19;--surface:#1e293b;--border:#334155;--border-d:#475569;
+  --text-1:#f1f5f9;--text-2:#94a3b8;--text-3:#64748b;
+  --accent-l:#1e1b4b;--accent-m:rgba(99,102,241,.25);
+  --danger-l:#2c0a0a;--danger-m:#7f1d1d;
+  --warn-l:#1c1003;--ok-l:#052e16;
+  background:#0b0f19;color:#f1f5f9;
+}
+html.dark body .topbar,
+html.dark body .settings-card,html.dark body .surface-card,
+html.dark body .card,html.dark body .metric-card,html.dark body .chart-card,
+html.dark body .stat-card,html.dark body .section-card,
+html.dark body .appt-card,html.dark body .session-card,
+html.dark body .patient-card,html.dark body .review-card,
+html.dark body .resource-card,html.dark body .res-card,
+html.dark body .msg-sidebar,html.dark body .chat-area,
+html.dark body .profile-card,html.dark body .modal,
+html.dark body .drawer,html.dark body .bg-white,
+html.dark body .filter-bar{
+  background:var(--surface)!important;
+  border-color:var(--border)!important;
+  color:var(--text-1)!important;
+}
+html.dark body .topbar{border-bottom-color:var(--border)!important}
+html.dark body .text-slate-900,html.dark body .text-slate-800{color:var(--text-1)!important}
+html.dark body .text-slate-500,html.dark body .text-slate-400{color:var(--text-2)!important}
+html.dark body .border-slate-100,html.dark body .border-slate-200{border-color:var(--border)!important}
+html.dark body thead th{background:#0d1424;color:var(--text-3);border-color:var(--border)}
+html.dark body tbody tr{border-color:var(--border)}
+html.dark body tbody tr:hover{background:#141d2e}
+html.dark body input,html.dark body textarea,html.dark body select,
+html.dark body .s-input,html.dark body .s-select,
+html.dark body .search-box,html.dark body .search-res,
+html.dark body .form-field,html.dark body .compose-input{
+  background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important;
+}
+html.dark body input::placeholder,html.dark body textarea::placeholder{color:var(--text-3)!important}
+html.dark body .icon-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .icon-btn:hover{background:var(--border)}
+html.dark body .range-btn{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .range-btn.active{background:var(--accent)!important;color:#fff!important}
+html.dark body .cat-chip{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-2)!important}
+html.dark body .cat-chip.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+html.dark body .assign-select{background:var(--bg)!important;border-color:var(--border)!important;color:var(--text-1)!important}
+html.dark body .setting-row{border-color:var(--border)!important}
+html.dark body .danger-zone{background:#1a0a0a!important;border-color:#7f1d1d!important}
+html.dark body .thread-item{border-color:var(--border)!important}
+html.dark body .thread-item:hover,html.dark body .thread-item.active{background:#263148!important}
+html.dark body .bubble-in{background:#263148!important;color:var(--text-1)!important}
+html.dark body .mc{background:var(--surface)!important;border-color:var(--border)!important}
+html.dark body .quick-card,html.dark body .log-item{background:var(--surface);border-color:var(--border)}
+html.dark body .filter-chip{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .calendar-day{background:var(--surface);border-color:var(--border)}
+html.dark body .calendar-day:hover{background:#141d2e}
+html.dark body .time-slot,html.dark body .slot-btn{background:var(--surface);border-color:var(--border)}
+html.dark body .vt-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .vt-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+html.dark body .panel{background:var(--surface);border-color:var(--border)}
+html.dark body .profile-section,html.dark body .info-row{border-color:var(--border)}
+html.dark body .log-entry{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item{background:var(--surface);border-color:var(--border)}
+html.dark body .queue-item:hover,html.dark body .queue-item.active{background:#141d2e}
+html.dark body .review-action-btn{background:var(--bg);border-color:var(--border);color:var(--text-2)}
+html.dark body .modal-bg,html.dark body .modal-overlay{background:rgba(0,0,0,.7)}
+html.dark body .modal,html.dark body .modal-inner,html.dark body .assign-modal-inner{
+  background:var(--surface)!important;border-color:var(--border)!important;
+}
+html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--text-1)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" role="navigation">
+  <div class="sb-brand">
+    <div class="sb-logo"><i class="ti ti-heart-handshake"></i></div>
+    <div><div class="sb-title">MH Journal</div><div class="sb-sub">Therapist Portal</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-section">Main</div>
+    <a href="4_therapist_dashboard.html" class="nav-item"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+    <a href="4_therapist_dashboard.html#patients" class="nav-item"><i class="ti ti-users"></i>My Patients<span class="nav-badge">12</span></a>
+    <a href="therapist_appointments.html" class="nav-item"><i class="ti ti-calendar"></i>Appointments</a>
+    <a href="therapist_reviews.html" class="nav-item"><i class="ti ti-notebook"></i>Journal Reviews<span class="nav-badge">5</span></a>
+    <div class="nav-section">Tools</div>
+    <a href="therapist_messages.html" class="nav-item"><i class="ti ti-message-2"></i>Messages<span class="nav-badge">3</span></a>
+    <a href="therapist_analytics.html" class="nav-item"><i class="ti ti-chart-bar"></i>Analytics</a>
+    <a href="therapist_resources.html" class="nav-item active" aria-current="page"><i class="ti ti-books"></i>Resources</a>
+    <div class="nav-section">Account</div>
+    <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
+    <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto;color:rgba(255,255,255,.38)"><i class="ti ti-logout"></i>Sign Out</a>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-user" onclick="window.location.href='therapist_profile.html'">
+      <div class="sb-avatar">IK</div>
+      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div>
+      <div class="tb-title">Clinical Resource Library</div>
+      <div class="tb-sub">Worksheets, guides, and tools — assign directly to patients</div>
+    </div>
+    <div class="tb-right">
+      <a href="4_therapist_dashboard.html" class="icon-btn" title="Dashboard"><i class="ti ti-layout-dashboard"></i></a>
+      <a href="therapist_profile.html" class="icon-btn" title="Profile"><i class="ti ti-user-circle"></i></a>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <div class="search-res-wrap">
+        <i class="ti ti-search sr-icon"></i>
+        <input type="text" class="search-res" placeholder="Search resources…" id="resSearch" oninput="filterResources()"/>
+      </div>
+      <div class="cats" id="catChips"></div>
+      <div class="res-count" id="resCount">18 resources</div>
+    </div>
+
+    <!-- RESOURCE GRID -->
+    <div class="res-grid" id="resGrid"></div>
+
+  </main>
+</div>
+</div>
+
+<!-- ASSIGN MODAL -->
+<div class="overlay" id="overlay" onclick="closeModal()"></div>
+<div class="assign-modal" id="assignModal">
+  <div class="assign-modal-inner">
+    <div class="am-head">
+      <div class="am-title">Assign Resource to Patient</div>
+      <button class="am-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="am-body">
+      <div class="am-res-name" id="amResName"></div>
+      <div class="am-res-cat" id="amResCat"></div>
+      <div class="am-label">Select Patient</div>
+      <select class="assign-select" id="assignPatient">
+        <option value="">Choose a patient…</option>
+        <option value="p1">Sara Ahmed — Crisis</option>
+        <option value="p2">Ali Khan — Active</option>
+        <option value="p3">Fatima Noor — Crisis</option>
+        <option value="p4">Zainab Raza — Stable</option>
+        <option value="p5">Hassan Malik — Active</option>
+      </select>
+      <div class="am-label">Priority</div>
+      <select class="assign-select" id="assignPriority">
+        <option value="routine">Routine — review within 1 week</option>
+        <option value="priority">Priority — review within 48 hours</option>
+        <option value="urgent">Urgent — review immediately</option>
+      </select>
+      <div class="am-note"><i class="ti ti-info-circle"></i> The patient will receive a notification in their journal app and the resource will appear under their assigned materials.</div>
+    </div>
+    <div class="am-foot">
+      <button class="am-btn am-ghost" onclick="closeModal()">Cancel</button>
+      <button class="am-btn am-primary" onclick="confirmAssign()"><i class="ti ti-send"></i>Assign Resource</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="alert"><i id="toastIcon"></i><span id="toastMsg"></span></div>
+
+<script>
+(function(){ if(localStorage.getItem('mhj_theme')==='dark') document.documentElement.classList.add('dark'); })();
+
+const RESOURCES = [
+  {id:'r1',cat:'CBT Worksheet',title:'Thought Record & Cognitive Restructuring',desc:'A structured 7-column CBT thought diary for identifying and challenging automatic negative thoughts.',emoji:'🧠',bg:'#eef2ff',badge:'pop',pages:2,mins:20,tags:['cbt','anxiety','depression']},
+  {id:'r2',cat:'Crisis Protocol',title:'Safety Planning Worksheet',desc:'Step-by-step personalized safety plan for patients experiencing suicidal ideation or self-harm urges.',emoji:'🛡️',bg:'#fef2f2',badge:'new',pages:3,mins:30,tags:['crisis','self-harm','safety']},
+  {id:'r3',cat:'Mindfulness',title:'Body Scan Meditation Guide',desc:'15-minute guided body scan practice for stress reduction and grounding during anxiety episodes.',emoji:'🧘',bg:'#f0fdf4',badge:null,pages:1,mins:15,tags:['mindfulness','anxiety','stress']},
+  {id:'r4',cat:'Psychoeducation',title:'Understanding Panic Attacks',desc:'Patient-friendly explanation of the panic cycle, physical symptoms, and evidence-based interruption techniques.',emoji:'💨',bg:'#fffbeb',badge:'pop',pages:2,mins:10,tags:['panic','anxiety','psychoeducation']},
+  {id:'r5',cat:'Sleep Hygiene',title:'Sleep Hygiene Checklist & Log',desc:'14-day sleep diary with behavioral guidelines for improving sleep onset and maintaining circadian rhythm.',emoji:'🌙',bg:'#f1f5f9',badge:null,pages:3,mins:5,tags:['sleep','anxiety','routine']},
+  {id:'r6',cat:'Grounding Technique',title:'5-4-3-2-1 Sensory Grounding Card',desc:'Printable pocket-sized grounding exercise for use during dissociation, panic, or acute stress episodes.',emoji:'🌿',bg:'#f0fdf4',badge:'new',pages:1,mins:5,tags:['grounding','panic','crisis']},
+  {id:'r7',cat:'CBT Worksheet',title:'Activity Scheduling for Depression',desc:'Behavioral activation worksheet helping patients plan rewarding activities to counter depressive withdrawal.',emoji:'📅',bg:'#eef2ff',badge:null,pages:2,mins:15,tags:['depression','cbt','behavioral']},
+  {id:'r8',cat:'Psychoeducation',title:'Stress Response & Window of Tolerance',desc:'Infographic-style handout explaining the nervous system\'s stress response and how to widen the tolerance window.',emoji:'📊',bg:'#fffbeb',badge:null,pages:1,mins:8,tags:['stress','psychoeducation','trauma']},
+  {id:'r9',cat:'Mindfulness',title:'Loving-Kindness Meditation Script',desc:'Compassion cultivation practice for patients struggling with self-criticism, shame, or interpersonal conflict.',emoji:'❤️',bg:'#fdf2f8',badge:null,pages:1,mins:12,tags:['mindfulness','self-compassion','shame']},
+  {id:'r10',cat:'CBT Worksheet',title:'Core Beliefs Identification Log',desc:'Schema-based worksheet for uncovering and recording deep-seated core beliefs that drive emotional patterns.',emoji:'🔍',bg:'#eef2ff',badge:'new',pages:2,mins:25,tags:['cbt','schema','beliefs']},
+  {id:'r11',cat:'Communication',title:'Assertiveness Training Script',desc:'Role-play framework and sentence starters for practicing assertive (not aggressive or passive) communication.',emoji:'🗣️',bg:'#eff6ff',badge:null,pages:2,mins:20,tags:['communication','assertiveness','relationships']},
+  {id:'r12',cat:'Grounding Technique',title:'TIPP Crisis Skill Card (DBT)',desc:'DBT-based TIPP (Temperature, Intense exercise, Paced breathing, Paired muscle relaxation) skill for emotional dysregulation.',emoji:'🌊',bg:'#f0fdf4',badge:'pop',pages:1,mins:5,tags:['dbt','crisis','grounding','emotion']},
+  {id:'r13',cat:'Sleep Hygiene',title:'Stimulus Control & Sleep Restriction Guide',desc:'CBT-I protocol worksheet for reassociating bed with sleep using stimulus control and sleep restriction techniques.',emoji:'💤',bg:'#f8fafc',badge:null,pages:2,mins:10,tags:['sleep','cbt-i','insomnia']},
+  {id:'r14',cat:'Psychoeducation',title:'Grief Stages & Processing Model',desc:'Gentle psychoeducation handout on non-linear grief responses and healthy mourning practices.',emoji:'🕊️',bg:'#f5f3ff',badge:null,pages:2,mins:12,tags:['grief','loss','psychoeducation']},
+  {id:'r15',cat:'Communication',title:'Relationship Needs Inventory',desc:'Structured questionnaire for identifying emotional needs, attachment styles, and communication preferences in relationships.',emoji:'💞',bg:'#fff1f2',badge:null,pages:3,mins:20,tags:['relationships','attachment','communication']},
+  {id:'r16',cat:'Mindfulness',title:'Mindful Journaling Prompts (28-Day)',desc:'Daily prompts designed to cultivate emotional awareness, self-compassion, and therapeutic insight through structured writing.',emoji:'📓',bg:'#f0fdf4',badge:'new',pages:4,mins:15,tags:['mindfulness','journaling','self-awareness']},
+  {id:'r17',cat:'CBT Worksheet',title:'Problem-Solving Therapy Worksheet',desc:'Structured 5-step problem-solving framework for reducing avoidance and building practical coping skills.',emoji:'⚙️',bg:'#eef2ff',badge:null,pages:2,mins:20,tags:['cbt','problem-solving','anxiety']},
+  {id:'r18',cat:'Crisis Protocol',title:'Coping Cards — Emergency Toolkit',desc:'Wallet-sized quick-reference coping statements and distress tolerance reminders for use during crisis moments.',emoji:'🃏',bg:'#fef2f2',badge:'pop',pages:1,mins:5,tags:['crisis','coping','emergency']},
+];
+
+const CATS = ['All','CBT Worksheet','Crisis Protocol','Mindfulness','Psychoeducation','Sleep Hygiene','Grounding Technique','Communication'];
+let activeCat = 'All';
+let assignTarget = null;
+let toastTimer;
+
+function renderCats() {
+  document.getElementById('catChips').innerHTML = CATS.map(c => `
+    <button class="cat-chip ${activeCat===c ? 'active' : ''}" onclick="setCat('${c}')">${c}</button>
+  `).join('');
+}
+
+function setCat(cat) {
+  activeCat = cat;
+  renderCats();
+  filterResources();
+}
+
+function filterResources() {
+  const query = document.getElementById('resSearch').value.toLowerCase();
+  const filtered = RESOURCES.filter(r => {
+    const matchCat = activeCat === 'All' || r.cat === activeCat;
+    const matchQ = !query || r.title.toLowerCase().includes(query) || r.cat.toLowerCase().includes(query) || r.tags.some(t=>t.includes(query));
+    return matchCat && matchQ;
+  });
+  document.getElementById('resCount').textContent = filtered.length + ' resource' + (filtered.length!==1?'s':'');
+  renderGrid(filtered);
+}
+
+function renderGrid(list) {
+  if(list.length === 0) {
+    document.getElementById('resGrid').innerHTML = `<div class="no-res"><i class="ti ti-books"></i><p>No resources match your search.</p></div>`;
+    return;
+  }
+  document.getElementById('resGrid').innerHTML = list.map(r => `
+    <div class="res-card">
+      <div class="res-thumb" style="background:${r.bg}">
+        <span style="font-size:38px">${r.emoji}</span>
+        ${r.badge ? `<span class="res-badge ${r.badge==='new'?'rb-new':'rb-pop'}">${r.badge==='new'?'NEW':'POPULAR'}</span>` : ''}
+      </div>
+      <div class="res-body">
+        <div class="res-cat">${r.cat}</div>
+        <div class="res-title">${r.title}</div>
+        <div class="res-desc">${r.desc}</div>
+        <div class="res-meta">
+          <span><i class="ti ti-file-text"></i> ${r.pages}p</span>
+          <span><i class="ti ti-clock"></i> ${r.mins} min</span>
+        </div>
+      </div>
+      <div class="res-foot">
+        <button class="rf-btn rf-ghost" onclick="previewRes('${r.id}')"><i class="ti ti-eye"></i>Preview</button>
+        <button class="rf-btn rf-primary" onclick="openAssign('${r.id}')"><i class="ti ti-send"></i>Assign</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function previewRes(id) {
+  const r = RESOURCES.find(x=>x.id===id);
+  showToast('Opening preview: ' + r.title, 'ok');
+}
+
+function openAssign(id) {
+  assignTarget = id;
+  const r = RESOURCES.find(x=>x.id===id);
+  document.getElementById('amResName').textContent = r.title;
+  document.getElementById('amResCat').textContent = r.cat + ' · ' + r.pages + ' pages · ' + r.mins + ' min';
+  document.getElementById('assignPatient').value = '';
+  document.getElementById('assignPriority').value = 'routine';
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('assignModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('assignModal').classList.remove('open');
+  assignTarget = null;
+}
+
+function confirmAssign() {
+  const patient = document.getElementById('assignPatient');
+  if(!patient.value) { showToast('Please select a patient first.','err'); return; }
+  const r = RESOURCES.find(x=>x.id===assignTarget);
+  const patientName = patient.options[patient.selectedIndex].text.split(' — ')[0];
+  closeModal();
+  showToast('"' + r.title + '" assigned to ' + patientName + ' successfully.', 'ok');
+}
+
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').className = type==='ok' ? 'ti ti-circle-check' : 'ti ti-alert-circle';
+  t.className = 'toast t-' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+/* INIT */
+renderCats();
+filterResources();
+</script>
+</body>
+</html>
