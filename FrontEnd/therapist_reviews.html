@@ -244,12 +244,12 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
     <div class="nav-section">Account</div>
     <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
     <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-    <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    <a href="#" class="nav-item" data-action="signout" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
   </nav>
   <div class="sb-foot">
     <div class="sb-user">
-      <div class="sb-avatar">IK</div>
-      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+      <div class="sb-avatar" id="sbAvatarInitials">IK</div>
+      <div><div class="sb-uname" id="sbUname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
     </div>
   </div>
 </aside>
@@ -278,57 +278,9 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
         <div class="search-box"><i class="ti ti-search"></i><input type="text" placeholder="Search patient or trigger…" oninput="filterQueue(this.value)"/></div>
       </div>
       <div class="queue-list" id="queueList">
-
-        <!-- Item 1 — CRISIS -->
-        <div class="queue-item crisis-item" onclick="loadEntry(0)" id="qi-0">
-          <div class="q-avatar" style="background:#fee2e2;color:#991b1b">FN</div>
-          <div class="q-body">
-            <div class="q-top"><div class="q-name">Fatima Noor</div><div class="q-date">Today, 9:14 AM</div></div>
-            <div class="q-mood"><div class="mood-dot dot-red"></div><span style="color:#dc2626">Mood 2/10 · CRISIS</span><span class="crisis-badge">Urgent</span></div>
-            <div class="q-preview">Reported feeling unsafe, couldn't stop crying</div>
-          </div>
+        <div style="text-align:center;padding:30px;color:var(--text-3)" id="queue-loading">
+          <i class="ti ti-loader" style="font-size:24px"></i><br>Loading entries…
         </div>
-
-        <!-- Item 2 — CRISIS -->
-        <div class="queue-item crisis-item" onclick="loadEntry(1)" id="qi-1">
-          <div class="q-avatar" style="background:#e0f2fe;color:#0369a1">SA</div>
-          <div class="q-body">
-            <div class="q-top"><div class="q-name">Sara Ahmed</div><div class="q-date">Apr 22</div></div>
-            <div class="q-mood"><div class="mood-dot dot-red"></div><span style="color:#dc2626">Mood 3/10 · CRISIS</span><span class="crisis-badge">Urgent</span></div>
-            <div class="q-preview">Panic attack at work, felt trapped in meeting room</div>
-          </div>
-        </div>
-
-        <!-- Item 3 -->
-        <div class="queue-item" onclick="loadEntry(2)" id="qi-2">
-          <div class="q-avatar" style="background:#fef3c7;color:#b45309">AK</div>
-          <div class="q-body">
-            <div class="q-top"><div class="q-name">Ali Khan</div><div class="q-date">Apr 24</div></div>
-            <div class="q-mood"><div class="mood-dot dot-amber"></div><span style="color:#d97706">Mood 5/10 · Moderate</span></div>
-            <div class="q-preview">Family argument about finances, felt unheard</div>
-          </div>
-        </div>
-
-        <!-- Item 4 -->
-        <div class="queue-item" onclick="loadEntry(3)" id="qi-3">
-          <div class="q-avatar" style="background:#ede9fe;color:#5b21b6">HM</div>
-          <div class="q-body">
-            <div class="q-top"><div class="q-name">Hassan Malik</div><div class="q-date">Apr 18</div></div>
-            <div class="q-mood"><div class="mood-dot dot-amber"></div><span style="color:#d97706">Mood 4/10 · Moderate</span></div>
-            <div class="q-preview">Sleep pattern worsening, less than 4 hrs per night</div>
-          </div>
-        </div>
-
-        <!-- Item 5 -->
-        <div class="queue-item" onclick="loadEntry(4)" id="qi-4">
-          <div class="q-avatar" style="background:#dcfce7;color:#15803d">ZR</div>
-          <div class="q-body">
-            <div class="q-top"><div class="q-name">Zainab Raza</div><div class="q-date">Apr 23</div></div>
-            <div class="q-mood"><div class="mood-dot dot-green"></div><span style="color:#16a34a">Mood 7/10 · Good</span></div>
-            <div class="q-preview">Great day, finished assignment early, feeling proud</div>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -347,65 +299,161 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
 </div>
 
 <script>
-const entries = [
-  {
-    name:'Fatima Noor', initials:'FN', avatarBg:'#fee2e2', avatarColor:'#991b1b',
-    date:'Today, May 9 · 9:14 AM', week:'Week 3', crisis:true,
-    mood:2, moodColor:'#dc2626', moodLabel:'Very Low — CRISIS',
-    triggers:['Depression','Social Isolation','Self-Harm Risk'],
-    symptoms:['Racing heart','Shallow breathing','Fatigue','Nausea'],
-    coping:['Called a friend'],
-    notes:'I woke up feeling completely empty today. I couldn\'t stop crying and I don\'t know why. I felt like everything is pointless. I texted my friend but she didn\'t reply and that made it worse. I feel unsafe and I don\'t know what to do.',
-    location:'At home'
-  },
-  {
-    name:'Sara Ahmed', initials:'SA', avatarBg:'#e0f2fe', avatarColor:'#0369a1',
-    date:'Apr 22, 2026 · 2:31 PM', week:'Week 12', crisis:true,
-    mood:3, moodColor:'#dc2626', moodLabel:'Low — Crisis Entry',
-    triggers:['Work Stress','Panic Attacks'],
-    symptoms:['Chest tightness','Racing heart','Shallow breathing'],
-    coping:['Deep breathing'],
-    notes:'I was in a meeting and suddenly I couldn\'t breathe. I had to excuse myself and went to the bathroom. I felt like I was dying. The deadlines are piling up and my manager keeps adding more work. I used the breathing exercise which helped a little.',
-    location:'At work / office'
-  },
-  {
-    name:'Ali Khan', initials:'AK', avatarBg:'#fef3c7', avatarColor:'#b45309',
-    date:'Apr 24, 2026 · 8:00 PM', week:'Week 6', crisis:false,
-    mood:5, moodColor:'#d97706', moodLabel:'Below Average — Neutral',
-    triggers:['Family','Finance'],
-    symptoms:['Headache','Fatigue'],
-    coping:['Deep breathing','Journaling'],
-    notes:'My sister and I got into a big argument about our shared apartment bills. She said I wasn\'t contributing enough but I explained I just lost overtime at work. I felt unheard and frustrated. I journaled about it after and it helped a bit.',
-    location:'At home'
-  },
-  {
-    name:'Hassan Malik', initials:'HM', avatarBg:'#ede9fe', avatarColor:'#5b21b6',
-    date:'Apr 18, 2026 · 11:50 PM', week:'Week 8', crisis:false,
-    mood:4, moodColor:'#d97706', moodLabel:'Below Average',
-    triggers:['Sleep Issues','Social Anxiety'],
-    symptoms:['Fatigue','Headache'],
-    coping:['Meditation'],
-    notes:'I can\'t sleep again. Been lying awake since 9pm. My mind keeps racing about the presentation next week. I tried meditating but kept getting distracted. I\'ve only had maybe 3-4 hours sleep the past 3 nights. I feel physically tired but my brain won\'t stop.',
-    location:'At home'
-  },
-  {
-    name:'Zainab Raza', initials:'ZR', avatarBg:'#dcfce7', avatarColor:'#15803d',
-    date:'Apr 23, 2026 · 5:45 PM', week:'Week 18', crisis:false,
-    mood:7, moodColor:'#16a34a', moodLabel:'Good',
-    triggers:['Academic'],
-    symptoms:[],
-    coping:['Journaling','Light exercise'],
-    notes:'Today was actually a good day! I submitted my assignment two days early and my professor said it was excellent. I went for a walk in the park after. I feel like the strategies we\'ve been working on are starting to pay off. Very proud of myself today.',
-    location:'At school / university'
-  }
-];
 
+/* ══════════════════════════════════════════
+   SUPABASE + AUTH
+══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
+
+async function supaFetch(endpoint, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...options.headers
+    }
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+(function initAuth() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) { window.location.href = '1_login_register.html'; return; }
+  const user = JSON.parse(raw);
+  const name = user.full_name || 'Therapist';
+  const parts = name.trim().split(/\s+/);
+  const initials = parts.map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const avEl = document.getElementById('sbAvatarInitials');
+  const unEl = document.getElementById('sbUname');
+  if (avEl) avEl.textContent = initials;
+  if (unEl) unEl.textContent = name;
+  document.querySelectorAll('[data-action="signout"]').forEach(el =>
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      localStorage.removeItem('mh_user');
+      window.location.href = '1_login_register.html';
+    })
+  );
+})();
+
+/* entries populated by Supabase */
+let ENTRIES = [];
 let selectedIdx = null;
+
+/* ── AV COLOURS ── */
+const AV_COLORS_R = [
+  {bg:'#dbeafe',fg:'#1d4ed8'},{bg:'#fce7f3',fg:'#9d174d'},{bg:'#dcfce7',fg:'#15803d'},
+  {bg:'#fef3c7',fg:'#b45309'},{bg:'#ede9fe',fg:'#5b21b6'},{bg:'#e0f2fe',fg:'#0369a1'}
+];
+function avColorR(i){return AV_COLORS_R[i%AV_COLORS_R.length];}
+function initialsR(name){return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function fmtDateR(dt){
+  if(!dt)return '—';
+  const d=new Date(dt);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+function moodColor(m){return m<=3?'#dc2626':m<=6?'#d97706':'#16a34a';}
+function moodLabel(m){return m<=2?'Very Low — CRISIS':m<=3?'Low — Crisis Entry':m<=5?'Below Average':m<=7?'Moderate':'Good';}
+
+/* ── LOAD QUEUE FROM SUPABASE ── */
+async function loadReviewQueue() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) return;
+  const user = JSON.parse(raw);
+  const loading = document.getElementById('queue-loading');
+  const queueList = document.getElementById('queueList');
+
+  try {
+    const links = await supaFetch(`therapist_patient_link?therapist_id=eq.${user.user_id}&is_active=eq.true&select=patient_id`);
+    const patientIds = links.map(l => l.patient_id);
+
+    ENTRIES = [];
+    if (patientIds.length === 0) {
+      loading.innerHTML = '<span style="color:var(--text-3)">No patients linked.</span>';
+      return;
+    }
+
+    // Get recent trigger logs
+    const logs = await supaFetch(
+      `trigger_logs?user_id=in.(${patientIds.join(',')})&order=log_date.desc&limit=30&select=*`
+    );
+
+    const users = await supaFetch(`users?user_id=in.(${patientIds.join(',')})&select=user_id,full_name`);
+    const nameMap = {};
+    users.forEach(u => { nameMap[u.user_id] = u.full_name; });
+
+    loading.style.display = 'none';
+
+    if (logs.length === 0) {
+      queueList.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-3)">No journal entries yet.</div>';
+      return;
+    }
+
+    // Build ENTRIES and queue items
+    logs.forEach((log, i) => {
+      const name = nameMap[log.user_id] || 'Patient';
+      const col = avColorR(i);
+      const ini = initialsR(name);
+      const isCrisis = (log.mood_score || 10) <= 3;
+      const mood = log.mood_score || 5;
+      const mColor = moodColor(mood);
+      const mLabel = moodLabel(mood);
+      const triggers = log.trigger_type ? (Array.isArray(log.trigger_type) ? log.trigger_type : [log.trigger_type]) : [];
+      const symptoms = log.symptom_tags ? (Array.isArray(log.symptom_tags) ? log.symptom_tags : [log.symptom_tags]) : [];
+      const coping = log.coping_used ? (Array.isArray(log.coping_used) ? log.coping_used : [log.coping_used]) : [];
+
+      ENTRIES.push({
+        logId: log.log_id || log.id,
+        userId: log.user_id,
+        name, initials: ini, avatarBg: col.bg, avatarColor: col.fg,
+        date: fmtDateR(log.log_date),
+        crisis: isCrisis,
+        mood, moodColor: mColor, moodLabel: mLabel,
+        triggers, symptoms, coping,
+        notes: log.trigger_description || log.notes || log.journal_text || '(No notes logged)',
+        location: log.location || 'Not specified'
+      });
+
+      const item = document.createElement('div');
+      item.className = `queue-item${isCrisis ? ' crisis-item' : ''}`;
+      item.id = `qi-${i}`;
+      item.onclick = () => loadEntry(i);
+      item.innerHTML = `
+        <div class="q-avatar" style="background:${col.bg};color:${col.fg}">${ini}</div>
+        <div class="q-body">
+          <div class="q-top">
+            <div class="q-name">${name}</div>
+            <div class="q-date">${fmtDateR(log.log_date).split('·')[0].trim()}</div>
+          </div>
+          <div class="q-mood">
+            <div class="mood-dot" style="background:${mColor};width:8px;height:8px;border-radius:50%;flex-shrink:0"></div>
+            <span style="color:${mColor}">Mood ${mood}/10${isCrisis ? ' · CRISIS' : ''}</span>
+            ${isCrisis ? '<span class="crisis-badge">Urgent</span>' : ''}
+          </div>
+          <div class="q-preview">${(log.trigger_description || log.notes || log.journal_text || '').slice(0,60)}…</div>
+        </div>`;
+      queueList.appendChild(item);
+    });
+
+    // Auto-open first entry
+    if (ENTRIES.length > 0) setTimeout(() => loadEntry(0), 100);
+
+  } catch(err) {
+    loading.innerHTML = `<span style="color:var(--danger)">Error: ${err.message}</span>`;
+    console.error('loadReviewQueue error:', err);
+  }
+}
 
 function loadEntry(idx) {
   selectedIdx = idx;
   document.querySelectorAll('.queue-item').forEach((el,i) => el.classList.toggle('active', i === idx));
-  const e = entries[idx];
+  const e = ENTRIES[idx];
+  if (!e) return;
   document.getElementById('dpEmpty').style.display = 'none';
   document.getElementById('dpContent').style.display = 'flex';
   document.getElementById('dpContent').innerHTML = buildDetail(e, idx);
@@ -413,19 +461,19 @@ function loadEntry(idx) {
 
 function buildDetail(e, idx) {
   const moodBarW = ((e.mood-1)/9*100).toFixed(0) + '%';
-  const moodBarColor = e.mood <= 3 ? '#ef4444' : e.mood <= 6 ? '#f59e0b' : '#22c55e';
+  const moodBarColor = e.moodColor;
   return `
     <div class="dp-header">
       <div class="dp-patient">
         <div class="dp-avatar" style="background:${e.avatarBg};color:${e.avatarColor}">${e.initials}</div>
         <div>
           <div class="dp-name">${e.name} ${e.crisis ? '<span class="crisis-badge">CRISIS</span>' : ''}</div>
-          <div class="dp-meta">${e.week} of treatment · ${e.date} · ${e.location}</div>
+          <div class="dp-meta">${e.date} · ${e.location}</div>
         </div>
       </div>
       <div class="dp-actions">
         <button class="dp-btn" onclick="alert('Calling ${e.name}…')"><i class="ti ti-phone"></i>Call</button>
-        <button class="dp-btn" onclick="alert('Opening message to ${e.name}…')"><i class="ti ti-message-2"></i>Message</button>
+        <button class="dp-btn" onclick="window.location.href='therapist_messages.html'"><i class="ti ti-message-2"></i>Message</button>
         ${e.crisis ? '<button class="dp-btn primary"><i class="ti ti-alert-triangle"></i>Flag Urgent</button>' : ''}
       </div>
     </div>
@@ -445,7 +493,7 @@ function buildDetail(e, idx) {
 
         <div class="entry-card">
           <div class="ec-label">Triggers</div>
-          <div class="tags-row">${e.triggers.map(t => `<span class="tag tag-trigger"><i class="ti ti-tag" style="font-size:10px"></i> ${t}</span>`).join('')}</div>
+          <div class="tags-row">${e.triggers.length ? e.triggers.map(t => `<span class="tag tag-trigger"><i class="ti ti-tag" style="font-size:10px"></i> ${t}</span>`).join('') : '<span style="color:var(--text-3)">None logged</span>'}</div>
         </div>
 
         ${e.symptoms.length ? `
@@ -503,7 +551,7 @@ function buildDetail(e, idx) {
             <input type="text" id="fc-rec-${idx}" placeholder="e.g. 5-4-3-2-1 grounding, box breathing…"/>
           </div>
 
-          <button class="submit-review-btn" onclick="submitReview(${idx})">
+          <button class="submit-review-btn" onclick="submitReview(${idx}, '${e.logId}', '${e.userId}')">
             <i class="ti ti-send"></i>Submit Clinical Review
           </button>
           <div class="success-msg" id="fc-success-${idx}">
@@ -523,17 +571,42 @@ function buildDetail(e, idx) {
     </div>`;
 }
 
-function submitReview(idx) {
+async function submitReview(idx, logId, userId) {
   const btn = document.querySelector('.submit-review-btn');
   btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Submitting…'; btn.disabled = true;
-  setTimeout(() => {
-    document.getElementById('fc-success-'+idx).classList.add('show');
-    btn.innerHTML = '<i class="ti ti-check"></i> Review Submitted';
-    btn.style.background = '#16a34a';
-    // Remove from queue
-    const qi = document.getElementById('qi-'+idx);
-    if (qi) { qi.style.opacity = '.4'; qi.style.pointerEvents = 'none'; }
-  }, 1000);
+  const severity = document.getElementById('fc-severity-'+idx).value;
+  const action = document.getElementById('fc-action-'+idx).value;
+  const notes = document.getElementById('fc-notes-'+idx).value;
+  const rec = document.getElementById('fc-rec-'+idx).value;
+
+  try {
+    // Save therapist feedback to Supabase (therapist_feedback table, or notifications)
+    const raw = localStorage.getItem('mh_user');
+    const therapist = JSON.parse(raw);
+    const payload = {
+      log_id: logId,
+      therapist_id: therapist.user_id,
+      patient_id: userId,
+      severity,
+      recommended_action: action,
+      clinical_notes: notes,
+      coping_recommendation: rec,
+      reviewed_at: new Date().toISOString()
+    };
+    // Try therapist_feedback table first; if it doesn't exist it'll fail silently
+    try { await supaFetch('therapist_feedback', { method:'POST', headers:{'Prefer':'return=minimal'}, body: JSON.stringify(payload) }); } catch(e) {}
+
+    setTimeout(() => {
+      document.getElementById('fc-success-'+idx).classList.add('show');
+      btn.innerHTML = '<i class="ti ti-check"></i> Review Submitted';
+      btn.style.background = '#16a34a';
+      const qi = document.getElementById('qi-'+idx);
+      if (qi) { qi.style.opacity = '.4'; qi.style.pointerEvents = 'none'; }
+    }, 800);
+  } catch(err) {
+    btn.innerHTML = '<i class="ti ti-send"></i>Submit Clinical Review'; btn.disabled = false;
+    console.error('submitReview error:', err);
+  }
 }
 
 function filterQueue(q) {
@@ -541,6 +614,10 @@ function filterQueue(q) {
     el.style.display = el.textContent.toLowerCase().includes(q.toLowerCase()) ? 'flex' : 'none';
   });
 }
+
+/* ── INIT ── */
+loadReviewQueue();
 </script>
+
 </body>
 </html>

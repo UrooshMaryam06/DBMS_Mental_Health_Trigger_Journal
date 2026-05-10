@@ -360,13 +360,13 @@ html.dark .tq-license{background:#0d1424;color:#475569}
     </nav>
     <div class="sb-foot">
       <div class="sb-user">
-        <div class="sb-avatar">AD</div>
-        <div><div class="sb-uname">Admin User</div><div class="sb-role">Super Administrator</div></div>
+        <div class="sb-avatar" id="sbAvatarInitials">AD</div>
+        <div><div class="sb-uname" id="sbUname">Admin User</div><div class="sb-role">Super Administrator</div></div>
       </div>
       <div class="sb-foot-links">
         <a href="admin_profile.html" class="sb-foot-link"><i class="ti ti-user-circle"></i>Profile</a>
         <a href="admin_settings.html" class="sb-foot-link"><i class="ti ti-settings"></i>Settings</a>
-        <a href="1_login_register.html" class="sb-foot-link"><i class="ti ti-logout"></i>Sign Out</a>
+        <button class="sb-foot-link" data-action="signout"><i class="ti ti-logout"></i>Sign Out</button>
       </div>
     </div>
   </aside>
@@ -549,10 +549,10 @@ html.dark .tq-license{background:#0d1424;color:#475569}
           <p>Anonymized global entry log. Monitor usage patterns and flag crisis indicators.</p>
         </div>
         <div class="journal-stats">
-          <div class="jstat"><div class="jstat-val">4,812</div><div class="jstat-label">Total Entries</div></div>
-          <div class="jstat"><div class="jstat-val">38</div><div class="jstat-label">Entries Today</div></div>
-          <div class="jstat"><div class="jstat-val" style="color:var(--danger)">7</div><div class="jstat-label">Crisis Flags (30d)</div></div>
-          <div class="jstat"><div class="jstat-val">6.4</div><div class="jstat-label">Avg Mood Score</div></div>
+          <div class="jstat"><div class="jstat-val" id="jstat-total">—</div><div class="jstat-label">Total Entries</div></div>
+          <div class="jstat"><div class="jstat-val" id="jstat-today">—</div><div class="jstat-label">Entries Today</div></div>
+          <div class="jstat"><div class="jstat-val" id="jstat-crisis" style="color:var(--danger)">—</div><div class="jstat-label">Crisis Flags</div></div>
+          <div class="jstat"><div class="jstat-val" id="jstat-avg">—</div><div class="jstat-label">Avg Mood Score</div></div>
         </div>
         <div class="table-card">
           <div class="table-head">
@@ -704,49 +704,68 @@ html.dark .tq-license{background:#0d1424;color:#475569}
 
 <script>
 // =====================================================================
-// DATA
+// SUPABASE CONFIG
 // =====================================================================
-const usersData = [
-  {id:'#USR-0041',name:'Sara Ahmed',email:'sara@mhjournal.com',role:'patient',status:'active',joined:'Jan 15, 2026',lastActive:'Apr 27, 2026',initials:'SA',avatarBg:'#dbeafe',avatarColor:'#1d4ed8'},
-  {id:'#USR-0012',name:'Dr. Imran Khan',email:'imran@mhjournal.com',role:'therapist',status:'active',joined:'Oct 3, 2025',lastActive:'Apr 27, 2026',initials:'IK',avatarBg:'#dcfce7',avatarColor:'#15803d'},
-  {id:'#USR-0067',name:'Fatima Noor',email:'fatima@mhjournal.com',role:'patient',status:'suspended',joined:'Feb 20, 2026',lastActive:'Apr 26, 2026',initials:'FN',avatarBg:'#fce7f3',avatarColor:'#9d174d'},
-  {id:'#USR-0089',name:'Zainab Raza',email:'zainab@mhjournal.com',role:'patient',status:'active',joined:'Mar 8, 2026',lastActive:'Apr 25, 2026',initials:'ZR',avatarBg:'#fef3c7',avatarColor:'#b45309'},
-  {id:'#USR-0001',name:'Admin User',email:'admin@mhjournal.com',role:'admin',status:'active',joined:'Sep 1, 2025',lastActive:'Apr 27, 2026',initials:'AD',avatarBg:'#f5f3ff',avatarColor:'#4c1d95'},
-  {id:'#USR-0103',name:'Dr. Nadia Jamil',email:'nadia@mhjournal.com',role:'therapist',status:'pending',joined:'Apr 26, 2026',lastActive:'—',initials:'NJ',avatarBg:'#e0e7ff',avatarColor:'#3730a3'},
-  {id:'#USR-0115',name:'Ali Hassan',email:'ali.hassan@mhjournal.com',role:'patient',status:'active',joined:'Apr 10, 2026',lastActive:'Apr 26, 2026',initials:'AH',avatarBg:'#fce7f3',avatarColor:'#be185d'},
-  {id:'#USR-0078',name:'Mehwish Tariq',email:'mehwish@mhjournal.com',role:'patient',status:'active',joined:'Mar 1, 2026',lastActive:'Apr 22, 2026',initials:'MT',avatarBg:'#e0f2fe',avatarColor:'#0369a1'},
-];
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
 
-const therapistQueue = [
-  {initials:'NJ',name:'Dr. Nadia Jamil',specialty:'Cognitive Behavioral Therapy',submitted:'Apr 26, 2026',license:'LIC-2026-CBT-9847',hospital:'Shifa International Hospital'},
-  {initials:'AR',name:'Dr. Aamir Riaz',specialty:'Psychiatry & Trauma',submitted:'Apr 25, 2026',license:'LIC-2024-PSY-3312',hospital:'Agha Khan University Hospital'},
-];
-const processedTherapists = [
-  {initials:'IK',name:'Dr. Imran Khan',specialty:'Family & Couples Therapy',status:'approved',date:'Oct 3, 2025'},
-  {initials:'SB',name:'Dr. Sadia Baig',specialty:'Anxiety & Depression',status:'rejected',date:'Mar 12, 2026'},
-];
+async function supaFetch(endpoint, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...options.headers
+    }
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  if (res.status === 204) return null;
+  return res.json();
+}
 
-const journalEntries = [
-  {id:'#JRN-4812',date:'Apr 27, 2026',user:'USR-0041',mood:7,tags:'Anxiety, Work',crisis:'none'},
-  {id:'#JRN-4811',date:'Apr 27, 2026',user:'USR-0089',mood:4,tags:'Sleep, Family',crisis:'medium'},
-  {id:'#JRN-4810',date:'Apr 26, 2026',user:'USR-0115',mood:2,tags:'Self-harm ideation',crisis:'high'},
-  {id:'#JRN-4809',date:'Apr 26, 2026',user:'USR-0078',mood:8,tags:'Progress, Exercise',crisis:'none'},
-  {id:'#JRN-4808',date:'Apr 25, 2026',user:'USR-0067',mood:3,tags:'Isolation, Grief',crisis:'medium'},
-  {id:'#JRN-4807',date:'Apr 25, 2026',user:'USR-0041',mood:6,tags:'Social, Therapy',crisis:'none'},
-  {id:'#JRN-4806',date:'Apr 24, 2026',user:'USR-0012',mood:9,tags:'Milestone, Hope',crisis:'none'},
-];
+// =====================================================================
+// AUTH / SESSION
+// =====================================================================
+function initAuth() {
+  const session = JSON.parse(localStorage.getItem('mh_user') || 'null');
+  if (!session || session.role !== 'admin') {
+    localStorage.removeItem('mh_user');
+    window.location.href = '1_login_register.html';
+    return null;
+  }
+  const initials = session.full_name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const el = document.getElementById('sbAvatarInitials');
+  const un = document.getElementById('sbUname');
+  if (el) el.textContent = initials;
+  if (un) un.textContent = session.full_name;
+  return session;
+}
 
+document.addEventListener('click', e => {
+  // Sign out
+  if (e.target.closest('[data-action="signout"]')) {
+    localStorage.removeItem('mh_user');
+    window.location.href = '1_login_register.html';
+    return;
+  }
+  // Nav item view switching (handles clicks on child elements like icons/badges too)
+  const navBtn = e.target.closest('.nav-item[data-view]');
+  if (navBtn) {
+    switchView(navBtn.dataset.view);
+  }
+});
+let usersData = [];
+let journalData = [];
+let pendingTherapists = [];
+let processedList = [];
+
+// Static system logs (no table for these — kept as-is)
 const sysLogs = [
-  {time:'Apr 27, 2026 · 07:43 AM',icon:'ti-alert-triangle',iconClass:'lic-err',msg:'Disk usage exceeded 70% on DB Server 2',tag:'danger',tagLabel:'Warning'},
-  {time:'Apr 27, 2026 · 06:01 AM',icon:'ti-shield-check',iconClass:'lic-ok',msg:'Admin login success — admin@mhjournal.com (IP: 192.168.1.10)',tag:'success',tagLabel:'Auth'},
-  {time:'Apr 26, 2026 · 11:22 PM',icon:'ti-user-off',iconClass:'lic-warn',msg:'User #USR-0067 suspended after 3 failed login attempts',tag:'warning',tagLabel:'Security'},
-  {time:'Apr 26, 2026 · 11:17 PM',icon:'ti-lock',iconClass:'lic-err',msg:'Failed admin password attempt — unknown IP: 45.33.32.156',tag:'danger',tagLabel:'Threat'},
-  {time:'Apr 26, 2026 · 02:00 AM',icon:'ti-database',iconClass:'lic-ok',msg:'Database backup completed successfully (14.2 GB in 8m 41s)',tag:'success',tagLabel:'Backup'},
-  {time:'Apr 26, 2026 · 09:10 AM',icon:'ti-user-plus',iconClass:'lic-info',msg:'New therapist registration: Dr. Nadia Jamil — pending approval',tag:'info',tagLabel:'Registration'},
-  {time:'Apr 25, 2026 · 03:00 AM',icon:'ti-database',iconClass:'lic-ok',msg:'Scheduled database backup completed (13.9 GB)',tag:'success',tagLabel:'Backup'},
-  {time:'Apr 25, 2026 · 11:55 AM',icon:'ti-user-check',iconClass:'lic-ok',msg:'User #USR-0115 account verified and activated',tag:'success',tagLabel:'Account'},
-  {time:'Apr 24, 2026 · 04:22 PM',icon:'ti-refresh',iconClass:'lic-info',msg:'Cache flushed — Redis cleared by scheduled maintenance',tag:'info',tagLabel:'Maintenance'},
-  {time:'Apr 24, 2026 · 08:00 AM',icon:'ti-lock',iconClass:'lic-warn',msg:'Failed login attempt — sara@mhjournal.com (1/3 attempts)',tag:'warning',tagLabel:'Auth'},
+  {time:'System · Live',icon:'ti-shield-check',iconClass:'lic-ok',msg:'Admin session active — data loaded from Supabase',tag:'success',tagLabel:'Auth'},
+  {time:'Scheduled',icon:'ti-database',iconClass:'lic-ok',msg:'Database backup scheduled daily at 02:00 AM',tag:'info',tagLabel:'Backup'},
+  {time:'Monitoring',icon:'ti-alert-triangle',iconClass:'lic-err',msg:'Disk usage exceeded 70% on DB Server 2 — action recommended',tag:'danger',tagLabel:'Warning'},
+  {time:'Monitoring',icon:'ti-activity',iconClass:'lic-info',msg:'Live metrics updating every 3.2 seconds',tag:'info',tagLabel:'System'},
 ];
 
 // =====================================================================
@@ -754,8 +773,103 @@ const sysLogs = [
 // =====================================================================
 let editTargetRow = null;
 let deleteTargetRow = null;
-let pendingTherapists = [...therapistQueue];
-let processedList = [...processedTherapists];
+
+// =====================================================================
+// SUPABASE DATA LOADERS
+// =====================================================================
+function avatarColors(role) {
+  return {
+    patient:   ['#dbeafe','#1d4ed8'],
+    therapist: ['#dcfce7','#15803d'],
+    admin:     ['#f5f3ff','#4c1d95'],
+  }[role] || ['#f1f5f9','#64748b'];
+}
+
+async function loadAllData() {
+  try {
+    // Load users
+    const rawUsers = await supaFetch('users?select=user_id,full_name,email,role,created_at&order=created_at.desc');
+    usersData = rawUsers.map(u => {
+      const [bg, col] = avatarColors(u.role);
+      const initials = (u.full_name || u.email).split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      const joined = u.created_at ? new Date(u.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+      return {
+        id: '#USR-' + String(u.user_id).slice(-4).padStart(4,'0'),
+        _uid: u.user_id,
+        name: u.full_name || '(no name)',
+        email: u.email,
+        role: u.role,
+        status: 'active',   // no status column yet; default active
+        joined,
+        lastActive: '—',
+        initials,
+        avatarBg: bg,
+        avatarColor: col,
+      };
+    });
+
+    // Update dashboard metric
+    const metricEl = document.getElementById('metricUsers');
+    if (metricEl) metricEl.textContent = usersData.length;
+
+    // Therapist queue: pending = therapists whose role is 'therapist' (treat as active; in real app you'd have a status column)
+    pendingTherapists = usersData
+      .filter(u => u.role === 'therapist')
+      .map(u => ({
+        initials: u.initials,
+        name: u.name,
+        specialty: 'General Practice',
+        submitted: u.joined,
+        license: 'LIC-PENDING',
+        hospital: '—',
+        _uid: u._uid,
+        status: 'active', // all therapists in users table are treated as verified
+      }));
+    processedList = [];  // no separate tracking yet
+
+    // Load journal entries
+    const rawLogs = await supaFetch('trigger_logs?select=log_id,user_id,mood_score,trigger_type,symptom_tags,is_crisis,log_date&order=log_date.desc&limit=50');
+    journalData = rawLogs.map(l => {
+      const crisis = l.is_crisis ? 'high' : (l.mood_score <= 3 ? 'medium' : 'none');
+      const tags = [l.trigger_type, ...(l.symptom_tags || [])].filter(Boolean).join(', ') || '—';
+      const date = l.log_date ? new Date(l.log_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+      return {
+        id: '#JRN-' + String(l.log_id).slice(-4).padStart(4,'0'),
+        date,
+        user: 'USR-' + String(l.user_id).slice(-4).padStart(4,'0'),
+        mood: l.mood_score || 0,
+        tags,
+        crisis,
+      };
+    });
+
+    // Update journal stats on dashboard/journal panel
+    const totalJrn = document.getElementById('jstat-total');
+    const crisisJrn = document.getElementById('jstat-crisis');
+    const avgMood = document.getElementById('jstat-avg');
+    const todayJrn = document.getElementById('jstat-today');
+    if (totalJrn) totalJrn.textContent = rawLogs.length;
+    if (crisisJrn) crisisJrn.textContent = rawLogs.filter(l => l.is_crisis).length;
+    if (avgMood) {
+      const scores = rawLogs.map(l => l.mood_score).filter(Boolean);
+      avgMood.textContent = scores.length ? (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(1) : '—';
+    }
+    const todayStr = new Date().toISOString().slice(0,10);
+    if (todayJrn) todayJrn.textContent = rawLogs.filter(l => l.log_date && l.log_date.startsWith(todayStr)).length;
+
+    // Pending badge for nav
+    updatePendingBadge();
+
+    // Re-render current view if users/journal is already open
+    if (document.getElementById('view-users')?.classList.contains('active')) renderUsers();
+    if (document.getElementById('view-journal')?.classList.contains('active')) renderJournal();
+    if (document.getElementById('view-therapists')?.classList.contains('active')) renderTherapists();
+
+  } catch(err) {
+    console.error('Supabase load error:', err);
+    showToast('Could not load live data: ' + err.message, 'error');
+  }
+}
 
 // =====================================================================
 // SPA VIEW SWITCHER
@@ -784,10 +898,6 @@ function switchView(viewId) {
   if(viewId === 'journal') renderJournal();
   if(viewId === 'logs') renderLogs();
 }
-
-document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
-  btn.addEventListener('click', () => switchView(btn.dataset.view));
-});
 
 // =====================================================================
 // USER TABLE
@@ -887,20 +997,22 @@ function confirmDelete(uid) {
 function executeDelete() {
   const btn = document.getElementById('deleteConfirmBtn');
   btn.innerHTML = '<i class="ti ti-loader-2 spin"></i> Deleting…'; btn.disabled = true;
-  setTimeout(() => {
-    const idx = usersData.findIndex(u => u.id === deleteTargetUid);
-    if(idx > -1) {
+  const user = usersData.find(u => u.id === deleteTargetUid);
+  if (!user) { closeModal('deleteModal'); btn.innerHTML = '<i class="ti ti-trash"></i> Delete Permanently'; btn.disabled = false; return; }
+  supaFetch(`users?user_id=eq.${user._uid}`, { method: 'DELETE', headers: { 'Prefer': 'return=minimal' } })
+    .then(() => {
       const row = document.querySelector(`tr[data-uid="${deleteTargetUid}"]`);
-      if(row) {
-        row.classList.add('row-exit');
-        setTimeout(() => { usersData.splice(idx, 1); renderUsers(); }, 300);
-      } else { usersData.splice(idx, 1); renderUsers(); }
-    }
-    closeModal('deleteModal');
-    btn.innerHTML = '<i class="ti ti-trash"></i> Delete Permanently'; btn.disabled = false;
-    showToast('User account permanently deleted.', 'error');
-    updatePendingBadge();
-  }, 900);
+      if(row) { row.classList.add('row-exit'); setTimeout(() => { usersData.splice(usersData.findIndex(u=>u.id===deleteTargetUid),1); renderUsers(); }, 300); }
+      else { usersData.splice(usersData.findIndex(u=>u.id===deleteTargetUid),1); renderUsers(); }
+      closeModal('deleteModal');
+      btn.innerHTML = '<i class="ti ti-trash"></i> Delete Permanently'; btn.disabled = false;
+      showToast('User account permanently deleted.', 'error');
+      updatePendingBadge();
+    }).catch(err => {
+      closeModal('deleteModal');
+      btn.innerHTML = '<i class="ti ti-trash"></i> Delete Permanently'; btn.disabled = false;
+      showToast('Delete failed: ' + err.message, 'error');
+    });
 }
 
 // Edit slide-over
@@ -920,16 +1032,26 @@ function closeSlideOver() {
   document.getElementById('editBg').classList.remove('show');
   document.getElementById('editPanel').classList.remove('show');
 }
-function saveEdit() {
+async function saveEdit() {
   const user = usersData.find(u => u.id === editTargetUid);
   if(!user) return;
-  user.name = document.getElementById('editName').value || user.name;
-  user.email = document.getElementById('editEmail').value || user.email;
-  user.role = document.getElementById('editRole').value || user.role;
-  user.initials = user.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  renderUsers();
-  closeSlideOver();
-  showToast(`${user.name}'s profile updated successfully.`, 'success');
+  const newName = document.getElementById('editName').value || user.name;
+  const newEmail = document.getElementById('editEmail').value || user.email;
+  const newRole = document.getElementById('editRole').value || user.role;
+  try {
+    await supaFetch(`users?user_id=eq.${user._uid}`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ full_name: newName, email: newEmail, role: newRole })
+    });
+    user.name = newName; user.email = newEmail; user.role = newRole;
+    user.initials = user.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    renderUsers();
+    closeSlideOver();
+    showToast(`${user.name}'s profile updated successfully.`, 'success');
+  } catch(err) {
+    showToast('Update failed: ' + err.message, 'error');
+  }
 }
 
 // =====================================================================
@@ -1073,22 +1195,28 @@ function runBackup() {
 // =====================================================================
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 function openAddUserModal() { document.getElementById('addUserModal').classList.add('show'); }
-function createUser() {
+async function createUser() {
   const name = document.getElementById('newUserName').value.trim();
   const email = document.getElementById('newUserEmail').value.trim();
   const role = document.getElementById('newUserRole').value;
   if(!name || !email || !role) { showToast('Please fill in all fields.', 'error'); return; }
-  const initials = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-  const colors = {patient:['#dbeafe','#1d4ed8'], therapist:['#dcfce7','#15803d'], admin:['#f5f3ff','#4c1d95']};
-  const [bg, col] = colors[role] || colors.patient;
-  const newId = '#USR-' + String(Math.floor(Math.random()*900)+100).padStart(4,'0');
-  usersData.unshift({id:newId,name,email,role,status:'active',joined:'Apr 27, 2026',lastActive:'—',initials,avatarBg:bg,avatarColor:col});
-  document.getElementById('newUserName').value='';
-  document.getElementById('newUserEmail').value='';
-  document.getElementById('newUserRole').value='';
-  closeModal('addUserModal');
-  if(document.getElementById('view-users').classList.contains('active')) renderUsers();
-  showToast(`User ${name} created successfully!`, 'success');
+
+  try {
+    // Insert into Supabase users table
+    await supaFetch('users', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ full_name: name, email, role })
+    });
+    document.getElementById('newUserName').value='';
+    document.getElementById('newUserEmail').value='';
+    document.getElementById('newUserRole').value='';
+    closeModal('addUserModal');
+    showToast(`User ${name} created successfully!`, 'success');
+    await loadAllData(); // Refresh from Supabase
+  } catch(err) {
+    showToast('Failed to create user: ' + err.message, 'error');
+  }
 }
 
 // Close modals on backdrop click
@@ -1162,8 +1290,10 @@ updateUptime();
 // =====================================================================
 // INIT
 // =====================================================================
-renderUsers();
+initAuth();
+loadAllData();
 updatePendingBadge();
+renderLogs(); // system logs are static, render immediately
 </script>
 </body>
 </html>

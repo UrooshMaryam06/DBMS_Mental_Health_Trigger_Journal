@@ -105,7 +105,7 @@
   .notif-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--cream); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background .15s; user-select: none; }
   .notif-btn:hover { background: var(--peach-soft); border-color: var(--peach); }
   .notif-btn i { font-size: 18px; color: var(--text-2); }
-  .notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; border: 1.5px solid var(--warm-white); }
+  .notif-dot { position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; border: 1.5px solid var(--warm-white); display: none; }
 
   .notif-dropdown {
     display: none; position: absolute; top: calc(100% + 8px); right: 0;
@@ -458,7 +458,7 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
     </a>
     <a class="nav-item" href="3_journal_entry.html">
       <i class="ti ti-notebook"></i> My Journal
-      <span class="nav-badge">3</span>
+      
     </a>
     <a class="nav-item" href="5_appointments.html">
       <i class="ti ti-calendar-event"></i> Appointments
@@ -472,7 +472,7 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
     </a>
     <a class="nav-item" href="patient_messages.html">
       <i class="ti ti-message-circle"></i> Messages
-      <span class="nav-badge">2</span>
+      
     </a>
     <div class="nav-section">Account</div>
     <a class="nav-item" href="patient_profile.html">
@@ -481,15 +481,15 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
     <a class="nav-item" href="patient_settings.html">
       <i class="ti ti-settings"></i> Settings
     </a>
-    <a class="nav-item" href="1_login_register.html">
+    <a class="nav-item" href="1_login_register.html" onclick="localStorage.clear()">
       <i class="ti ti-logout"></i> Sign Out
     </a>
   </nav>
   <div class="sb-foot">
     <a href="patient_profile.html" class="sb-user" style="text-decoration:none">
-      <div class="sb-avatar" id="sbAvatarInitials">SA</div>
+      <div class="sb-avatar" id="sbAvatarInitials">??</div>
       <div>
-        <div class="sb-uname" id="sbUname">Sara Ahmed</div>
+        <div class="sb-uname" id="sbUname"><span id="sbUname">Loading...</span></div>
         <div class="sb-role">Patient · Week 12</div>
       </div>
     </a>
@@ -504,11 +504,11 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
       <i class="ti ti-menu-2"></i>
     </button>
     <div class="tb-center">
-      <div class="tb-title">Good morning, Sara 🌸</div>
-      <div class="tb-sub">Saturday, 9 May 2026 &nbsp;·&nbsp; Therapist: Dr. Imran Khan</div>
+      <div class="tb-title">Good morning 🌸</div>
+      <div class="tb-sub" id="dashTopSub">Loading...</div>
     </div>
     <div class="tb-right">
-      <div class="crisis-pill">
+      <div class="crisis-pill" id="crisisPill" style="display:none">
         <div class="cdot"></div>
         <span>1 Crisis Alert</span>
       </div>
@@ -995,6 +995,416 @@ new Chart(document.getElementById('sympChart'), {
 /* ─── INIT ─── */
 renderNotifications();
 updateNotifDot();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  SERENITY — DASHBOARD DATA LOADER
+//  Fetches real journal data from Supabase for logged-in user.
+//  Demo accounts (sara@mhjournal.com etc.) show hardcoded data.
+// ═══════════════════════════════════════════════════════════
+
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
+const DEMO_EMAILS = ['sara@mhjournal.com','imran@mhjournal.com','admin@mhjournal.com','ali@mhjournal.com'];
+
+async function supabaseFetch(path) {
+  const res = await fetch(SUPABASE_URL + path, {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json'
+    }
+  });
+  if (!res.ok) throw new Error('Supabase error: ' + res.status);
+  return res.json();
+}
+
+(async function() {
+  try {
+    // ── Auth guard ──────────────────────────────────────────
+    const raw = localStorage.getItem('mh_user');
+    if (!raw) { window.location.href = '1_login_register.html'; return; }
+    const user = JSON.parse(raw);
+    const name      = user.full_name || 'User';
+    const parts     = name.trim().split(' ');
+    const firstName = parts[0];
+    const initials  = (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+    const isDemo    = DEMO_EMAILS.includes((user.email || '').toLowerCase());
+
+    // ── Fill sidebar name & avatar ──────────────────────────
+    ['sbUname','sidebarName'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = name;
+    });
+    ['sbAvatarInitials'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = initials;
+    });
+    const savedPhoto = localStorage.getItem('photoURL');
+    if (savedPhoto) {
+      const av = document.getElementById('sbAvatarInitials');
+      if (av) { av.style.backgroundImage = `url(${savedPhoto})`; av.style.backgroundSize = 'cover'; av.textContent = ''; }
+    }
+
+    // ── Topbar subtitle ─────────────────────────────────────
+    const dashTopSub = document.getElementById('dashTopSub');
+    if (dashTopSub) {
+      const today = new Date().toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      dashTopSub.textContent = isDemo
+        ? today + ' · Therapist: Dr. Imran Khan'
+        : today;
+    }
+
+    // ── DEMO: keep hardcoded Sara data ──────────────────────
+    if (isDemo) {
+      document.getElementById('crisisPill').style.display = 'flex';
+      return;
+    }
+
+    // ── REAL USER: fetch their journal entries ──────────────
+    const userId = user.id || user.user_id;
+    if (!userId) {
+      showNewUserEmptyState(firstName);
+      return;
+    }
+
+    let entries = [];
+    try {
+      entries = await supabaseFetch(
+        `/rest/v1/trigger_logs?user_id=eq.${userId}&order=created_at.desc&limit=50`
+      );
+    } catch(e) {
+      console.warn('Could not fetch entries:', e);
+    }
+
+    // Also fetch appointments
+    let appointments = [];
+    try {
+      appointments = await supabaseFetch(
+        `/rest/v1/appointments?patient_id=eq.${userId}&order=scheduled_at.asc&limit=10`
+      );
+    } catch(e) { console.warn('Could not fetch appointments:', e); }
+
+    if (!entries || entries.length === 0) {
+      showNewUserEmptyState(firstName, appointments);
+      return;
+    }
+
+    // ── REAL USER HAS DATA: render their real data ──────────
+    renderRealDashboard(entries, firstName, user, appointments);
+
+  } catch(e) {
+    console.error('Dashboard load error:', e);
+  }
+})();
+
+// ── Empty state for new users with no entries ───────────────
+function showNewUserEmptyState(firstName, appointments) {
+  appointments = appointments || [];
+  const content = document.querySelector('main.content');
+  if (!content) return;
+  Array.from(content.children).forEach(c => c.style.display = 'none');
+  const welcome = document.createElement('div');
+  welcome.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px;gap:20px;min-height:60vh;animation:fadeInUp .4s ease both';
+  welcome.innerHTML = `
+    <div style="font-size:64px;line-height:1">🌱</div>
+    <div style="font-size:26px;font-weight:700;color:#2d4a38;font-family:'Lora',serif">Welcome, ${firstName}!</div>
+    <div style="font-size:15px;color:#6b5c56;max-width:420px;line-height:1.7">
+      Your mental health journey starts here.<br>Log your first journal entry to begin tracking your mood and triggers.
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center">
+      <a href="3_journal_entry.html" style="background:#2d4a38;color:#fff;text-decoration:none;padding:12px 28px;border-radius:12px;font-size:14px;font-weight:600;font-family:'Quicksand',sans-serif;display:flex;align-items:center;gap:8px">
+        <i class="ti ti-notebook"></i> Log First Entry
+      </a>
+      <a href="5_appointments.html" style="background:transparent;color:#2d4a38;text-decoration:none;padding:12px 28px;border-radius:12px;border:1.5px solid #b7d4bc;font-size:14px;font-weight:600;font-family:'Quicksand',sans-serif;display:flex;align-items:center;gap:8px">
+        <i class="ti ti-calendar"></i> Book Appointment
+      </a>
+    </div>
+    <div style="margin-top:16px;background:#e8f4ea;border-radius:14px;padding:16px 24px;max-width:380px">
+      <div style="font-size:13px;color:#3d6b4a;font-weight:600;margin-bottom:4px">💡 Your dashboard fills up as you journal</div>
+      <div style="font-size:12px;color:#5a9264;line-height:1.6">Mood charts, trigger patterns, and weekly insights will appear here once you start logging entries.</div>
+    </div>`;
+  content.appendChild(welcome);
+}
+
+// ── Render real dashboard from Supabase entries ─────────────
+function renderRealDashboard(entries, firstName, user, appointments) {
+  appointments = appointments || [];
+  const content = document.querySelector('main.content');
+  if (!content) return;
+
+  // Hide all hardcoded Sara sections
+  Array.from(content.children).forEach(c => c.style.display = 'none');
+
+  // ── Compute metrics from real data ──
+  const now = new Date();
+  const moodScores = entries.map(e => parseFloat(e.mood_score || e.mood || 0)).filter(v => v > 0);
+  const avgMood = moodScores.length ? (moodScores.reduce((a,b)=>a+b,0)/moodScores.length).toFixed(1) : '—';
+  const crisisEntries = entries.filter(e => e.is_crisis || e.mood_score <= 2 || e.mood <= 2);
+  const totalEntries = entries.length;
+
+  // Streak calculation
+  let streak = 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const entryDates = [...new Set(entries.map(e => {
+    const d = new Date(e.created_at); d.setHours(0,0,0,0); return d.getTime();
+  }))].sort((a,b)=>b-a);
+  let check = today.getTime();
+  for (const d of entryDates) {
+    if (d === check || d === check - 86400000) { streak++; check = d - 86400000; }
+    else break;
+  }
+
+  // Trigger counts
+  const triggerCounts = {};
+  entries.forEach(e => {
+    const t = e.people_involved || e.trigger_category || e.trigger || e.category || 'Other';
+    triggerCounts[t] = (triggerCounts[t] || 0) + 1;
+  });
+  const topTriggers = Object.entries(triggerCounts).sort((a,b)=>b[1]-a[1]);
+  const primaryTrigger = topTriggers[0] ? topTriggers[0][0] : '—';
+  const triggerTotal = Object.values(triggerCounts).reduce((a,b)=>a+b,0);
+
+  // Last 14 days mood for chart
+  const last14 = [];
+  for (let i=13;i>=0;i--) {
+    const d = new Date(now); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+    const dayEntries = entries.filter(e => {
+      const ed = new Date(e.created_at); ed.setHours(0,0,0,0);
+      return ed.getTime() === d.getTime();
+    });
+    const score = dayEntries.length
+      ? dayEntries.reduce((a,en)=>a+(parseFloat(en.mood_score||en.mood||0)),0)/dayEntries.length
+      : null;
+    last14.push({ date: d, score });
+  }
+
+  // Recent 4 entries for journal list
+  const recent4 = entries.slice(0, 4);
+
+  // ── Build new content div ──
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;flex-direction:column;gap:20px';
+  div.innerHTML = `
+
+    <!-- GREETING + EMOTIONS (always shown for real users) -->
+    <div class="greeting-band">
+      <div class="greeting-text">
+        <h2>How are you feeling right now? 🌼</h2>
+        <p>Tap an emotion to log it — your feelings are always valid here.</p>
+      </div>
+      <div>
+        <div class="mood-section-label">Today’s Mood Check-In</div>
+        <div class="emotions-row">
+          <button class="em-btn" data-mood="Happy"    onclick="selectEmotion(this)"><span class="em-icon">😊</span><span class="em-label">Happy</span></button>
+          <button class="em-btn" data-mood="Peaceful" onclick="selectEmotion(this)"><span class="em-icon">😌</span><span class="em-label">Peaceful</span></button>
+          <button class="em-btn" data-mood="Anxious"  onclick="selectEmotion(this)"><span class="em-icon">😰</span><span class="em-label">Anxious</span></button>
+          <button class="em-btn" data-mood="Sad"      onclick="selectEmotion(this)"><span class="em-icon">😢</span><span class="em-label">Sad</span></button>
+          <button class="em-btn" data-mood="Angry"    onclick="selectEmotion(this)"><span class="em-icon">😤</span><span class="em-label">Angry</span></button>
+          <button class="em-btn" data-mood="Tired"    onclick="selectEmotion(this)"><span class="em-icon">😴</span><span class="em-label">Tired</span></button>
+          <button class="em-btn" data-mood="Grateful" onclick="selectEmotion(this)"><span class="em-icon">🥰</span><span class="em-label">Grateful</span></button>
+          <button class="em-btn" data-mood="Hopeful"  onclick="selectEmotion(this)"><span class="em-icon">🌟</span><span class="em-label">Hopeful</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div>
+      <div class="sec-label">Your Overview</div>
+      <div class="metrics-grid">
+        <div class="mc">
+          <div class="mc-icon-wrap" style="background:#dcfce7"><i class="ti ti-flame" style="color:#15803d;font-size:20px"></i></div>
+          <div class="mc-label">Journal Streak</div>
+          <div class="mc-val" id="realStreak">0 <sub>days</sub></div>
+          <div class="mc-sub" style="color:#15803d">Keep it up! 🔥</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon-wrap" style="background:#fef3c7"><i class="ti ti-alert-circle" style="color:#b45309;font-size:20px"></i></div>
+          <div class="mc-label">Top Trigger</div>
+          <div class="mc-val" id="realTopTrigger" style="font-size:18px">—</div>
+          <div class="mc-sub" id="realTriggerPct"></div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon-wrap" style="background:#e0f2fe"><i class="ti ti-notebook" style="color:#0369a1;font-size:20px"></i></div>
+          <div class="mc-label">Total Entries</div>
+          <div class="mc-val" id="realTotalEntries">0</div>
+          <div class="mc-sub" id="realAvgMood">Avg mood: —</div>
+        </div>
+        <div class="mc">
+          <div class="mc-icon-wrap" style="background:#fce7f3"><i class="ti ti-alert-triangle" style="color:#9d174d;font-size:20px"></i></div>
+          <div class="mc-label">Crisis Entries</div>
+          <div class="mc-val" id="realCrisisCount" style="color:var(--rose-d)">0</div>
+          <div class="mc-sub" id="realCrisisSub">None this month ✓</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOOD CHART + TRIGGERS -->
+    <div class="row-2col">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><i class="ti ti-chart-line" style="color:var(--peach-d)"></i>Your Mood — Last 14 Days</div>
+          <a href="patient_analytics.html" class="card-action">View all →</a>
+        </div>
+        <div style="position:relative;height:190px"><canvas id="realMoodChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title"><i class="ti ti-tag" style="color:var(--sage-d)"></i>Your Triggers</div>
+          <a href="patient_analytics.html" class="card-action">Details →</a>
+        </div>
+        <div id="realTriggerBars" class="cat-list" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- JOURNAL ENTRIES + RIGHT COLUMN -->
+    <div class="row-2col-alt">
+      <div>
+        <div class="card-head" style="margin-bottom:10px">
+          <div class="card-title"><i class="ti ti-notebook" style="color:var(--peach-d)"></i>Recent Journal Entries</div>
+          <a href="3_journal_entry.html" class="card-action">+ New Entry</a>
+        </div>
+        <div class="journal-list" id="realJournalList"></div>
+        <button class="view-all-btn" onclick="location.href='patient_analytics.html'">View all entries →</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- UPCOMING APPOINTMENT -->
+        <div id="apptCardWrap"></div>
+        <!-- AFFIRMATION / QUOTE -->
+        <div class="affirmation-card">
+          <div class="aff-deco" id="affDeco">🌸</div>
+          <div class="aff-text" id="affText">"You are doing the best you can, and that is more than enough."</div>
+          <div class="aff-sub">Daily Affirmation · <span id="affDate"></span></div>
+          <button class="aff-btn" onclick="nextAffirmation()">✶ New Affirmation</button>
+        </div>
+      </div>
+    </div>`
+  content.appendChild(div);
+
+  // ── Populate metric cards ──
+  document.getElementById('realStreak').innerHTML = streak + ' <sub>days</sub>';
+  document.getElementById('realTopTrigger').textContent = primaryTrigger;
+  document.getElementById('realTriggerPct').textContent = topTriggers[0] ? Math.round(topTriggers[0][1]/triggerTotal*100)+'% of entries' : 'No data yet';
+  document.getElementById('realTotalEntries').textContent = totalEntries;
+  document.getElementById('realAvgMood').textContent = 'Avg mood: ' + (avgMood > 0 ? avgMood+'/10' : '—');
+  document.getElementById('realCrisisCount').textContent = crisisEntries.length;
+  document.getElementById('realCrisisSub').textContent = crisisEntries.length > 0 ? 'Therapist notified ✓' : 'None logged ✓';
+
+  // ── Affirmation date ──
+  const affDateEl = document.getElementById('affDate');
+  if (affDateEl) affDateEl.textContent = new Date().toLocaleDateString('en-US',{weekday:'long',day:'numeric',month:'long'});
+
+  // ── Upcoming appointment card ──
+  const apptWrap = document.getElementById('apptCardWrap');
+  if (apptWrap) {
+    const nowStr = new Date().toISOString();
+    const upcoming = appointments.filter(a => a.status !== 'cancelled' && a.scheduled_at >= nowStr);
+    if (upcoming.length > 0) {
+      const next = upcoming[0];
+      const apptDate = new Date(next.scheduled_at);
+      const dateStr = apptDate.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+      const timeStr = apptDate.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      const statusColor = next.status === 'confirmed' ? '#22c55e' : '#f59e0b';
+      const statusLabel = next.status === 'confirmed' ? 'Confirmed' : 'Pending';
+      const sessionLabel = next.session_type ? (next.session_type.charAt(0).toUpperCase()+next.session_type.slice(1)+' Session') : 'Session';
+      apptWrap.innerHTML = `<div class="appt-card">
+        <div class="appt-label">Next Appointment</div>
+        <div class="appt-name">Dr. Imran Khan</div>
+        <div class="appt-meta">${dateStr} · ${timeStr} · ${sessionLabel}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <span style="font-size:11px;font-weight:700;color:${statusColor};background:${statusColor}22;padding:3px 10px;border-radius:20px">${statusLabel}</span>
+          <button class="join-btn" onclick="location.href='5_appointments.html'"><i class="ti ti-calendar"></i> View</button>
+        </div>
+      </div>`;
+    } else if (appointments.length > 0) {
+      apptWrap.innerHTML = `<div class="card" style="text-align:center;padding:16px">
+        <i class="ti ti-calendar-check" style="font-size:28px;color:var(--sage-d);margin-bottom:8px;display:block"></i>
+        <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:4px">No upcoming sessions</div>
+        <div style="font-size:11px;color:var(--text-3)">Your past appointment has been completed.</div>
+        <button onclick="location.href='5_appointments.html'" style="margin-top:10px;background:var(--sage-soft);color:var(--sage-dd);border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">Book Again</button>
+      </div>`;
+    } else {
+      apptWrap.innerHTML = `<div class="card" style="text-align:center;padding:16px">
+        <i class="ti ti-calendar-plus" style="font-size:28px;color:var(--peach-d);margin-bottom:8px;display:block"></i>
+        <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:4px">No appointments yet</div>
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:10px">Book a session with a therapist.</div>
+        <button onclick="location.href='5_appointments.html'" style="background:linear-gradient(135deg,var(--peach),var(--peach-d));color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;display:flex;align-items:center;gap:6px;margin:0 auto"><i class="ti ti-calendar-plus"></i> Book Session</button>
+      </div>`;
+    }
+  }
+
+  // ── Render mood chart with real data ──
+  const chartLabels = last14.map(d => d.date.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+  const chartData   = last14.map(d => d.score);
+  new Chart(document.getElementById('realMoodChart'), {
+    type: 'line',
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        label: 'Mood', data: chartData,
+        borderColor: '#e07d56', backgroundColor: 'rgba(244,169,130,.1)',
+        borderWidth: 2.5,
+        pointRadius: ctx => chartData[ctx.dataIndex] !== null ? 4 : 0,
+        pointBackgroundColor: ctx => {
+          const v = ctx.parsed.y;
+          return !v ? 'transparent' : v<=3?'#ef4444':v<=6?'#f59e0b':'#22c55e';
+        },
+        pointBorderColor: '#fff', pointBorderWidth: 2, tension: .38, fill: true,
+        spanGaps: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{display:false}, tooltip:{callbacks:{label:c=>c.parsed.y!==null?'Mood: '+c.parsed.y.toFixed(1)+'/10':'No entry'}, backgroundColor:'#2d4a38', cornerRadius:10, padding:10}},
+      scales: {
+        y:{min:1,max:10,ticks:{color:'#a89890',font:{size:11},stepSize:3},grid:{color:'rgba(0,0,0,.05)'}},
+        x:{ticks:{color:'#a89890',font:{size:10},maxRotation:45,maxTicksLimit:7},grid:{display:false}}
+      }
+    }
+  });
+
+  // ── Render trigger bars ──
+  const barColors = ['#93c5fd','#86efac','#fde68a','#f9a8d4','#c4b5fd','#fdba74'];
+  const barsEl = document.getElementById('realTriggerBars');
+  if (topTriggers.length === 0) {
+    barsEl.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:12px;padding:20px">No trigger data yet</div>';
+  } else {
+    const maxCount = topTriggers[0][1];
+    barsEl.innerHTML = topTriggers.slice(0,5).map(([name, count], i) => `
+      <div class="cat-row">
+        <span class="cat-name" style="min-width:90px;font-size:11px">${name}</span>
+        <div class="cat-bar-wrap"><div class="cat-bar" style="width:${Math.round(count/maxCount*100)}%;background:${barColors[i%barColors.length]}"></div></div>
+        <span class="cat-pct">${Math.round(count/triggerTotal*100)}%</span>
+      </div>`).join('');
+  }
+
+  // ── Render journal list ──
+  const journalEl = document.getElementById('realJournalList');
+  if (recent4.length === 0) {
+    journalEl.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:13px;padding:20px">No entries yet</div>';
+  } else {
+    journalEl.innerHTML = recent4.map(e => {
+      const d = new Date(e.created_at || e.log_date);
+      const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+      const mood = parseFloat(e.mood_score || e.mood || 0);
+      const isCrisis = e.is_crisis || mood <= 2;
+      const moodClass = mood <= 3 ? 'm-low' : mood <= 6 ? 'm-mid' : 'm-high';
+      const moodDisplay = mood > 0 ? Math.round(mood) : '—';
+      const text = e.trigger_description || e.entry_text || e.description || e.notes || e.text || '(No text)';
+      const trigger = e.people_involved || e.trigger_category || e.trigger || e.category || '';
+      const tagMap = {'Work Stress':'t-work','Family':'t-family','Finance':'t-finance','Health':'t-health','Relationships':'t-social','Academic':'t-social','Sleep Issues':'t-social','Work':'t-work'};
+      const tagCls = tagMap[trigger] || 't-social';
+      return `
+        <div class="je${isCrisis?' crisis':''}">
+          <div class="je-date">${dateStr}${isCrisis?'<div class="je-crisis-lbl">CRISIS</div>':''}</div>
+          <div style="flex:1">
+            <div class="je-desc">${text.length > 100 ? text.substring(0,100)+'...' : text}</div>
+            ${trigger ? `<div class="tags"><span class="tag ${tagCls}">${trigger}</span></div>` : ''}
+          </div>
+          <div class="mood-pill ${moodClass}">${moodDisplay}</div>
+        </div>`;
+    }).join('');
+  }
+}
 </script>
 </body>
 </html>

@@ -245,12 +245,12 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
     <div class="nav-section">Account</div>
     <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
     <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-    <a href="1_login_register.html" class="nav-item" style="margin-top:auto;color:rgba(255,255,255,.38)"><i class="ti ti-logout"></i>Sign Out</a>
+    <a href="#" class="nav-item" data-action="signout" style="margin-top:auto;color:rgba(255,255,255,.38)"><i class="ti ti-logout"></i>Sign Out</a>
   </nav>
   <div class="sb-foot">
     <div class="sb-user" onclick="window.location.href='therapist_profile.html'">
-      <div class="sb-avatar">IK</div>
-      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+      <div class="sb-avatar" id="sbAvatarInitials">IK</div>
+      <div><div class="sb-uname" id="sbUname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
     </div>
   </div>
 </aside>
@@ -290,7 +290,7 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
         <i class="ti ti-messages"></i>
         <p>Select a conversation to start messaging</p>
       </div>
-      <div id="chatMain" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none">
+      <div id="chatMain" style="display:none;flex-direction:column;overflow:hidden;flex:1">
         <!-- crisis banner injected here -->
         <div id="crisisbanner"></div>
         <div class="chat-header" id="chatHeader"></div>
@@ -312,71 +312,157 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
 <div class="toast" id="toast" role="alert"><i id="toastIcon"></i><span id="toastMsg"></span></div>
 
 <script>
+
+/* ══════════════════════════════════════════
+   SUPABASE + AUTH
+══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
+
+async function supaFetch(endpoint, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...options.headers
+    }
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+(function initAuth() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) { window.location.href = '1_login_register.html'; return; }
+  const user = JSON.parse(raw);
+  const name = user.full_name || 'Therapist';
+  const parts = name.trim().split(/\s+/);
+  const initials = parts.map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const avEl = document.getElementById('sbAvatarInitials');
+  const unEl = document.getElementById('sbUname');
+  if (avEl) avEl.textContent = initials;
+  if (unEl) unEl.textContent = name;
+  document.querySelectorAll('[data-action="signout"]').forEach(el =>
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      localStorage.removeItem('mh_user');
+      window.location.href = '1_login_register.html';
+    })
+  );
+})();
+
 /* ── DARK MODE APPLY ── */
 (function(){
   const t = localStorage.getItem('mhj_theme');
   if(t === 'dark') document.documentElement.classList.add('dark');
 })();
 
-/* ── DATA ── */
-const THREADS = [
-  {
-    id:'t1', patientId:'p3', name:'Fatima Noor', initials:'FN',
-    avBg:'#fce7f3', avColor:'#9d174d', crisis:true, unread:2,
-    lastMsg:'I don\'t feel safe right now. Can we talk?', lastTime:'9:14 AM',
-    status:'Crisis patient — mood 2/10',
-    messages:[
-      {from:'patient', text:'Dr. Khan, I had a really bad night. I couldn\'t sleep at all.', time:'8:45 AM'},
-      {from:'patient', text:'I\'ve been having thoughts I shouldn\'t have. I\'m scared.', time:'8:52 AM'},
-      {from:'therapist', text:'Fatima, I\'m here with you. Thank you for reaching out — that took courage. Can you tell me more about what you\'re experiencing right now?', time:'9:00 AM'},
-      {from:'patient', text:'I don\'t feel safe right now. Can we talk?', time:'9:14 AM'},
-    ]
-  },
-  {
-    id:'t2', patientId:'p1', name:'Sara Ahmed', initials:'SA',
-    avBg:'#dbeafe', avColor:'#1d4ed8', crisis:true, unread:1,
-    lastMsg:'The breathing exercises helped a little. Thank you.', lastTime:'Yesterday',
-    status:'Crisis patient — panic disorder',
-    messages:[
-      {from:'therapist', text:'Sara, how are you feeling after this morning\'s episode? I want to check in before our session.', time:'10:30 AM'},
-      {from:'patient', text:'I\'m exhausted. The panic attack at work was humiliating. My manager saw.', time:'10:45 AM'},
-      {from:'therapist', text:'That sounds incredibly difficult. Your feelings are completely valid. We\'ll use our session time today to process this together. Please try the 4-7-8 breathing if you feel another wave coming.', time:'11:00 AM'},
-      {from:'patient', text:'The breathing exercises helped a little. Thank you.', time:'Yesterday'},
-    ]
-  },
-  {
-    id:'t3', patientId:'p2', name:'Ali Khan', initials:'AK',
-    avBg:'#dcfce7', avColor:'#15803d', crisis:false, unread:0,
-    lastMsg:'Could you recommend something for financial anxiety?', lastTime:'Apr 24',
-    status:'Active patient — anxiety, family conflict',
-    messages:[
-      {from:'patient', text:'Dr. Khan, I had another argument with my father about money. It really set me back.', time:'Apr 23'},
-      {from:'therapist', text:'I understand, Ali. Family financial conflicts are among the most stressful triggers. Let\'s talk about this in our next session — I\'ll prepare some specific CBT exercises for financial anxiety.', time:'Apr 23'},
-      {from:'patient', text:'Could you recommend something for financial anxiety?', time:'Apr 24'},
-    ]
-  },
-  {
-    id:'t4', patientId:'p5', name:'Hassan Malik', initials:'HM',
-    avBg:'#ede9fe', avColor:'#5b21b6', crisis:false, unread:0,
-    lastMsg:'I\'ve started using the sleep hygiene checklist you sent.', lastTime:'Apr 19',
-    status:'Active patient — social anxiety, sleep disorder',
-    messages:[
-      {from:'therapist', text:'Hassan, I\'ve assigned you the Sleep Hygiene worksheet. Please review it before Friday.', time:'Apr 18'},
-      {from:'patient', text:'I\'ve started using the sleep hygiene checklist you sent. Managed 6 hours last night — first time in weeks!', time:'Apr 19'},
-      {from:'therapist', text:'That\'s wonderful progress, Hassan! A full sleep cycle makes such a difference for anxiety management. Keep tracking your sleep this week.', time:'Apr 19'},
-    ]
-  },
-  {
-    id:'t5', patientId:'p4', name:'Zainab Raza', initials:'ZR',
-    avBg:'#fef3c7', avColor:'#b45309', crisis:false, unread:0,
-    lastMsg:'I\'m actually feeling pretty good this week!', lastTime:'Apr 23',
-    status:'Stable patient — academic stress',
-    messages:[
-      {from:'patient', text:'I\'m actually feeling pretty good this week! Finished my thesis chapter on time.', time:'Apr 23'},
-      {from:'therapist', text:'Zainab, that\'s excellent news! Completing that chapter is a significant milestone. How is your mood holding up alongside the workload?', time:'Apr 23'},
-    ]
-  }
+/* ── DATA — loaded from Supabase ── */
+let THREADS = [];
+
+/* ── AV COLOURS ── */
+const MSG_COLORS = [
+  {bg:'#dbeafe',fg:'#1d4ed8'},{bg:'#fce7f3',fg:'#9d174d'},{bg:'#dcfce7',fg:'#15803d'},
+  {bg:'#fef3c7',fg:'#b45309'},{bg:'#ede9fe',fg:'#5b21b6'},{bg:'#e0f2fe',fg:'#0369a1'}
 ];
+function msgColor(i){return MSG_COLORS[i%MSG_COLORS.length];}
+function msgInitials(name){return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+
+/* ── LOAD THREADS FROM SUPABASE ── */
+async function loadThreads() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) return;
+  const user = JSON.parse(raw);
+  const therapistId = user.user_id;
+
+  try {
+    // Get linked patients
+    const links = await supaFetch(`therapist_patient_link?therapist_id=eq.${therapistId}&is_active=eq.true&select=patient_id`);
+    const patientIds = links.map(l => l.patient_id);
+
+    if (patientIds.length === 0) {
+      document.getElementById('threadList').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3)">No patients linked.</div>';
+      return;
+    }
+
+    // Get patient names
+    const users = await supaFetch(`users?user_id=in.(${patientIds.join(',')})&select=user_id,full_name`);
+    const nameMap = {};
+    users.forEach(u => { nameMap[u.user_id] = u.full_name; });
+
+    // Get crisis flags
+    const crisisLogs = await supaFetch(`trigger_logs?user_id=in.(${patientIds.join(',')})&mood_score=lte.3&order=log_date.desc&select=user_id`);
+    const crisisSet = new Set(crisisLogs.map(l => l.user_id));
+
+    // Get all messages involving these patients (sent or received)
+    let allMsgs = [];
+    try {
+      allMsgs = await supaFetch(
+        `messages?or=(sender_id.in.(${patientIds.join(',')}),receiver_id.in.(${patientIds.join(',')}))&order=created_at.asc&limit=500&select=id,sender_id,receiver_id,content,is_read,created_at`
+      );
+    } catch(e) {
+      console.warn('messages fetch failed, showing threads without messages:', e);
+      allMsgs = [];
+    }
+
+    // Group messages by patient
+    const byPatient = {};
+    allMsgs.forEach(m => {
+      const patientId = patientIds.includes(m.sender_id) ? m.sender_id : m.receiver_id;
+      if (!byPatient[patientId]) byPatient[patientId] = [];
+      byPatient[patientId].push(m);
+    });
+
+    // Build THREADS
+    THREADS = [];
+    patientIds.forEach((pid, i) => {
+      const msgs = (byPatient[pid] || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+      const name = nameMap[pid] || 'Patient';
+      const col = msgColor(i);
+      const ini = msgInitials(name);
+      const isCrisis = crisisSet.has(pid);
+      const lastMsg = msgs.length > 0 ? msgs[msgs.length-1] : null;
+      const unread = msgs.filter(m => m.sender_id === pid && !m.is_read).length;
+
+      THREADS.push({
+        id: pid,
+        patientId: pid,
+        name,
+        initials: ini,
+        avBg: col.bg,
+        avColor: col.fg,
+        crisis: isCrisis,
+        unread,
+        lastMsg: lastMsg ? (lastMsg.content || '').slice(0,60) : 'No messages yet',
+        lastTime: lastMsg ? new Date(lastMsg.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '',
+        status: isCrisis ? 'Crisis patient' : 'Active patient',
+        messages: msgs.map(m => ({
+          id: m.id,
+          from: m.sender_id === pid ? 'patient' : 'therapist',
+          text: m.content || '',
+          time: new Date(m.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+        }))
+      });
+    });
+
+    // Sort: crisis first, then by unread, then by last message
+    THREADS.sort((a,b) => {
+      if (a.crisis && !b.crisis) return -1;
+      if (!a.crisis && b.crisis) return 1;
+      return b.unread - a.unread;
+    });
+
+    renderThreads();
+    if (THREADS.length > 0) setTimeout(() => openThread(THREADS[0].id), 100);
+
+  } catch(err) {
+    document.getElementById('threadList').innerHTML = `<div style="padding:20px;color:var(--danger)">Error: ${err.message}</div>`;
+    console.error('loadThreads error:', err);
+  }
+}
 
 let activeThread = null;
 let toastTimer;
@@ -413,16 +499,23 @@ function openThread(id) {
   const thread = THREADS.find(t => t.id === id);
   if(!thread) return;
 
-  // Mark as read
+  // Mark as read locally
   thread.unread = 0;
   renderThreads(document.getElementById('threadSearch').value);
 
+  // Mark as read in Supabase (async, non-blocking)
+  const raw = localStorage.getItem('mh_user');
+  const user = JSON.parse(raw);
+  supaFetch(`messages?sender_id=eq.${thread.patientId}&receiver_id=eq.${user.user_id}&is_read=eq.false`, {
+    method: 'PATCH',
+    headers: { 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ is_read: true })
+  }).catch(e => console.warn('mark-read error:', e));
+
+  // Show chat area — hide placeholder, show main
   document.getElementById('chatPlaceholder').style.display = 'none';
   const cm = document.getElementById('chatMain');
-  cm.style.display = 'flex';
-  cm.style.flexDirection = 'column';
-  cm.style.overflow = 'hidden';
-  cm.style.flex = '1';
+  cm.style.cssText = 'display:flex;flex-direction:column;overflow:hidden;flex:1';
 
   // Crisis banner
   document.getElementById('crisisbanner').innerHTML = thread.crisis
@@ -460,7 +553,7 @@ function renderMessages(thread) {
           <div class="bubble ${isOut ? 'bubble-out' : 'bubble-in'}">${m.text}</div>
           <div class="b-time">${m.time}</div>
         </div>
-        ${isOut ? `<div class="b-av" style="background:linear-gradient(135deg,#a5b4fc,#818cf8);color:#1e1b4b">IK</div>` : ''}
+        ${isOut ? `<div class="b-av" style="background:linear-gradient(135deg,#a5b4fc,#818cf8);color:#1e1b4b">${therapistInitials}</div>` : ''}
       </div>
     `;
   });
@@ -476,32 +569,42 @@ const AUTO_REPLIES = [
   'Please remember your coping toolkit for tonight. I\'ll follow up first thing tomorrow.',
 ];
 
-function sendMessage() {
+async function sendMessage() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if(!text || !activeThread) return;
 
   const thread = THREADS.find(t => t.id === activeThread);
+  if (!thread) return;
+
+  const raw = localStorage.getItem('mh_user');
+  const user = JSON.parse(raw);
   const timeStr = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+
+  // Optimistic update
   thread.messages.push({from:'therapist', text, time:timeStr});
   thread.lastMsg = text.length > 48 ? text.slice(0,48)+'…' : text;
   thread.lastTime = 'Just now';
-
   input.value = '';
   input.style.height = 'auto';
   renderMessages(thread);
   renderThreads(document.getElementById('threadSearch').value);
 
-  // Simulate patient reply
-  setTimeout(() => {
-    const reply = AUTO_REPLIES[Math.floor(Math.random()*AUTO_REPLIES.length)];
-    const replyTime = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    thread.messages.push({from:'patient', text:reply, time:replyTime});
-    thread.lastMsg = reply.length > 48 ? reply.slice(0,48)+'…' : reply;
-    thread.lastTime = 'Just now';
-    renderMessages(thread);
-    renderThreads(document.getElementById('threadSearch').value);
-  }, 1400 + Math.random()*1000);
+  // Save to Supabase
+  try {
+    await supaFetch('messages', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        sender_id: user.user_id,
+        receiver_id: thread.patientId,
+        content: text,
+        is_read: false
+      })
+    });
+  } catch(e) {
+    console.error('sendMessage save error:', e);
+  }
 }
 
 function handleKey(e) {
@@ -522,9 +625,9 @@ function showToast(msg, type='ok') {
 }
 
 /* ── INIT ── */
-renderThreads();
-// Auto-open first (crisis) thread
-setTimeout(() => openThread('t1'), 100);
+const _mu = localStorage.getItem('mh_user');
+const therapistInitials = _mu ? (function(n){const p=n.trim().split(/\s+/);return p.map(w=>w[0]).slice(0,2).join('').toUpperCase();})(JSON.parse(_mu).full_name||'T') : 'T';
+loadThreads();
 </script>
 </body>
 </html>

@@ -261,12 +261,12 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
     <div class="nav-section">Account</div>
     <a href="therapist_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>Profile</a>
     <a href="therapist_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-    <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    <a href="#" class="nav-item" data-action="signout" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
   </nav>
   <div class="sb-foot">
     <div class="sb-user">
-      <div class="sb-avatar">IK</div>
-      <div><div class="sb-uname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
+      <div class="sb-avatar" id="sbAvatarInitials">IK</div>
+      <div><div class="sb-uname" id="sbUname">Dr. Imran Khan</div><div class="sb-role">Clinical Therapist</div></div>
     </div>
   </div>
 </aside>
@@ -307,132 +307,10 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
             </div>
           </div>
 
-          <div class="appt-list" id="session-list">
-
-            <div class="appt-card crisis-card" data-status="crisis" data-name="fatima noor">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="p-av" style="background:#fce7f3;color:#9d174d">FN</div>
-                  <div><div class="p-name">Fatima Noor <span class="sbadge sb-x" style="font-size:10px;padding:2px 7px;margin-left:4px"><i class="ti ti-alert-triangle"></i>CRISIS</span></div><div class="p-meta">Week 3 · Crisis Follow-Up</div></div>
-                </div>
-                <span class="sbadge sb-x"><i class="ti ti-alert-circle"></i>Urgent Today</span>
-              </div>
-              <div class="ac-info">
-                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
-                <span class="chip"><i class="ti ti-clock"></i>2:00 PM · 60 min</span>
-                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-                <span class="chip" style="color:var(--danger)"><i class="ti ti-heart-broken" style="color:var(--danger)"></i>Mood: 2/10</span>
-              </div>
-              <div class="crisis-note"><strong>⚠ Crisis:</strong> Patient logged suicidal ideation at 9:14 AM. Mood critically low. Emergency session confirmed.</div>
-              <div class="ac-actions">
-                <button class="btn btn-red" onclick="joinSession('Fatima Noor')"><i class="ti ti-video"></i>Join Emergency Session</button>
-                <button class="btn btn-notes" onclick="openNotes('Fatima Noor')"><i class="ti ti-notes"></i>Session Notes</button>
-                <button class="btn btn-ghost" onclick="showToast('Initiating call to Fatima Noor…','warn')"><i class="ti ti-phone"></i>Call Now</button>
-              </div>
+                    <div class="appt-list" id="session-list">
+            <div style="text-align:center;padding:30px;color:var(--text-3)" id="appt-loading">
+              <i class="ti ti-loader" style="font-size:24px"></i><br>Loading appointments…
             </div>
-
-            <div class="appt-card today-card" data-status="confirmed" data-name="sara ahmed">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="p-av" style="background:#e0f2fe;color:#0369a1">SA</div>
-                  <div><div class="p-name">Sara Ahmed</div><div class="p-meta">Week 12 · CBT — Anxiety Management</div></div>
-                </div>
-                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
-              </div>
-              <div class="ac-info">
-                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
-                <span class="chip"><i class="ti ti-clock"></i>10:00 AM · 50 min</span>
-                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-              </div>
-              <div class="ac-actions">
-                <button class="btn btn-join" onclick="joinSession('Sara Ahmed')"><i class="ti ti-video"></i>Join Session</button>
-                <button class="btn btn-notes" onclick="openNotes('Sara Ahmed')"><i class="ti ti-notes"></i>Session Notes</button>
-                <button class="btn btn-ghost" onclick="openReschedule('Sara Ahmed')"><i class="ti ti-calendar-event"></i>Reschedule</button>
-                <button class="btn btn-ghost" onclick="cancelSess('Sara Ahmed')"><i class="ti ti-x"></i>Cancel</button>
-              </div>
-            </div>
-
-            <div class="appt-card today-card" data-status="confirmed" data-name="ali khan">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="p-av" style="background:#dcfce7;color:#15803d">AK</div>
-                  <div><div class="p-name">Ali Khan</div><div class="p-meta">Week 6 · Cognitive Therapy</div></div>
-                </div>
-                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
-              </div>
-              <div class="ac-info">
-                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
-                <span class="chip"><i class="ti ti-clock"></i>11:30 AM · 50 min</span>
-                <span class="chip"><i class="ti ti-building"></i>In-Person · Room 3B</span>
-              </div>
-              <div class="ac-actions">
-                <button class="btn btn-ghost"><i class="ti ti-map-pin"></i>Room 3B</button>
-                <button class="btn btn-notes" onclick="openNotes('Ali Khan')"><i class="ti ti-notes"></i>Session Notes</button>
-                <button class="btn btn-ghost" onclick="openReschedule('Ali Khan')"><i class="ti ti-calendar-event"></i>Reschedule</button>
-                <button class="btn btn-ghost" onclick="cancelSess('Ali Khan')"><i class="ti ti-x"></i>Cancel</button>
-              </div>
-            </div>
-
-            <div class="appt-card today-card" data-status="confirmed" data-name="zainab raza">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="p-av" style="background:#fef3c7;color:#b45309">ZR</div>
-                  <div><div class="p-name">Zainab Raza</div><div class="p-meta">Week 18 · Progress Review</div></div>
-                </div>
-                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
-              </div>
-              <div class="ac-info">
-                <span class="chip"><i class="ti ti-calendar"></i>Today, Apr 27</span>
-                <span class="chip"><i class="ti ti-clock"></i>4:00 PM · 50 min</span>
-                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-              </div>
-              <div class="ac-actions">
-                <button class="btn btn-join" onclick="joinSession('Zainab Raza')"><i class="ti ti-video"></i>Join Session</button>
-                <button class="btn btn-notes" onclick="openNotes('Zainab Raza')"><i class="ti ti-notes"></i>Session Notes</button>
-                <button class="btn btn-ghost" onclick="openReschedule('Zainab Raza')"><i class="ti ti-calendar-event"></i>Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card" data-status="confirmed" data-name="hassan malik">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="p-av" style="background:#ede9fe;color:#5b21b6">HM</div>
-                  <div><div class="p-name">Hassan Malik</div><div class="p-meta">Week 8 · DBT Module 3</div></div>
-                </div>
-                <span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>
-              </div>
-              <div class="ac-info">
-                <span class="chip"><i class="ti ti-calendar"></i>Tomorrow, Apr 28</span>
-                <span class="chip"><i class="ti ti-clock"></i>9:00 AM · 50 min</span>
-                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-              </div>
-              <div class="ac-actions">
-                <button class="btn btn-join" onclick="joinSession('Hassan Malik')"><i class="ti ti-video"></i>Join Session</button>
-                <button class="btn btn-notes" onclick="openNotes('Hassan Malik')"><i class="ti ti-notes"></i>Session Notes</button>
-                <button class="btn btn-ghost" onclick="openReschedule('Hassan Malik')"><i class="ti ti-calendar-event"></i>Reschedule</button>
-              </div>
-            </div>
-
-            <div class="appt-card" data-status="pending" data-name="omar sheikh">
-              <div class="ac-top">
-                <div class="ac-patient">
-                  <div class="p-av" style="background:#f0fdf4;color:#15803d">OS</div>
-                  <div><div class="p-name">Omar Sheikh</div><div class="p-meta">Week 2 · Grief Counseling</div></div>
-                </div>
-                <span class="sbadge sb-p"><i class="ti ti-clock"></i>Awaiting Confirm</span>
-              </div>
-              <div class="ac-info">
-                <span class="chip"><i class="ti ti-calendar"></i>Apr 29</span>
-                <span class="chip"><i class="ti ti-clock"></i>3:30 PM · 50 min</span>
-                <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-              </div>
-              <div class="ac-actions">
-                <button class="btn btn-ok" onclick="quickApprove(this,'Omar Sheikh')"><i class="ti ti-check"></i>Confirm</button>
-                <button class="btn btn-notes" onclick="openNotes('Omar Sheikh')"><i class="ti ti-notes"></i>Notes</button>
-                <button class="btn btn-ghost" onclick="openReschedule('Omar Sheikh')"><i class="ti ti-calendar-event"></i>Reschedule</button>
-              </div>
-            </div>
-
           </div><!-- /session-list -->
         </div><!-- /left col -->
 
@@ -467,70 +345,10 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
         <div style="font-size:15px;font-weight:600;color:var(--text-1)">Appointment Requests Awaiting Approval</div>
         <div class="req-count" id="pend-count">3 pending</div>
       </div>
-      <div class="req-list">
-
-        <div class="req-card" id="rcard-1">
-          <div class="ac-top">
-            <div class="ac-patient">
-              <div class="p-av" style="background:#f3e8ff;color:#6b21a8">LI</div>
-              <div><div class="p-name">Layla Ibrahim</div><div class="p-meta">New Patient · Anxiety &amp; Depression</div></div>
-            </div>
-            <span class="sbadge sb-p"><i class="ti ti-clock"></i>Pending</span>
-          </div>
-          <div class="ac-info">
-            <span class="chip"><i class="ti ti-calendar"></i>Requested: Apr 29 · 11:00 AM</span>
-            <span class="chip"><i class="ti ti-clock"></i>50 min</span>
-            <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-          </div>
-          <div class="req-note"><strong>Patient message:</strong> "I've been struggling with severe anxiety for 3 months after a job loss. I was referred by my GP. I'm hoping to begin CBT therapy as soon as possible."</div>
-          <div id="ract-1" style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-ok" onclick="approveReq(1,'Layla Ibrahim')"><i class="ti ti-check"></i>Approve &amp; Confirm</button>
-            <button class="btn btn-rej" onclick="rejectReq(1,'Layla Ibrahim')"><i class="ti ti-x"></i>Decline</button>
-            <button class="btn btn-ghost" onclick="openReschedule('Layla Ibrahim')"><i class="ti ti-calendar-event"></i>Suggest Other Time</button>
-          </div>
+      <div class="req-list" id="req-list">
+        <div style="text-align:center;padding:30px;color:var(--text-3)" id="req-loading">
+          <i class="ti ti-loader" style="font-size:24px"></i><br>Loading requests…
         </div>
-
-        <div class="req-card" id="rcard-2">
-          <div class="ac-top">
-            <div class="ac-patient">
-              <div class="p-av" style="background:#f0fdf4;color:#15803d">OS</div>
-              <div><div class="p-name">Omar Sheikh</div><div class="p-meta">Week 2 · Extra Session Request</div></div>
-            </div>
-            <span class="sbadge sb-p"><i class="ti ti-clock"></i>Pending</span>
-          </div>
-          <div class="ac-info">
-            <span class="chip"><i class="ti ti-calendar"></i>Requested: Apr 29 · 3:30 PM</span>
-            <span class="chip"><i class="ti ti-clock"></i>50 min</span>
-            <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-          </div>
-          <div class="req-note"><strong>Patient message:</strong> "I had a particularly rough week dealing with my father's passing. I would appreciate an extra session before our next scheduled one on May 3rd."</div>
-          <div id="ract-2" style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-ok" onclick="approveReq(2,'Omar Sheikh')"><i class="ti ti-check"></i>Approve &amp; Confirm</button>
-            <button class="btn btn-rej" onclick="rejectReq(2,'Omar Sheikh')"><i class="ti ti-x"></i>Decline</button>
-            <button class="btn btn-ghost" onclick="openReschedule('Omar Sheikh')"><i class="ti ti-calendar-event"></i>Suggest Other Time</button>
-          </div>
-        </div>
-
-        <div class="req-card crisis-card" id="rcard-3">
-          <div class="ac-top">
-            <div class="ac-patient">
-              <div class="p-av" style="background:#fce7f3;color:#9d174d">NH</div>
-              <div><div class="p-name">Nadia Hassan <span class="sbadge sb-x" style="font-size:10px;padding:2px 7px;margin-left:4px"><i class="ti ti-alert-triangle"></i>CRISIS</span></div><div class="p-meta">Week 5 · Emergency Request</div></div>
-            </div>
-            <span class="sbadge sb-x"><i class="ti ti-alert-circle"></i>Crisis — Urgent</span>
-          </div>
-          <div class="ac-info">
-            <span class="chip"><i class="ti ti-calendar"></i>TODAY · Immediate</span>
-            <span class="chip"><i class="ti ti-clock"></i>ASAP</span>
-            <span class="chip"><i class="ti ti-video"></i>Video Call</span>
-          </div>
-          <div class="req-note" style="background:#fef2f2;border-color:#fca5a5"><strong style="color:var(--danger)">⚠ Crisis flag:</strong> System flagged journal entry (mood 1/10, self-harm keywords). Last contact: 3 days ago.</div>
-          <div id="ract-3" style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-red" onclick="approveReq(3,'Nadia Hassan')"><i class="ti ti-check"></i>Approve Immediately</button>
-            <button class="btn btn-ghost" onclick="showToast('Calling Nadia Hassan now…','warn')"><i class="ti ti-phone"></i>Call Patient Now</button>
-          </div>
-        </div>
-
       </div><!-- /req-list -->
     </div><!-- /panel-pending -->
   </div><!-- /content -->
@@ -582,6 +400,48 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="t-icon"></i><span id="t-msg">Done</span></div>
 
 <script>
+
+/* ══════════════════════════════════════════
+   SUPABASE + AUTH
+══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
+
+async function supaFetch(endpoint, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...options.headers
+    }
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+(function initAuth() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) { window.location.href = '1_login_register.html'; return; }
+  const user = JSON.parse(raw);
+  const name = user.full_name || 'Therapist';
+  const parts = name.trim().split(/\s+/);
+  const initials = parts.map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  const avEl = document.getElementById('sbAvatarInitials');
+  const unEl = document.getElementById('sbUname');
+  if (avEl) avEl.textContent = initials;
+  if (unEl) unEl.textContent = name;
+  document.querySelectorAll('[data-action="signout"]').forEach(el =>
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      localStorage.removeItem('mh_user');
+      window.location.href = '1_login_register.html';
+    })
+  );
+})();
+
 // Panel switch
 function switchPanel(name,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -589,33 +449,254 @@ function switchPanel(name,btn){
   document.getElementById('panel-'+name).classList.add('active');
   btn.classList.add('active');
 }
-// Filter sessions
+// Filter sessions (works on dynamically loaded cards)
 function filterSessions(q){document.querySelectorAll('#session-list .appt-card').forEach(c=>{c.style.display=c.dataset.name.includes(q.toLowerCase())?'':'none'})}
 function filterStatus(v){document.querySelectorAll('#session-list .appt-card').forEach(c=>{c.style.display=(v==='all'||c.dataset.status===v)?'':'none'})}
-// Quick approve from upcoming
+
+/* ── COLOUR HELPERS ── */
+const AV_COLORS = [
+  {bg:'#dbeafe',fg:'#1d4ed8'},{bg:'#fce7f3',fg:'#9d174d'},{bg:'#dcfce7',fg:'#15803d'},
+  {bg:'#fef3c7',fg:'#b45309'},{bg:'#ede9fe',fg:'#5b21b6'},{bg:'#f0fdf4',fg:'#15803d'},
+  {bg:'#e0f2fe',fg:'#0369a1'},{bg:'#f3e8ff',fg:'#6b21a8'}
+];
+function avColor(idx){return AV_COLORS[idx % AV_COLORS.length];}
+function initials(name){return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function fmtDate(dt){
+  if(!dt) return '—';
+  const d = new Date(dt);
+  const now = new Date();
+  const tod = new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const tom = new Date(tod); tom.setDate(tom.getDate()+1);
+  const day = new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const prefix = day.getTime()===tod.getTime() ? 'Today' : day.getTime()===tom.getTime() ? 'Tomorrow' : d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const time = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  return `${prefix}, ${time}`;
+}
+
+/* ── LOAD APPOINTMENTS FROM SUPABASE ── */
+async function loadAppointments() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) return;
+  const user = JSON.parse(raw);
+  const therapistId = user.user_id;
+  const list = document.getElementById('session-list');
+  const loading = document.getElementById('appt-loading');
+
+  try {
+    // Get linked patients
+    const links = await supaFetch(`therapist_patient_link?therapist_id=eq.${therapistId}&is_active=eq.true&select=patient_id`);
+    const patientIds = links.map(l => l.patient_id);
+
+    // Get appointments
+    let appts = [];
+    if (patientIds.length > 0) {
+      appts = await supaFetch(`appointments?therapist_id=eq.${therapistId}&status=in.(pending,confirmed)&order=scheduled_at.asc&select=appointment_id,patient_id,scheduled_at,duration_mins,status,session_type,notes`);
+    }
+
+    // Get patient names
+    const nameMap = {};
+    const crisisMap = {};
+    if (patientIds.length > 0) {
+      const users = await supaFetch(`users?user_id=in.(${patientIds.join(',')})&select=user_id,full_name`);
+      users.forEach(u => { nameMap[u.user_id] = u.full_name; });
+
+      // Check crisis flags (mood <= 3 in trigger_logs)
+      const logs = await supaFetch(`trigger_logs?user_id=in.(${patientIds.join(',')})&mood_score=lte.3&order=log_date.desc&select=user_id,mood_score`);
+      const seenCrisis = new Set();
+      logs.forEach(l => { if (!seenCrisis.has(l.user_id)) { crisisMap[l.user_id] = true; seenCrisis.add(l.user_id); } });
+    }
+
+    loading.style.display = 'none';
+
+    if (appts.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-3)"><i class="ti ti-calendar-off" style="font-size:32px"></i><br><br>No appointments scheduled.</div>';
+      return;
+    }
+
+    const now = new Date();
+    appts.forEach((a, i) => {
+      const name = nameMap[a.patient_id] || 'Patient';
+      const ini = initials(name);
+      const col = avColor(i);
+      const isCrisis = !!crisisMap[a.patient_id];
+      const apptDate = new Date(a.scheduled_at);
+      const isToday = apptDate.toDateString() === now.toDateString();
+      const status = (a.status || 'confirmed').toLowerCase();
+      const duration = a.duration_mins || 50;
+      const format = a.session_type || 'Video Call';
+      const notes = a.notes || '';
+
+      const card = document.createElement('div');
+      card.className = `appt-card ${isCrisis ? 'crisis-card' : isToday ? 'today-card' : ''}`;
+      card.dataset.status = isCrisis ? 'crisis' : status;
+      card.dataset.name = name.toLowerCase();
+
+      card.innerHTML = `
+        <div class="ac-top">
+          <div class="ac-patient">
+            <div class="p-av" style="background:${col.bg};color:${col.fg}">${ini}</div>
+            <div>
+              <div class="p-name">${name}${isCrisis ? '<span class="sbadge sb-x" style="font-size:10px;padding:2px 7px;margin-left:4px"><i class="ti ti-alert-triangle"></i>CRISIS</span>' : ''}</div>
+              <div class="p-meta">${notes || (format + ' · ' + duration + ' min')}</div>
+            </div>
+          </div>
+          ${isCrisis
+            ? '<span class="sbadge sb-x"><i class="ti ti-alert-circle"></i>Urgent</span>'
+            : status === 'pending'
+              ? '<span class="sbadge sb-p"><i class="ti ti-clock"></i>Awaiting Confirm</span>'
+              : '<span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>'}
+        </div>
+        <div class="ac-info">
+          <span class="chip"><i class="ti ti-calendar"></i>${fmtDate(a.scheduled_at)}</span>
+          <span class="chip"><i class="ti ti-clock"></i>${duration} min</span>
+          <span class="chip"><i class="ti ti-${format.toLowerCase().includes('video') ? 'video' : format.toLowerCase().includes('person') ? 'building' : 'phone'}"></i>${format}</span>
+        </div>
+        ${isCrisis ? '<div class="crisis-note"><strong>⚠ Crisis:</strong> Patient has recent low-mood journal entries. Consider emergency follow-up.</div>' : ''}
+        <div class="ac-actions">
+          ${isCrisis
+            ? `<button class="btn btn-red" onclick="joinSession('${name}')"><i class="ti ti-video"></i>Join Emergency Session</button>`
+            : format.toLowerCase().includes('video')
+              ? `<button class="btn btn-join" onclick="joinSession('${name}')"><i class="ti ti-video"></i>Join Session</button>`
+              : ''}
+          ${status === 'pending'
+            ? `<button class="btn btn-ok" onclick="approveAppt(this,'${a.appointment_id}','${name}')"><i class="ti ti-check"></i>Confirm</button>`
+            : ''}
+          <button class="btn btn-notes" onclick="openNotes('${name}')"><i class="ti ti-notes"></i>Session Notes</button>
+          <button class="btn btn-ghost" onclick="openReschedule('${name}')"><i class="ti ti-calendar-event"></i>Reschedule</button>
+          ${!isCrisis ? `<button class="btn btn-ghost" onclick="cancelAppt('${a.appointment_id}','${name}')"><i class="ti ti-x"></i>Cancel</button>` : ''}
+        </div>`;
+      list.appendChild(card);
+    });
+  } catch(err) {
+    loading.innerHTML = `<span style="color:var(--danger)">Error loading appointments: ${err.message}</span>`;
+    console.error('loadAppointments error:', err);
+  }
+}
+
+/* ── LOAD PENDING REQUESTS ── */
+async function loadRequests() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) return;
+  const user = JSON.parse(raw);
+  const reqList = document.getElementById('req-list');
+  const reqLoading = document.getElementById('req-loading');
+  const pendCount = document.getElementById('pend-count');
+
+  try {
+    // Appointments with status='pending' for this therapist's patients
+    const links = await supaFetch(`therapist_patient_link?therapist_id=eq.${user.user_id}&is_active=eq.true&select=patient_id`);
+    const patientIds = links.map(l => l.patient_id);
+
+    let pending = [];
+    if (patientIds.length > 0) {
+      pending = await supaFetch(`appointments?therapist_id=eq.${user.user_id}&status=eq.pending&order=scheduled_at.asc&select=appointment_id,patient_id,scheduled_at,duration_mins,status,session_type,notes`);
+    }
+
+    const nameMap = {};
+    if (patientIds.length > 0) {
+      const users = await supaFetch(`users?user_id=in.(${patientIds.join(',')})&select=user_id,full_name`);
+      users.forEach(u => { nameMap[u.user_id] = u.full_name; });
+    }
+
+    reqLoading.style.display = 'none';
+    pendCount.textContent = `${pending.length} pending`;
+
+    if (pending.length === 0) {
+      reqList.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-3)"><i class="ti ti-circle-check" style="font-size:32px"></i><br><br>No pending requests.</div>';
+      return;
+    }
+
+    pending.forEach((a, i) => {
+      const name = nameMap[a.patient_id] || 'Patient';
+      const ini = initials(name);
+      const col = avColor(i);
+      const card = document.createElement('div');
+      card.className = 'req-card';
+      card.id = `rcard-${a.appointment_id}`;
+      card.innerHTML = `
+        <div class="ac-top">
+          <div class="ac-patient">
+            <div class="p-av" style="background:${col.bg};color:${col.fg}">${ini}</div>
+            <div><div class="p-name">${name}</div><div class="p-meta">${a.notes || 'Session Request'}</div></div>
+          </div>
+          <span class="sbadge sb-p"><i class="ti ti-clock"></i>Pending</span>
+        </div>
+        <div class="ac-info">
+          <span class="chip"><i class="ti ti-calendar"></i>Requested: ${fmtDate(a.scheduled_at)}</span>
+          <span class="chip"><i class="ti ti-clock"></i>${a.duration_mins || 50} min</span>
+          <span class="chip"><i class="ti ti-video"></i>${a.session_type || 'Video Call'}</span>
+        </div>
+        <div id="ract-${a.id}" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ok" onclick="approveReq('${a.appointment_id}','${name}')"><i class="ti ti-check"></i>Approve &amp; Confirm</button>
+          <button class="btn btn-rej" onclick="rejectReq('${a.appointment_id}','${name}')"><i class="ti ti-x"></i>Decline</button>
+          <button class="btn btn-ghost" onclick="openReschedule('${name}')"><i class="ti ti-calendar-event"></i>Suggest Other Time</button>
+        </div>`;
+      reqList.appendChild(card);
+    });
+  } catch(err) {
+    reqLoading.innerHTML = `<span style="color:var(--danger)">Error: ${err.message}</span>`;
+    console.error('loadRequests error:', err);
+  }
+}
+
+// Approve via Supabase PATCH
+async function approveAppt(btn, id, name) {
+  try {
+    await supaFetch(`appointments?appointment_id=eq.${id}`, { method:'PATCH', body: JSON.stringify({status:'confirmed'}) });
+    const card = btn.closest('.appt-card');
+    card.querySelector('.sbadge:last-of-type').outerHTML = '<span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>';
+    btn.remove();
+    showToast(name + ' session confirmed!', 'ok');
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+}
+
+async function approveReq(id, name) {
+  try {
+    await supaFetch(`appointments?appointment_id=eq.${id}`, { method:'PATCH', body: JSON.stringify({status:'confirmed'}) });
+    const card = document.getElementById('rcard-'+id);
+    if (card) {
+      card.classList.add('approved');
+      card.querySelector('.sbadge:last-of-type').className = 'sbadge sb-c';
+      card.querySelector('.sbadge:last-of-type').innerHTML = '<i class="ti ti-circle-check"></i>Confirmed';
+      document.getElementById('ract-'+id).innerHTML = '<div class="res-ok"><i class="ti ti-circle-check"></i>Approved — patient notified</div>';
+    }
+    const pc = document.getElementById('pend-count');
+    const n = parseInt(pc.textContent) - 1;
+    pc.textContent = Math.max(0,n) + ' pending';
+    showToast(name + ' session approved!', 'ok');
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+}
+
+async function rejectReq(id, name) {
+  try {
+    await supaFetch(`appointments?appointment_id=eq.${id}`, { method:'PATCH', body: JSON.stringify({status:'cancelled'}) });
+    const card = document.getElementById('rcard-'+id);
+    if (card) {
+      card.classList.add('rejected-card');
+      document.getElementById('ract-'+id).innerHTML = '<div class="res-no"><i class="ti ti-x"></i>Declined — patient notified</div>';
+    }
+    const pc = document.getElementById('pend-count');
+    const n = parseInt(pc.textContent) - 1;
+    pc.textContent = Math.max(0,n) + ' pending';
+    showToast('Request from ' + name + ' declined.', 'warn');
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+}
+
+async function cancelAppt(id, name) {
+  if (!confirm('Cancel session with ' + name + '?')) return;
+  try {
+    await supaFetch(`appointments?appointment_id=eq.${id}`, { method:'PATCH', body: JSON.stringify({status:'cancelled'}) });
+    showToast('Session cancelled. Patient notified.', 'warn');
+    loadAppointments();
+  } catch(e) { showToast('Error: ' + e.message, 'err'); }
+}
+
+// Quick approve from upcoming list (UI only — for non-db cards, kept for compat)
 function quickApprove(btn,name){
   const card=btn.closest('.appt-card');
   card.querySelector('.sbadge').outerHTML='<span class="sbadge sb-c"><i class="ti ti-circle-check"></i>Confirmed</span>';
   btn.outerHTML='<button class="btn btn-join" onclick="joinSession(\''+name+'\')"><i class="ti ti-video"></i>Join Session</button>';
   showToast(name+' session confirmed!','ok');
-}
-// Pending approve/reject
-let pendCount=3;
-function approveReq(id,name){
-  document.getElementById('rcard-'+id).classList.add('approved');
-  const b=document.getElementById('rcard-'+id).querySelector('.sbadge:last-of-type');
-  if(b)b.className='sbadge sb-c',b.innerHTML='<i class="ti ti-circle-check"></i>Confirmed';
-  document.getElementById('ract-'+id).innerHTML='<div class="res-ok"><i class="ti ti-circle-check"></i>Approved — patient notified</div>';
-  pendCount=Math.max(0,pendCount-1);
-  document.getElementById('pend-count').textContent=pendCount+' pending';
-  showToast(name+' session approved!','ok');
-}
-function rejectReq(id,name){
-  document.getElementById('rcard-'+id).classList.add('rejected-card');
-  document.getElementById('ract-'+id).innerHTML='<div class="res-no"><i class="ti ti-x"></i>Declined — patient notified</div>';
-  pendCount=Math.max(0,pendCount-1);
-  document.getElementById('pend-count').textContent=pendCount+' pending';
-  showToast('Request from '+name+' declined.','warn');
 }
 // Join
 function joinSession(name){showToast('Launching video session with '+name+'…','ok')}
@@ -659,6 +740,10 @@ function renderCal(){
 }
 function changeMonth(dir){cm+=dir;if(cm>11){cm=0;cy++}if(cm<0){cm=11;cy--}renderCal()}
 renderCal();
+
+/* ── INIT ── */
+loadAppointments();
+loadRequests();
 </script>
 </body>
 </html>

@@ -85,6 +85,7 @@ body {
 .sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#f4a982,#f7c5a0); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #2d4a38; }
 .sb-uname { font-size: 13px; font-weight: 700; color: #fff; }
 .sb-role { font-size: 11px; color: rgba(255,255,255,.35); }
+.nav-badge { display: none !important; }
 
 /* ── MAIN ── */
 .main { margin-left: 240px; flex: 1; }
@@ -391,12 +392,12 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
       <div class="nav-section">Account</div>
       <a href="patient_profile.html"      class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
       <a href="patient_settings.html"     class="nav-item active"><i class="ti ti-settings"></i>Settings</a>
-      <a href="1_login_register.html"     class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
+      <a href="1_login_register.html"     class="nav-item" onclick="localStorage.clear()"><i class="ti ti-logout"></i>Sign Out</a>
     </div>
     <div class="sb-foot">
       <a href="patient_profile.html" class="sb-user">
         <div class="sb-avatar">SA</div>
-        <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+        <div><div class="sb-uname"><span id="sbUname">Loading...</span></div><div class="sb-role">Patient · Week 12</div></div>
       </a>
     </div>
   </nav>
@@ -809,6 +810,68 @@ function showToast(title, sub, icon = 'ti-circle-check') {
     setTimeout(() => t.remove(), 400);
   }, 3500);
 }
+</script>
+
+<script>
+(function() {
+  try {
+    const raw = localStorage.getItem('mh_user');
+    if (!raw) { window.location.href = '1_login_register.html'; return; }
+    const user = JSON.parse(raw);
+    const name = user.full_name || 'User';
+    const parts = name.split(' ');
+    const firstName = parts[0];
+    const initials = (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+
+    // Sidebar name
+    ['sbUname','sidebarName','sb-uname'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = name;
+    });
+
+    // Sidebar initials
+    ['sbAvatarInitials','sbInitials'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = initials;
+    });
+
+    // Topbar greeting
+    ['tbGreeting','topbarGreeting','pageGreeting'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        const hour = new Date().getHours();
+        const g = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+        el.textContent = g + ', ' + firstName + ' 🌸';
+      }
+    });
+
+    // Hero name on profile pages
+    ['heroName','profileName','userName'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = name;
+    });
+
+    // Hero initials
+    ['heroInitials','profileInitials'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = initials;
+    });
+
+    // Profile photo
+    const savedPhoto = localStorage.getItem('photoURL');
+    if (savedPhoto) {
+      ['heroPhoto','sbAvatarPhoto','profilePhoto'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.src = savedPhoto; el.style.display = 'block'; }
+      });
+      ['heroInitials','sbAvatarInitials'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+  } catch(e) { console.error('User load error:', e); }
+})();
 </script>
 </body>
 </html>

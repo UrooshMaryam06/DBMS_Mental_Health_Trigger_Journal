@@ -43,6 +43,7 @@
   .nav-item:hover i,.nav-item.active i{color:#95d5b2}
   .nav-item i{font-size:17px;color:rgba(255,255,255,.4)}
   .nav-badge{margin-left:auto;background:#be123c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .nav-badge { display: none !important; }
   .sb-foot{padding:16px 20px;border-top:0.5px solid rgba(255,255,255,.1)}
   .sb-user{display:flex;align-items:center;gap:10px}
   .sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#95d5b2,#52b788);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1b4332}
@@ -278,12 +279,12 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
     <div class="nav-section">Account</div>
     <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
     <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-    <a href="1_login_register.html" class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
+    <a href="1_login_register.html" class="nav-item" onclick="localStorage.clear()"><i class="ti ti-logout"></i>Sign Out</a>
   </nav>
   <div class="sb-foot">
     <div class="sb-user">
-      <div class="sb-avatar">SA</div>
-      <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+      <div class="sb-avatar" id="sbAvatarInitials">??</div>
+      <div><div class="sb-uname"><span id="sbUname">Loading...</span></div><div class="sb-role">Patient · Week 12</div></div>
     </div>
   </div>
 </aside>
@@ -566,6 +567,286 @@ new Chart(document.getElementById('dowChart'), {
   }
   wrap.appendChild(grid);
 })();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  SERENITY — ANALYTICS DATA LOADER
+//  Fetches real journal data from Supabase for logged-in user.
+// ═══════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
+const DEMO_EMAILS_A = ['sara@mhjournal.com','imran@mhjournal.com','admin@mhjournal.com','ali@mhjournal.com'];
+
+async function analyticsSupabaseFetch(path) {
+  const res = await fetch(SUPABASE_URL + path, {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+    }
+  });
+  if (!res.ok) throw new Error('Supabase error: ' + res.status);
+  return res.json();
+}
+
+(async function() {
+  try {
+    const raw = localStorage.getItem('mh_user');
+    if (!raw) { window.location.href = '1_login_register.html'; return; }
+    const user = JSON.parse(raw);
+    const name = user.full_name || 'User';
+    const parts = name.trim().split(' ');
+    const firstName = parts[0];
+    const initials = (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+    const isDemo = DEMO_EMAILS_A.includes((user.email || '').toLowerCase());
+
+    // Sidebar
+    ['sbUname','sidebarName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=name; });
+    ['sbAvatarInitials'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=initials; });
+
+    if (isDemo) return; // Keep Sara's hardcoded charts
+
+    // Real user: fetch their data
+    const userId = user.id || user.user_id;
+    if (!userId) { showAnalyticsEmpty(firstName); return; }
+
+    let entries = [];
+    try {
+      entries = await analyticsSupabaseFetch(
+        `/rest/v1/trigger_logs?user_id=eq.${userId}&order=created_at.desc&limit=100`
+      );
+    } catch(e) { console.warn('Analytics fetch failed:', e); }
+
+    if (!entries || entries.length === 0) {
+      showAnalyticsEmpty(firstName);
+      return;
+    }
+
+    // ── Have real data: replace charts ──
+    renderRealAnalytics(entries, firstName);
+
+  } catch(e) { console.error('Analytics load error:', e); }
+})();
+
+function showAnalyticsEmpty(firstName) {
+  const content = document.querySelector('.content') || document.querySelector('main');
+  if (!content) return;
+  Array.from(content.children).forEach(c => c.style.display = 'none');
+  const empty = document.createElement('div');
+  empty.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px;gap:20px';
+  empty.innerHTML = `
+    <div style="font-size:60px;line-height:1">📊</div>
+    <div style="font-size:24px;font-weight:700;color:#1b4332">No analytics yet, ${firstName}</div>
+    <div style="font-size:14px;color:#6b6560;max-width:400px;line-height:1.7">
+      Your mood trends, trigger patterns, and wellness insights will appear here once you start logging journal entries.
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center">
+      <a href="3_journal_entry.html" style="background:#2d6a4f;color:#fff;text-decoration:none;padding:12px 28px;border-radius:12px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
+        <i class="ti ti-notebook"></i> Log First Entry
+      </a>
+      <a href="2_patient_dashboard.html" style="background:transparent;color:#2d6a4f;text-decoration:none;padding:12px 28px;border-radius:12px;border:1.5px solid #b7d4bc;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">
+        <i class="ti ti-layout-dashboard"></i> Go to Dashboard
+      </a>
+    </div>
+    <div style="margin-top:16px;background:#d8f3dc;border-radius:14px;padding:16px 24px;max-width:380px">
+      <div style="font-size:13px;color:#1b4332;font-weight:600;margin-bottom:4px">💡 Analytics build automatically</div>
+      <div style="font-size:12px;color:#2d6a4f;line-height:1.6">After just a few journal entries, you'll see your mood trends, top triggers, and coping patterns here.</div>
+    </div>`;
+  content.appendChild(empty);
+}
+
+function renderRealAnalytics(entries, firstName) {
+  const content = document.querySelector('.content') || document.querySelector('main');
+  if (!content) return;
+
+  // Hide all hardcoded Sara sections
+  Array.from(content.children).forEach(c => c.style.display = 'none');
+
+  // ── Compute stats ──
+  const moodScores = entries.map(e => parseFloat(e.mood_score || e.mood || 0)).filter(v => v > 0);
+  const avgMood = moodScores.length ? (moodScores.reduce((a,b)=>a+b,0)/moodScores.length).toFixed(1) : 0;
+  const crisisEntries = entries.filter(e => e.is_crisis || (parseFloat(e.mood_score||e.mood||5)) <= 2);
+
+  // Streak
+  let streak = 0;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const entryDates = [...new Set(entries.map(e => { const d=new Date(e.created_at); d.setHours(0,0,0,0); return d.getTime(); }))].sort((a,b)=>b-a);
+  let check = today.getTime();
+  for (const d of entryDates) {
+    if (d===check||d===check-86400000){streak++;check=d-86400000;}else break;
+  }
+
+  // Triggers
+  const trigCounts = {};
+  entries.forEach(e => { const t=e.people_involved||e.trigger_category||e.trigger||e.category||'Other'; trigCounts[t]=(trigCounts[t]||0)+1; });
+  const topTriggers = Object.entries(trigCounts).sort((a,b)=>b[1]-a[1]);
+  const trigTotal = Object.values(trigCounts).reduce((a,b)=>a+b,0);
+
+  // Last 30 days mood
+  const last30 = [];
+  for (let i=29;i>=0;i--) {
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const dayEntries=entries.filter(e=>{const ed=new Date(e.created_at);ed.setHours(0,0,0,0);return ed.getTime()===d.getTime();});
+    const score=dayEntries.length?dayEntries.reduce((a,en)=>a+(parseFloat(en.mood_score||en.mood||0)),0)/dayEntries.length:null;
+    last30.push({date:d,score});
+  }
+
+  // Day of week averages
+  const dowTotals = Array(7).fill(0), dowCounts = Array(7).fill(0);
+  entries.forEach(e => {
+    const s=parseFloat(e.mood_score||e.mood||0);
+    if(s>0){const dow=new Date(e.created_at).getDay();dowTotals[dow]+=s;dowCounts[dow]++;}
+  });
+  const dowAvgs = dowTotals.map((t,i)=>dowCounts[i]?+(t/dowCounts[i]).toFixed(1):null);
+
+  // ── Build content ──
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <!-- STAT OVERVIEW -->
+    <div class="stat-row">
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#d8f3dc"><i class="ti ti-mood-smile" style="color:#1b4332;font-size:18px"></i></div>
+        <div class="stat-label">Avg Mood Score</div>
+        <div class="stat-val">${avgMood} <sub>/10</sub></div>
+        <div class="stat-trend" style="color:var(--text-3)">Based on ${entries.length} entries</div>
+      </div>
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#dbeafe"><i class="ti ti-notebook" style="color:#1d4ed8;font-size:18px"></i></div>
+        <div class="stat-label">Entries Logged</div>
+        <div class="stat-val">${entries.length} <sub>entries</sub></div>
+        <div class="stat-trend up">Keep it up! 🎉</div>
+      </div>
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#fef3c7"><i class="ti ti-flame" style="color:#b45309;font-size:18px"></i></div>
+        <div class="stat-label">Current Streak</div>
+        <div class="stat-val">${streak} <sub>days</sub></div>
+        <div class="stat-trend" style="color:var(--text-3)">${streak>0?'Active streak 🔥':'Log today to start!'}</div>
+      </div>
+      <div class="stat-mc">
+        <div class="stat-icon" style="background:#ffe4e6"><i class="ti ti-alert-triangle" style="color:#be123c;font-size:18px"></i></div>
+        <div class="stat-label">Crisis Events</div>
+        <div class="stat-val" style="color:var(--danger)">${crisisEntries.length}</div>
+        <div class="stat-trend ${crisisEntries.length>0?'down':'up'}">${crisisEntries.length>0?'Therapist alerted':'None logged ✓'}</div>
+      </div>
+    </div>
+
+    <!-- MOOD TREND + TRIGGERS -->
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-line"></i>Your Mood — Last 30 Days</div>
+        <div class="card-sub">Your daily mood scores over the past month</div>
+        <div style="position:relative;height:200px"><canvas id="realMoodTrend"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-donut"></i>Your Trigger Breakdown</div>
+        <div class="card-sub">What's been driving your difficult days</div>
+        <div id="realTriggerSection" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- DAY OF WEEK + INSIGHTS -->
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-bar"></i>Mood by Day of Week</div>
+        <div class="card-sub">Average mood score for each day — find your best days</div>
+        <div style="position:relative;height:170px"><canvas id="realDowChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-bulb"></i>Your Insights</div>
+        <div class="card-sub">Patterns from your ${entries.length} entries</div>
+        <div id="realInsights" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+      </div>
+    </div>`;
+
+  content.appendChild(div);
+
+  // ── Mood trend chart ──
+  new Chart(document.getElementById('realMoodTrend'), {
+    type: 'line',
+    data: {
+      labels: last30.map(d => d.date.toLocaleDateString('en-US',{month:'short',day:'numeric'})),
+      datasets: [{
+        label:'Mood', fill:true,
+        data: last30.map(d => d.score),
+        borderColor:'#2d6a4f', backgroundColor:'rgba(45,106,79,.08)',
+        borderWidth:2, pointRadius:ctx=>last30[ctx.dataIndex].score!==null?3:0,
+        pointBackgroundColor:ctx=>{ const v=ctx.parsed.y; return !v?'transparent':v<=3?'#be123c':v<=6?'#c2410c':'#2d6a4f'; },
+        tension:.35, spanGaps:true
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y!==null?'Mood: '+c.parsed.y.toFixed(1)+'/10':'No entry'}}},
+      scales:{
+        y:{min:1,max:10,ticks:{color:'#9e9891',font:{size:10},stepSize:3},grid:{color:'rgba(0,0,0,.05)'}},
+        x:{ticks:{color:'#9e9891',font:{size:10},maxTicksLimit:8,maxRotation:45},grid:{display:false}}
+      }
+    }
+  });
+
+  // ── Triggers ──
+  const trigEl = document.getElementById('realTriggerSection');
+  if (topTriggers.length === 0) {
+    trigEl.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:30px;font-size:13px">No trigger data yet — keep journaling!</div>';
+  } else {
+    const colors = ['#93c5fd','#f9a8d4','#fde68a','#86efac','#c4b5fd'];
+    trigEl.innerHTML = `<div class="bar-row">${
+      topTriggers.slice(0,5).map(([name,count],i)=>`
+        <div class="br-item">
+          <span class="br-label">${name}</span>
+          <div class="br-track"><div class="br-fill" style="width:${Math.round(count/topTriggers[0][1]*100)}%;background:${colors[i%colors.length]}"></div></div>
+          <span class="br-val">${Math.round(count/trigTotal*100)}%</span>
+        </div>`).join('')
+    }</div>`;
+  }
+
+  // ── Day of week chart ──
+  new Chart(document.getElementById('realDowChart'), {
+    type:'bar',
+    data:{
+      labels:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+      datasets:[{
+        label:'Avg Mood',
+        data: dowAvgs,
+        backgroundColor: dowAvgs.map(v=>!v?'#e2dfd6':v<=3?'#fca5a5':v<=6?'#fde68a':'#b7e4c7'),
+        borderRadius:7, borderWidth:0
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y!==null?'Avg: '+c.parsed.y+'/10':'No data'}}},
+      scales:{
+        y:{min:0,max:10,ticks:{color:'#9e9891',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},
+        x:{ticks:{color:'#9e9891',font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+
+  // ── Personalised insights ──
+  const insightsEl = document.getElementById('realInsights');
+  const insights = [];
+
+  // Best day of week
+  const bestDow = dowAvgs.indexOf(Math.max(...dowAvgs.filter(v=>v!==null)));
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  if (bestDow>=0 && dowAvgs[bestDow]) {
+    insights.push(`<div class="insight-card"><div class="insight-icon"><i class="ti ti-trending-up"></i></div><div><div class="insight-label">Best Day</div><div class="insight-text">Your mood is highest on <strong>${days[bestDow]}s</strong> (avg ${dowAvgs[bestDow]}/10). Try to plan enjoyable activities on this day.</div></div></div>`);
+  }
+
+  // Top trigger
+  if (topTriggers[0]) {
+    insights.push(`<div class="warn-card"><div class="insight-icon"><i class="ti ti-alert-circle"></i></div><div><div class="insight-label">Top Trigger</div><div class="insight-text"><strong>${topTriggers[0][0]}</strong> appears in ${Math.round(topTriggers[0][1]/trigTotal*100)}% of your entries. Consider discussing strategies with a therapist.</div></div></div>`);
+  }
+
+  // Streak encouragement
+  if (streak >= 3) {
+    insights.push(`<div class="insight-card"><div class="insight-icon"><i class="ti ti-flame"></i></div><div><div class="insight-label">Streak Win 🔥</div><div class="insight-text">You've journaled for <strong>${streak} days in a row</strong>. Consistency is one of the best things you can do for your mental health.</div></div></div>`);
+  } else {
+    insights.push(`<div class="insight-card"><div class="insight-icon"><i class="ti ti-notebook"></i></div><div><div class="insight-label">Build Your Streak</div><div class="insight-text">You have <strong>${entries.length} entries</strong> so far. Try logging every day for a week — you'll start seeing patterns quickly.</div></div></div>`);
+  }
+
+  insightsEl.innerHTML = insights.join('') || '<div style="color:var(--text-3);font-size:13px">Log more entries to see personalised insights!</div>';
+}
 </script>
 </body>
 </html>

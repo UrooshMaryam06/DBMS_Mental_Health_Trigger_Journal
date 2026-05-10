@@ -803,16 +803,16 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
       <i class="ti ti-settings"></i>Settings
     </a>
 
-    <a href="1_login_register.html" class="nav-item" style="margin-top:auto;color:rgba(255,255,255,.38)">
+    <a href="#" class="nav-item" data-action="signout" style="margin-top:auto;color:rgba(255,255,255,.38)">
       <i class="ti ti-logout"></i>Sign Out
     </a>
   </nav>
 
   <div class="sb-foot">
     <div class="sb-user" onclick="window.location.href='therapist_profile.html'" title="View profile">
-      <div class="sb-avatar">IK</div>
+      <div class="sb-avatar" id="sbAvatarInitials">IK</div>
       <div>
-        <div class="sb-uname">Dr. Imran Khan</div>
+        <div class="sb-uname" id="sbUname">Therapist</div>
         <div class="sb-role">Clinical Therapist</div>
       </div>
     </div>
@@ -921,8 +921,8 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
 
     <!-- GREETING -->
     <div class="greeting">
-      <h1>Good morning, Dr. Khan 🩺</h1>
-      <p>You have <strong>4 sessions</strong> scheduled today. <strong>2 patients</strong> are flagged for crisis follow-up — please review when possible.</p>
+      <h1 id="greetingText">Welcome 🩺</h1>
+      <p id="greetingSub">Loading your dashboard…</p>
     </div>
 
     <!-- METRICS -->
@@ -932,32 +932,32 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
           <i class="ti ti-users" style="color:var(--accent)"></i>
         </div>
         <div class="mc-label">Assigned Patients</div>
-        <div class="mc-val">12</div>
-        <div class="mc-trend">↑ 2 new this month</div>
+        <div class="mc-val" id="mcPatients">—</div>
+        <div class="mc-trend" id="mcPatientsTrend">Loading…</div>
       </div>
       <div class="mc">
         <div class="mc-icon" style="background:var(--ok-l)">
           <i class="ti ti-calendar-check" style="color:var(--ok)"></i>
         </div>
         <div class="mc-label">Today's Sessions</div>
-        <div class="mc-val">4</div>
-        <div class="mc-trend">Next at 10:00 AM</div>
+        <div class="mc-val" id="mcSessions">—</div>
+        <div class="mc-trend" id="mcSessionsTrend">Loading…</div>
       </div>
       <div class="mc">
         <div class="mc-icon" style="background:var(--warn-l)">
           <i class="ti ti-notebook" style="color:var(--warn)"></i>
         </div>
         <div class="mc-label">Pending Reviews</div>
-        <div class="mc-val">5</div>
-        <div class="mc-trend">3 from this week</div>
+        <div class="mc-val" id="mcReviews">—</div>
+        <div class="mc-trend" id="mcReviewsTrend">Loading…</div>
       </div>
       <div class="mc">
         <div class="mc-icon" style="background:var(--danger-l)">
           <i class="ti ti-alert-triangle" style="color:var(--danger)"></i>
         </div>
         <div class="mc-label">Crisis Alerts</div>
-        <div class="mc-val" style="color:var(--danger)">2</div>
-        <div class="mc-trend" style="color:var(--danger)">⚠ Needs attention</div>
+        <div class="mc-val" id="mcCrisis" style="color:var(--danger)">—</div>
+        <div class="mc-trend" id="mcCrisisTrend" style="color:var(--danger)">Loading…</div>
       </div>
     </div>
 
@@ -1080,51 +1080,8 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
           Today's Appointments
           <a href="therapist_appointments.html" class="card-link">View full schedule →</a>
         </div>
-        <div class="appt-list">
-          <div class="appt-item">
-            <div class="appt-time"><div class="appt-t">10:00</div><div class="appt-d">AM</div></div>
-            <div class="appt-info">
-              <div class="appt-name">Sara Ahmed</div>
-              <div class="appt-type">Video · 50 min</div>
-            </div>
-            <button class="join-btn"
-              onclick="showToast('Launching video session with Sara Ahmed…','ok')">
-              <i class="ti ti-video"></i>Join
-            </button>
-          </div>
-          <div class="appt-item">
-            <div class="appt-time"><div class="appt-t">11:30</div><div class="appt-d">AM</div></div>
-            <div class="appt-info">
-              <div class="appt-name">Ali Khan</div>
-              <div class="appt-type">In-person · 50 min · Clinic A</div>
-            </div>
-            <button class="join-btn" style="background:#64748b"
-              onclick="showToast('Opening directions to Clinic A…','ok')">
-              <i class="ti ti-map-pin"></i>Directions
-            </button>
-          </div>
-          <div class="appt-item" style="background:#fef2f2;border:1px solid #fca5a5">
-            <div class="appt-time"><div class="appt-t">2:00</div><div class="appt-d">PM</div></div>
-            <div class="appt-info">
-              <div class="appt-name" style="color:var(--danger)">Fatima Noor 🚨</div>
-              <div class="appt-type">Video · Crisis follow-up · <strong>URGENT</strong></div>
-            </div>
-            <button class="join-btn" style="background:var(--danger)"
-              onclick="showToast('Launching urgent crisis session with Fatima Noor…','err')">
-              <i class="ti ti-alert-circle"></i>Urgent
-            </button>
-          </div>
-          <div class="appt-item">
-            <div class="appt-time"><div class="appt-t">4:00</div><div class="appt-d">PM</div></div>
-            <div class="appt-info">
-              <div class="appt-name">Zainab Raza</div>
-              <div class="appt-type">Video · 50 min · Check-in</div>
-            </div>
-            <button class="join-btn"
-              onclick="showToast('Launching video session with Zainab Raza…','ok')">
-              <i class="ti ti-video"></i>Join
-            </button>
-          </div>
+        <div class="appt-list" id="todayAppts">
+          <div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">Loading…</div>
         </div>
       </div>
 
@@ -1134,35 +1091,8 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
           Recent Journal Flags
           <a href="therapist_reviews.html" class="card-link">Review all →</a>
         </div>
-        <div class="notes-list">
-          <div class="note-item urgent" style="cursor:pointer" onclick="openSlideOver('p3')">
-            <div class="note-top">
-              <div class="note-name">Fatima Noor</div>
-              <span class="urgent-badge">CRISIS</span>
-            </div>
-            <div class="note-text">Reported suicidal ideation, asked for emergency contact. Logged today at 9:14 AM.</div>
-          </div>
-          <div class="note-item urgent" style="cursor:pointer" onclick="openSlideOver('p1')">
-            <div class="note-top">
-              <div class="note-name">Sara Ahmed</div>
-              <span class="urgent-badge">CRISIS</span>
-            </div>
-            <div class="note-text">Panic attack at work, mood score 3. Unable to continue meeting. Logged Apr 22.</div>
-          </div>
-          <div class="note-item" style="cursor:pointer" onclick="openSlideOver('p2')">
-            <div class="note-top">
-              <div class="note-name">Ali Khan</div>
-              <div class="note-time">Apr 24</div>
-            </div>
-            <div class="note-text">Mentioned increased financial stress. Requested coping resource materials.</div>
-          </div>
-          <div class="note-item" style="cursor:pointer" onclick="openSlideOver('p5')">
-            <div class="note-top">
-              <div class="note-name">Hassan Malik</div>
-              <div class="note-time">Apr 18</div>
-            </div>
-            <div class="note-text">Sleep pattern worsening — less than 4 hrs/night. Referred to sleep hygiene guide.</div>
-          </div>
+        <div class="notes-list" id="journalFlags">
+          <div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">Loading…</div>
         </div>
       </div>
 
@@ -1204,96 +1134,379 @@ html.dark body .toast{background:#1e293b;border-color:var(--border);color:var(--
 ════════════════════════════════════ -->
 <script>
 /* ══════════════════════════════════════════
-   PATIENT DATA STORE
+   SUPABASE
 ══════════════════════════════════════════ */
-const PATIENTS = [
-  {
-    id:'p1', name:'Sara Ahmed', initials:'SA',
-    avatarBg:'#dbeafe', avatarColor:'#1d4ed8',
-    since:'Week 12', age:28, city:'Islamabad', therapySince:'Jan 2026',
-    mood:3, moodClass:'mood-l', moodLabel:'😔 3/10',
-    triggers:['Work Stress','Panic Attacks'], triggerClass:'rt-high',
-    status:'active', crisis:true, lastEntry:'Apr 22',
-    lastEntryFull:'Apr 22, 2026 — Crisis entry logged. Panic attack at work.',
-    primaryTrigger:'Work Stress', copingTop:'Deep breathing, grounding exercises',
-    goals:'Reduce panic frequency, build workplace boundaries, improve coping toolkit.',
-    crisisNote:'CRISIS: Panic attack at work, mood dropped to 3/10. Therapist immediately notified. Follow-up session scheduled.',
-    logFreq:'today'
-  },
-  {
-    id:'p2', name:'Ali Khan', initials:'AK',
-    avatarBg:'#dcfce7', avatarColor:'#15803d',
-    since:'Week 6', age:34, city:'Lahore', therapySince:'Mar 2026',
-    mood:5, moodClass:'mood-m', moodLabel:'😐 5/10',
-    triggers:['Family Conflict','Financial Stress'], triggerClass:'rt-med',
-    status:'active', crisis:false, lastEntry:'Apr 24',
-    lastEntryFull:'Apr 24, 2026 — Family argument and ongoing financial stress noted.',
-    primaryTrigger:'Family Conflict', copingTop:'Journaling, cognitive reframing',
-    goals:'Improve family communication, reduce financial anxiety, build assertiveness.',
-    logFreq:'week'
-  },
-  {
-    id:'p3', name:'Fatima Noor', initials:'FN',
-    avatarBg:'#fce7f3', avatarColor:'#9d174d',
-    since:'Week 3', age:22, city:'Karachi', therapySince:'Apr 2026',
-    mood:2, moodClass:'mood-l', moodLabel:'😟 2/10',
-    triggers:['Depression','Self-Harm Risk'], triggerClass:'rt-high',
-    status:'active', crisis:true, lastEntry:'Today',
-    lastEntryFull:'Today, May 9 — Critical crisis entry flagged. Mood 2/10. Self-harm ideation present.',
-    primaryTrigger:'Major Depression', copingTop:'Safety planning in progress',
-    goals:'Safety planning, mood stabilization, build trusted support network.',
-    crisisNote:'CRISIS: Suicidal ideation and self-harm flags logged at 9:14 AM today. Immediate clinical review required. Emergency protocol may be needed.',
-    logFreq:'today'
-  },
-  {
-    id:'p4', name:'Zainab Raza', initials:'ZR',
-    avatarBg:'#fef3c7', avatarColor:'#b45309',
-    since:'Week 18', age:31, city:'Peshawar', therapySince:'Jan 2026',
-    mood:7, moodClass:'mood-h', moodLabel:'😊 7/10',
-    triggers:['Academic Pressure'], triggerClass:'rt-med',
-    status:'active', crisis:false, lastEntry:'Apr 23',
-    lastEntryFull:'Apr 23, 2026 — Positive progress entry. Mood improving consistently.',
-    primaryTrigger:'Academic Stress', copingTop:'Exercise, scheduled study breaks',
-    goals:'Maintain academic-work balance, continue positive streak, prevent burnout.',
-    logFreq:'week'
-  },
-  {
-    id:'p5', name:'Hassan Malik', initials:'HM',
-    avatarBg:'#ede9fe', avatarColor:'#5b21b6',
-    since:'Week 8', age:26, city:'Islamabad', therapySince:'Mar 2026',
-    mood:6, moodClass:'mood-m', moodLabel:'🙂 6/10',
-    triggers:['Social Anxiety','Sleep Disorder'], triggerClass:'rt-med',
-    status:'inactive', crisis:false, lastEntry:'Apr 18',
-    lastEntryFull:'Apr 18, 2026 — Sleep deprivation (<4 hrs/night). Social avoidance behaviors noted.',
-    primaryTrigger:'Sleep Issues', copingTop:'Meditation, sleep hygiene routine',
-    goals:'Improve sleep hygiene, build social confidence, reduce avoidance behaviors.',
-    logFreq:'no-week'
-  }
-];
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
+
+async function supaFetch(endpoint, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...options.headers
+    }
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  if (res.status === 204) return null;
+  return res.json();
+}
 
 /* ══════════════════════════════════════════
-   GLOBAL STATE
+   AUTH
+══════════════════════════════════════════ */
+let currentUser = null;
+
+(function initAuth() {
+  const raw = localStorage.getItem('mh_user');
+  if (!raw) { window.location.href = '1_login_register.html'; return; }
+  currentUser = JSON.parse(raw);
+  if (currentUser.role !== 'therapist') { window.location.href = '1_login_register.html'; return; }
+  const name = currentUser.full_name || 'Therapist';
+  const parts = name.trim().split(/\s+/);
+  const initials = parts.map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  document.getElementById('sbAvatarInitials').textContent = initials;
+  document.getElementById('sbUname').textContent = name;
+  // Greeting
+  const hour = new Date().getHours();
+  const tod = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+  document.getElementById('greetingText').textContent = `Good ${tod}, ${name} 🩺`;
+  // Sign out
+  document.querySelectorAll('[data-action="signout"]').forEach(el =>
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      localStorage.removeItem('mh_user');
+      window.location.href = '1_login_register.html';
+    })
+  );
+})();
+
+/* ══════════════════════════════════════════
+   LIVE PATIENT DATA (from Supabase)
+   Stored after fetch for slide-over panel
+══════════════════════════════════════════ */
+let PATIENTS = [];  // populated by loadDashboard()
+
+/* ══════════════════════════════════════════
+   GLOBAL UI STATE
 ══════════════════════════════════════════ */
 let activeTab     = 'all';
 let sortKey       = null;
 let sortDir       = 1;
 let statusFilter  = 'all';
 let logFilter     = 'all';
-let notifCount    = 4;
+let notifCount    = 0;
 let notifsOpen    = false;
 let toastTimer    = null;
 
 /* ══════════════════════════════════════════
-   SMOOTH SCROLL — My Patients sidebar link
+   LOAD DASHBOARD DATA
+══════════════════════════════════════════ */
+async function loadDashboard() {
+  if (!currentUser) return;
+  const uid = currentUser.user_id;
+
+  try {
+    // 1. Fetch linked patients
+    const links = await supaFetch(`therapist_patient_link?therapist_id=eq.${uid}&is_active=eq.true&select=patient_id`);
+    const patientIds = (links || []).map(l => l.patient_id);
+
+    if (patientIds.length === 0) {
+      document.getElementById('mcPatients').textContent = '0';
+      document.getElementById('mcPatientsTrend').textContent = 'No patients linked yet';
+      document.getElementById('greetingSub').textContent = 'No patients assigned yet. Check back soon.';
+      document.getElementById('patientBody').innerHTML = '<tr><td colspan="6"><div class="no-results" style="display:flex"><i class="ti ti-users"></i>No patients assigned to you yet.</div></td></tr>';
+      document.getElementById('todayAppts').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">No appointments today.</div>';
+      document.getElementById('journalFlags').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">No journal entries to review.</div>';
+      return;
+    }
+
+    const idsFilter = `(${patientIds.join(',')})`;
+
+    // 2. Fetch patient user records
+    const [patients, allLogs, crisisAlerts, appointments, notifications] = await Promise.all([
+      supaFetch(`users?user_id=in.${idsFilter}&select=user_id,full_name,email,created_at`),
+      supaFetch(`trigger_logs?user_id=in.${idsFilter}&order=log_date.desc&select=log_id,user_id,mood_score,trigger_description,is_crisis,log_date,created_at`),
+      supaFetch(`crisis_alerts?patient_id=in.${idsFilter}&is_resolved=eq.false&select=alert_id,patient_id,alert_time`),
+      supaFetch(`appointments?therapist_id=eq.${uid}&status=in.(pending,confirmed)&order=scheduled_at.asc&select=appointment_id,patient_id,scheduled_at,duration_mins,status,session_type,notes`),
+      supaFetch(`notifications?user_id=eq.${uid}&order=created_at.desc&limit=8&select=notification_id,notification_type,message,is_read,created_at`)
+    ]);
+
+    // 3. Build PATIENTS array for table + slide-over
+    const today = new Date().toISOString().slice(0, 10);
+    const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+
+    const patientMap = {};
+    (patients || []).forEach(p => { patientMap[p.user_id] = p; });
+
+    // Group logs by patient
+    const logsByPatient = {};
+    (allLogs || []).forEach(l => {
+      if (!logsByPatient[l.user_id]) logsByPatient[l.user_id] = [];
+      logsByPatient[l.user_id].push(l);
+    });
+
+    // Crisis patient ids set
+    const crisisPatientIds = new Set((crisisAlerts || []).map(a => a.patient_id));
+
+    PATIENTS = patientIds.map(pid => {
+      const p = patientMap[pid] || {};
+      const logs = logsByPatient[pid] || [];
+      const latestLog = logs[0] || null;
+      const moodScore = latestLog ? latestLog.mood_score : null;
+      const isCrisis = crisisPatientIds.has(pid);
+
+      // Avatar colors (cycle through palette)
+      const palettes = [
+        {bg:'#dbeafe',color:'#1d4ed8'},{bg:'#dcfce7',color:'#15803d'},
+        {bg:'#fce7f3',color:'#9d174d'},{bg:'#fef3c7',color:'#b45309'},
+        {bg:'#ede9fe',color:'#5b21b6'},{bg:'#fef9c3',color:'#854d0e'},
+      ];
+      const pal = palettes[pid % palettes.length];
+
+      const name = p.full_name || 'Patient';
+      const parts = name.trim().split(/\s+/);
+      const initials = parts.map(w => w[0]).slice(0, 2).join('').toUpperCase();
+
+      // Last entry label
+      let lastEntry = '—', logFreq = 'no-week';
+      if (latestLog) {
+        const d = latestLog.log_date.slice(0, 10);
+        if (d === today) { lastEntry = 'Today'; logFreq = 'today'; }
+        else if (d >= weekAgo) { lastEntry = new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'}); logFreq = 'week'; }
+        else { lastEntry = new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'}); logFreq = 'no-week'; }
+      }
+
+      const moodClass = moodScore === null ? 'mood-m' : moodScore <= 3 ? 'mood-l' : moodScore <= 6 ? 'mood-m' : 'mood-h';
+      const moodEmoji = moodScore === null ? '—' : moodScore <= 3 ? '😔' : moodScore <= 6 ? '😐' : '😊';
+      const moodLabel = moodScore !== null ? `${moodEmoji} ${moodScore}/10` : '— no data';
+
+      // Trigger tags from latest log
+      const triggers = latestLog && latestLog.trigger_description
+        ? latestLog.trigger_description.split(',').map(s => s.trim()).filter(Boolean).slice(0, 2)
+        : ['No recent triggers'];
+      const triggerClass = isCrisis ? 'rt-high' : moodScore !== null && moodScore <= 5 ? 'rt-med' : '';
+
+      // Since (weeks since linked)
+      const linkedDate = links.find(l => l.patient_id === pid)?.linked_date;
+      const weeksAgo = linkedDate
+        ? Math.floor((Date.now() - new Date(linkedDate)) / (7*864e5))
+        : '?';
+      const since = `Week ${weeksAgo}`;
+
+      return {
+        id: 'p' + pid, supaId: pid, name, initials,
+        avatarBg: pal.bg, avatarColor: pal.color,
+        since, therapySince: p.created_at ? new Date(p.created_at).toLocaleDateString('en-US',{month:'short',year:'numeric'}) : '—',
+        mood: moodScore !== null ? moodScore : 5,
+        moodClass, moodLabel,
+        triggers, triggerClass,
+        status: isCrisis ? 'active' : 'active',
+        crisis: isCrisis, lastEntry, logFreq,
+        lastEntryFull: latestLog
+          ? `${new Date(latestLog.log_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} — ${latestLog.trigger_description || 'Entry logged'}`
+          : 'No entries yet',
+        primaryTrigger: triggers[0] || 'Unknown',
+        copingTop: 'See journal entries',
+        goals: 'Review patient journal entries for details.',
+        crisisNote: isCrisis ? 'Active unresolved crisis alert. Immediate follow-up required.' : ''
+      };
+    });
+
+    // 4. Update metrics
+    const todayStr = today;
+    const todayAppts = (appointments || []).filter(a => a.scheduled_at && a.scheduled_at.startsWith(todayStr));
+    const crisisCount = crisisPatientIds.size;
+
+    document.getElementById('mcPatients').textContent = PATIENTS.length;
+    document.getElementById('mcPatientsTrend').textContent = `${PATIENTS.length} patient${PATIENTS.length !== 1 ? 's' : ''} assigned`;
+    document.getElementById('mcSessions').textContent = todayAppts.length;
+    document.getElementById('mcSessionsTrend').textContent = todayAppts.length
+      ? `Next: ${formatTime(todayAppts[0].scheduled_at)}`
+      : 'None today';
+    document.getElementById('mcReviews').textContent = (allLogs || []).filter(l => l.is_crisis).length;
+    document.getElementById('mcReviewsTrend').textContent = 'Crisis entries pending review';
+    document.getElementById('mcCrisis').textContent = crisisCount;
+    document.getElementById('mcCrisisTrend').textContent = crisisCount > 0 ? '⚠ Needs attention' : '✓ All clear';
+
+    // 5. Update greeting
+    const sessionWord = todayAppts.length === 1 ? '1 session' : `${todayAppts.length} sessions`;
+    const crisisWord = crisisCount > 0 ? ` <strong>${crisisCount} patient${crisisCount > 1 ? 's' : ''}</strong> flagged for crisis follow-up.` : ' All patients are currently stable.';
+    document.getElementById('greetingSub').innerHTML =
+      `You have <strong>${sessionWord}</strong> scheduled today.${crisisWord}`;
+
+    // 6. Crisis alert button
+    const alertBtn = document.querySelector('.alert-btn');
+    if (alertBtn) {
+      if (crisisCount > 0) {
+        alertBtn.style.display = '';
+        alertBtn.innerHTML = `<div class="a-dot"></div>${crisisCount} crisis alert${crisisCount > 1 ? 's' : ''}`;
+        alertBtn.onclick = () => { setActiveTab('crisis'); showToast(`Showing ${crisisCount} crisis patient${crisisCount > 1 ? 's' : ''}`, 'err'); };
+      } else {
+        alertBtn.style.display = 'none';
+      }
+    }
+
+    // 7. Tab counts
+    document.getElementById('cnt-all').textContent = PATIENTS.length;
+    document.getElementById('cnt-crisis').textContent = crisisCount;
+
+    // 8. Render patient table
+    renderTable();
+
+    // 9. Today's appointments panel
+    renderTodayAppts(todayAppts, patientMap);
+
+    // 10. Journal flags (crisis entries)
+    renderJournalFlags(allLogs, patientMap, crisisPatientIds);
+
+    // 11. Notifications
+    renderNotifications(notifications || []);
+
+  } catch (err) {
+    console.error('Dashboard load error:', err);
+    document.getElementById('greetingSub').textContent = 'Error loading data. Check console.';
+    showToast('Failed to load dashboard data', 'err');
+  }
+}
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+function formatTime(isoStr) {
+  if (!isoStr) return '—';
+  const d = new Date(isoStr);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+function formatDate(isoStr) {
+  if (!isoStr) return '—';
+  return new Date(isoStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+/* ══════════════════════════════════════════
+   RENDER TODAY'S APPOINTMENTS
+══════════════════════════════════════════ */
+function renderTodayAppts(appts, patientMap) {
+  const el = document.getElementById('todayAppts');
+  if (!appts || appts.length === 0) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">No appointments scheduled for today.</div>';
+    return;
+  }
+  el.innerHTML = appts.map(a => {
+    const p = patientMap[a.patient_id] || {};
+    const name = p.full_name || 'Patient';
+    const t = new Date(a.scheduled_at);
+    const hour = t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const [timeStr, ampm] = hour.includes(' ') ? hour.split(' ') : [hour, ''];
+    const typeIcon = a.session_type === 'video' ? 'ti-video' : a.session_type === 'phone' ? 'ti-phone' : 'ti-building';
+    const typeLabel = a.session_type === 'video' ? 'Video' : a.session_type === 'phone' ? 'Phone' : 'In-person';
+    return `
+      <div class="appt-item">
+        <div class="appt-time"><div class="appt-t">${timeStr}</div><div class="appt-d">${ampm}</div></div>
+        <div class="appt-info">
+          <div class="appt-name">${name}</div>
+          <div class="appt-type">${typeLabel} · ${a.duration_mins || 50} min${a.notes ? ' · ' + a.notes.slice(0,30) : ''}</div>
+        </div>
+        <button class="join-btn" onclick="showToast('Opening session with ${name}…','ok')">
+          <i class="ti ${typeIcon}"></i>${a.session_type === 'video' ? 'Join' : 'View'}
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   RENDER JOURNAL FLAGS
+══════════════════════════════════════════ */
+function renderJournalFlags(logs, patientMap, crisisIds) {
+  const el = document.getElementById('journalFlags');
+  // Show crisis + recent logs
+  const flagged = (logs || [])
+    .filter(l => l.is_crisis || l.mood_score <= 4)
+    .slice(0, 5);
+
+  if (flagged.length === 0) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--ok);font-size:13px">✓ No crisis or low-mood entries to review.</div>';
+    return;
+  }
+
+  el.innerHTML = flagged.map(l => {
+    const p = patientMap[l.user_id] || {};
+    const name = p.full_name || 'Patient';
+    const isCrisis = l.is_crisis;
+    const dateStr = formatDate(l.log_date);
+    const patId = 'p' + l.user_id;
+    return `
+      <div class="note-item ${isCrisis ? 'urgent' : ''}" style="cursor:pointer" onclick="openSlideOver('${patId}')">
+        <div class="note-top">
+          <div class="note-name">${name}</div>
+          ${isCrisis ? '<span class="urgent-badge">CRISIS</span>' : `<div class="note-time">${dateStr}</div>`}
+        </div>
+        <div class="note-text">${l.trigger_description ? l.trigger_description.slice(0, 100) : 'Low mood entry logged.'} ${isCrisis ? '' : `· Mood ${l.mood_score}/10`}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   RENDER NOTIFICATIONS
+══════════════════════════════════════════ */
+function renderNotifications(notifs) {
+  const list = document.getElementById('notifList');
+  const badge = document.getElementById('notifBadge');
+  const unread = notifs.filter(n => !n.is_read).length;
+  notifCount = unread;
+
+  if (notifs.length === 0) {
+    list.innerHTML = '<div class="nd-item"><div class="nd-body"><div class="nd-text" style="color:var(--text-3)">No notifications yet.</div></div></div>';
+    badge.classList.add('hidden');
+    return;
+  }
+
+  const typeIcon = {
+    crisis_alert: 'nic-danger ti-alert-triangle',
+    appointment_reminder: 'nic-info ti-calendar',
+    insight_ready: 'nic-ok ti-bulb',
+    feedback_request: 'nic-warn ti-star'
+  };
+
+  list.innerHTML = notifs.map(n => {
+    const iconClass = typeIcon[n.notification_type] || 'nic-info ti-bell';
+    const [nicClass, iconName] = iconClass.split(' ');
+    const timeStr = new Date(n.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `
+      <div class="nd-item ${n.is_read ? '' : 'unread'}" onclick="ndRead(this,${n.notification_id})" role="menuitem">
+        <div class="nd-ic ${nicClass}"><i class="ti ${iconName}"></i></div>
+        <div class="nd-body">
+          <div class="nd-text">${n.message || 'New notification'}</div>
+          <div class="nd-time">${timeStr}</div>
+        </div>
+        ${n.is_read ? '' : '<div class="nd-unread-dot"></div>'}
+      </div>
+    `;
+  }).join('');
+
+  if (unread > 0) {
+    badge.textContent = unread;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+
+/* ══════════════════════════════════════════
+   SMOOTH SCROLL
 ══════════════════════════════════════════ */
 function smoothScrollToPatients(e) {
   e.preventDefault();
   const el = document.getElementById('patients');
-  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ══════════════════════════════════════════
-   RENDER TABLE
+   RENDER PATIENT TABLE
 ══════════════════════════════════════════ */
 function renderTable() {
   const q = document.getElementById('patientSearch').value.toLowerCase().trim();
@@ -1301,23 +1514,20 @@ function renderTable() {
   let rows = PATIENTS.filter(p => {
     const matchSearch = !q
       || p.name.toLowerCase().includes(q)
-      || p.triggers.some(t => t.toLowerCase().includes(q))
-      || p.city.toLowerCase().includes(q);
+      || p.triggers.some(t => t.toLowerCase().includes(q));
 
-    const matchStatus = statusFilter === 'all'    ? true
-                      : statusFilter === 'crisis'  ? p.crisis
-                      : !p.crisis;
+    const matchStatus = statusFilter === 'all' ? true
+      : statusFilter === 'crisis' ? p.crisis : !p.crisis;
 
-    const matchLog    = logFilter === 'all'      ? true
-                      : logFilter === 'today'    ? p.logFreq === 'today'
-                      : p.logFreq === 'no-week';
+    const matchLog = logFilter === 'all' ? true
+      : logFilter === 'today' ? p.logFreq === 'today'
+      : p.logFreq === 'no-week';
 
-    const matchTab    = activeTab === 'crisis'   ? p.crisis : true;
+    const matchTab = activeTab === 'crisis' ? p.crisis : true;
 
     return matchSearch && matchStatus && matchLog && matchTab;
   });
 
-  // Sort
   if (sortKey) {
     rows = [...rows].sort((a, b) => {
       if (sortKey === 'name') return a.name.localeCompare(b.name) * sortDir;
@@ -1336,7 +1546,6 @@ function renderTable() {
   if (rows.length === 0) {
     tbody.innerHTML = '';
     if (activeTab === 'crisis' && !q && statusFilter === 'all' && logFilter === 'all') {
-      // Show the nice "no crisis" empty state
       tbody.innerHTML = `
         <tr><td colspan="6">
           <div class="empty-crisis">
@@ -1354,73 +1563,63 @@ function renderTable() {
   }
 
   noRes.style.display = 'none';
-  tbody.innerHTML = rows.map(p => {
-    const moodColor = p.mood <= 3 ? 'var(--danger)' : p.mood <= 6 ? 'var(--warn)' : 'var(--ok)';
-    return `
-      <tr class="${p.crisis ? 'crisis-row' : ''}"
-        onclick="openSlideOver('${p.id}')"
-        data-id="${p.id}"
-        tabindex="0"
-        onkeydown="if(event.key==='Enter')openSlideOver('${p.id}')"
-        title="Click to open ${p.name}'s detail panel">
-        <td>
-          <div class="patient-cell">
-            <div class="p-avatar" style="background:${p.avatarBg};color:${p.avatarColor}">${p.initials}</div>
-            <div>
-              <div class="p-name">
-                ${p.name}
-                ${p.crisis ? '<span class="crisis-badge">CRISIS</span>' : ''}
-              </div>
-              <div class="p-since">${p.since} of treatment</div>
+  tbody.innerHTML = rows.map(p => `
+    <tr class="${p.crisis ? 'crisis-row' : ''}"
+      onclick="openSlideOver('${p.id}')"
+      data-id="${p.id}"
+      tabindex="0"
+      onkeydown="if(event.key==='Enter')openSlideOver('${p.id}')"
+      title="Click to open ${p.name}'s detail panel">
+      <td>
+        <div class="patient-cell">
+          <div class="p-avatar" style="background:${p.avatarBg};color:${p.avatarColor}">${p.initials}</div>
+          <div>
+            <div class="p-name">
+              ${p.name}
+              ${p.crisis ? '<span class="crisis-badge">CRISIS</span>' : ''}
             </div>
+            <div class="p-since">${p.since} of treatment</div>
           </div>
-        </td>
-        <td>
-          <div class="mood-badge ${p.moodClass}">${p.moodLabel}</div>
-        </td>
-        <td>
-          <div class="risk-cell">
-            ${p.triggers.map(t => `<span class="risk-tag ${p.triggerClass}">${t}</span>`).join('')}
-          </div>
-        </td>
-        <td>
-          <div class="status-dot">
-            <div class="dot ${p.status === 'active' ? (p.crisis ? 'dot-red' : 'dot-green') : 'dot-gray'}"></div>
-            <span style="${p.crisis ? 'color:var(--danger);font-weight:700' : ''}">
-              ${p.status === 'active' ? (p.crisis ? 'Crisis' : 'Stable') : 'Inactive'}
-            </span>
-          </div>
-        </td>
-        <td style="color:${p.crisis ? 'var(--danger)' : 'var(--text-2)'}; font-weight:${p.crisis ? '700' : '400'}">
-          ${p.lastEntry}
-        </td>
-        <td onclick="event.stopPropagation()">
-          <button class="act-btn primary" onclick="openSlideOver('${p.id}')">
-            <i class="ti ti-eye"></i>Details
-          </button>
-          <button class="act-btn ${p.crisis ? 'danger' : ''}" onclick="openReview('${p.id}')">
-            <i class="ti ti-notebook"></i>${p.crisis ? 'Urgent' : 'Review'}
-          </button>
-          <button class="act-btn" onclick="openMessage('${p.id}')" title="Message ${p.name}">
-            <i class="ti ti-message-2"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
+        </div>
+      </td>
+      <td><div class="mood-badge ${p.moodClass}">${p.moodLabel}</div></td>
+      <td>
+        <div class="risk-cell">
+          ${p.triggers.map(t => `<span class="risk-tag ${p.triggerClass}">${t}</span>`).join('')}
+        </div>
+      </td>
+      <td>
+        <div class="status-dot">
+          <div class="dot ${p.crisis ? 'dot-red' : 'dot-green'}"></div>
+          <span style="${p.crisis ? 'color:var(--danger);font-weight:700' : ''}">
+            ${p.crisis ? 'Crisis' : 'Stable'}
+          </span>
+        </div>
+      </td>
+      <td style="color:${p.crisis ? 'var(--danger)' : 'var(--text-2)'};font-weight:${p.crisis ? '700' : '400'}">
+        ${p.lastEntry}
+      </td>
+      <td onclick="event.stopPropagation()">
+        <button class="act-btn primary" onclick="openSlideOver('${p.id}')">
+          <i class="ti ti-eye"></i>Details
+        </button>
+        <button class="act-btn ${p.crisis ? 'danger' : ''}" onclick="openReview('${p.id}')">
+          <i class="ti ti-notebook"></i>${p.crisis ? 'Urgent' : 'Review'}
+        </button>
+        <button class="act-btn" onclick="openMessage('${p.id}')" title="Message ${p.name}">
+          <i class="ti ti-message-2"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
 
-  // Update tab counts
-  const allCount    = PATIENTS.length;
-  const crisisCount = PATIENTS.filter(p => p.crisis).length;
-  document.getElementById('cnt-all').textContent    = allCount;
-  document.getElementById('cnt-crisis').textContent = crisisCount;
-
-  // Update active filter badge count
+  document.getElementById('cnt-all').textContent = PATIENTS.length;
+  document.getElementById('cnt-crisis').textContent = PATIENTS.filter(p => p.crisis).length;
   updateFilterBadge();
 }
 
 /* ══════════════════════════════════════════
-   FILTER BADGE COUNT
+   FILTER BADGE
 ══════════════════════════════════════════ */
 function updateFilterBadge() {
   const searchVal = document.getElementById('patientSearch').value.trim();
@@ -1428,14 +1627,9 @@ function updateFilterBadge() {
   if (searchVal) count++;
   if (statusFilter !== 'all') count++;
   if (logFilter !== 'all') count++;
-
   const badge = document.getElementById('activeFilterCount');
-  if (count > 0) {
-    badge.style.display = 'inline-block';
-    badge.textContent = count;
-  } else {
-    badge.style.display = 'none';
-  }
+  if (count > 0) { badge.style.display = 'inline-block'; badge.textContent = count; }
+  else { badge.style.display = 'none'; }
 }
 
 /* ══════════════════════════════════════════
@@ -1448,10 +1642,7 @@ function setActiveTab(tab) {
     t.setAttribute('aria-selected', 'false');
   });
   const el = document.getElementById('tab-' + tab);
-  if (el) {
-    el.classList.add('active');
-    el.setAttribute('aria-selected', 'true');
-  }
+  if (el) { el.classList.add('active'); el.setAttribute('aria-selected', 'true'); }
   renderTable();
 }
 
@@ -1459,11 +1650,9 @@ function setActiveTab(tab) {
    SEARCH
 ══════════════════════════════════════════ */
 function onSearchInput(input) {
-  const clearBtn = document.getElementById('searchClear');
-  clearBtn.style.display = input.value ? 'block' : 'none';
+  document.getElementById('searchClear').style.display = input.value ? 'block' : 'none';
   renderTable();
 }
-
 function clearSearch() {
   const input = document.getElementById('patientSearch');
   input.value = '';
@@ -1477,29 +1666,25 @@ function clearSearch() {
 ══════════════════════════════════════════ */
 function toggleFilterStrip() {
   const strip = document.getElementById('filterStrip');
-  const btn   = document.getElementById('filterToggleBtn');
-  const open  = strip.classList.toggle('open');
+  const btn = document.getElementById('filterToggleBtn');
+  const open = strip.classList.toggle('open');
   btn.classList.toggle('active', open);
   btn.setAttribute('aria-expanded', String(open));
 }
-
 function setStatusFilter(el, val) {
   statusFilter = val;
   document.querySelectorAll('[data-filter-status]').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
   renderTable();
 }
-
 function setLogFilter(el, val) {
   logFilter = val;
   document.querySelectorAll('[data-filter-log]').forEach(c => c.classList.remove('active'));
   if (el) el.classList.add('active');
   renderTable();
 }
-
 function clearFilters() {
-  statusFilter = 'all';
-  logFilter    = 'all';
+  statusFilter = 'all'; logFilter = 'all';
   document.getElementById('patientSearch').value = '';
   document.getElementById('searchClear').style.display = 'none';
   document.querySelectorAll('[data-filter-status]').forEach(c =>
@@ -1510,28 +1695,23 @@ function clearFilters() {
   showToast('All filters cleared', 'ok');
 }
 
-function applyFilters() { renderTable(); }
-
 /* ══════════════════════════════════════════
    SORT
 ══════════════════════════════════════════ */
 function toggleSort(key) {
   if (sortKey === key) { sortDir = sortDir === 1 ? -1 : 1; }
   else { sortKey = key; sortDir = 1; }
-
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  const map = { name:'sortNameBtn', risk:'sortRiskBtn', mood:'sortMoodBtn' };
+  const map = { name: 'sortNameBtn', risk: 'sortRiskBtn', mood: 'sortMoodBtn' };
   const btn = document.getElementById(map[key]);
   if (btn) btn.classList.add('active');
-
   const arrow = document.getElementById('arrow-name');
   if (arrow) arrow.textContent = (key === 'name') ? (sortDir === 1 ? '↑' : '↓') : '↕';
-
   renderTable();
 }
 
 /* ══════════════════════════════════════════
-   SLIDE-OVER PATIENT DRAWER
+   SLIDE-OVER DRAWER
 ══════════════════════════════════════════ */
 function openSlideOver(id) {
   const p = PATIENTS.find(x => x.id === id);
@@ -1539,15 +1719,15 @@ function openSlideOver(id) {
 
   const av = document.getElementById('soAvatar');
   av.style.background = p.avatarBg;
-  av.style.color       = p.avatarColor;
-  av.textContent       = p.initials;
+  av.style.color = p.avatarColor;
+  av.textContent = p.initials;
 
   document.getElementById('soName').innerHTML =
     p.name + (p.crisis ? ' <span class="crisis-badge">CRISIS</span>' : '');
   document.getElementById('soSince').textContent =
-    p.since + ' of treatment · Age ' + p.age + ' · ' + p.city;
+    p.since + ' of treatment · ' + p.therapySince;
 
-  const moodPct   = ((p.mood - 1) / 9 * 100).toFixed(0);
+  const moodPct = ((p.mood - 1) / 9 * 100).toFixed(0);
   const moodColor = p.mood <= 3 ? '#ef4444' : p.mood <= 6 ? '#f59e0b' : '#22c55e';
 
   document.getElementById('soBody').innerHTML = `
@@ -1556,39 +1736,27 @@ function openSlideOver(id) {
         <i class="ti ti-alert-triangle" style="font-size:16px;color:var(--danger);flex-shrink:0;margin-top:1px"></i>
         <div style="font-size:12px;color:#991b1b;line-height:1.65;font-weight:500">${p.crisisNote}</div>
       </div>` : ''}
-
     <div class="so-card">
-      <div class="so-section">Baseline Information</div>
+      <div class="so-section">Patient Information</div>
       <div class="so-row"><i class="ti ti-calendar"></i><span>In therapy since: <strong>${p.therapySince}</strong></span></div>
-      <div class="so-row"><i class="ti ti-map-pin"></i><span>Location: <strong>${p.city}</strong></span></div>
       <div class="so-row"><i class="ti ti-target"></i><span>Primary trigger: <strong>${p.primaryTrigger}</strong></span></div>
-      <div class="so-row"><i class="ti ti-heart"></i><span>Top coping strategy: <strong>${p.copingTop}</strong></span></div>
-      <div class="so-row"><i class="ti ti-notebook"></i><span>Last journal entry: <strong>${p.lastEntryFull}</strong></span></div>
+      <div class="so-row"><i class="ti ti-notebook"></i><span>Last entry: <strong>${p.lastEntryFull}</strong></span></div>
     </div>
-
     <div class="so-card">
       <div class="so-section">Current Mood Score</div>
       <div style="display:flex;align-items:center;gap:13px;margin-bottom:8px">
         <div style="font-size:34px;font-weight:800;color:${moodColor};letter-spacing:-.03em">${p.mood}</div>
         <div style="flex:1">
-          <div class="mood-meter">
-            <div class="mood-meter-fill" style="width:${moodPct}%;background:${moodColor}"></div>
-          </div>
+          <div class="mood-meter"><div class="mood-meter-fill" style="width:${moodPct}%;background:${moodColor}"></div></div>
           <div style="font-size:12px;color:var(--text-3);margin-top:4px">${p.moodLabel} — out of 10</div>
         </div>
       </div>
     </div>
-
     <div class="so-card">
       <div class="so-section">Active Triggers</div>
       <div class="so-tags">
         ${p.triggers.map(t => `<span class="so-tag ${p.crisis ? 'so-tag-r' : p.mood <= 5 ? 'so-tag-m' : 'so-tag-g'}">${t}</span>`).join('')}
       </div>
-    </div>
-
-    <div class="so-card">
-      <div class="so-section">Treatment Goals</div>
-      <div style="font-size:13px;color:var(--text-2);line-height:1.7">${p.goals}</div>
     </div>
   `;
 
@@ -1599,20 +1767,18 @@ function openSlideOver(id) {
     <button class="so-btn so-btn-ghost" onclick="openReview('${p.id}')">
       <i class="ti ti-notebook"></i>Review Journal
     </button>
-    ${p.crisis ? `
-      <button class="so-btn so-btn-danger" onclick="triggerCrisisProtocol('${p.id}')">
-        <i class="ti ti-alert-triangle"></i>Crisis Protocol
-      </button>` : `
-      <button class="so-btn so-btn-ghost" onclick="assignResource('${p.id}')">
-        <i class="ti ti-books"></i>Assign Resource
-      </button>`
-    }
+    ${p.crisis
+      ? `<button class="so-btn so-btn-danger" onclick="showToast('Emergency protocol initiated for ${p.name}. Notifications sent.','err')">
+          <i class="ti ti-alert-triangle"></i>Crisis Protocol
+        </button>`
+      : `<button class="so-btn so-btn-ghost" onclick="openReview('${p.id}')">
+          <i class="ti ti-books"></i>Assign Resource
+        </button>`}
   `;
 
   document.getElementById('overlay').classList.add('open');
   document.getElementById('slideOver').classList.add('open');
   document.body.style.overflow = 'hidden';
-  document.getElementById('slideOver').focus();
 }
 
 function closeSlideOver() {
@@ -1633,29 +1799,16 @@ function openMessage(id) {
   setTimeout(() => { window.location.href = 'therapist_messages.html'; }, 900);
 }
 
-function triggerCrisisProtocol(id) {
-  const p = PATIENTS.find(x => x.id === id);
-  showToast('Emergency protocol initiated for ' + (p ? p.name : 'patient') + '. Notifications sent.', 'err');
-}
-
-function assignResource(id) {
-  const p = PATIENTS.find(x => x.id === id);
-  showToast('Opening resource assignment for ' + (p ? p.name : 'patient') + '…', 'ok');
-  setTimeout(() => { window.location.href = 'therapist_resources.html'; }, 900);
-}
-
 /* ══════════════════════════════════════════
    NOTIFICATIONS
 ══════════════════════════════════════════ */
 function toggleNotifications() {
   notifsOpen = !notifsOpen;
   const dropdown = document.getElementById('notifDropdown');
-  const btn      = document.getElementById('notifBtn');
+  const btn = document.getElementById('notifBtn');
   dropdown.classList.toggle('open', notifsOpen);
   btn.setAttribute('aria-expanded', String(notifsOpen));
-
   if (notifsOpen) {
-    // Hide count badge when dropdown opens
     setTimeout(clearBadge, 500);
     document.addEventListener('click', outsideNotifHandler, true);
   } else {
@@ -1680,22 +1833,24 @@ function clearBadge() {
   badge.classList.add('hidden');
 }
 
-function ndRead(item) {
+async function ndRead(item, notifId) {
   item.classList.remove('unread');
   const dot = item.querySelector('.nd-unread-dot');
   if (dot) { dot.style.opacity = '0'; dot.style.transform = 'scale(0)'; }
-
   const unread = document.querySelectorAll('.nd-item.unread').length;
-  const badge  = document.getElementById('notifBadge');
-  if (unread === 0) {
-    badge.classList.add('hidden');
-  } else {
-    badge.textContent = unread;
-    badge.classList.remove('hidden');
+  const badge = document.getElementById('notifBadge');
+  if (unread === 0) { badge.classList.add('hidden'); }
+  else { badge.textContent = unread; badge.classList.remove('hidden'); }
+  // Mark read in Supabase
+  if (notifId) {
+    supaFetch(`notifications?notification_id=eq.${notifId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_read: true, read_at: new Date().toISOString() })
+    }).catch(() => {});
   }
 }
 
-function clearAllNotifs() {
+async function clearAllNotifs() {
   document.querySelectorAll('.nd-item').forEach(item => {
     item.classList.remove('unread');
     const dot = item.querySelector('.nd-unread-dot');
@@ -1703,20 +1858,25 @@ function clearAllNotifs() {
   });
   clearBadge();
   showToast('All notifications marked as read', 'ok');
+  if (currentUser) {
+    supaFetch(`notifications?user_id=eq.${currentUser.user_id}&is_read=eq.false`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_read: true, read_at: new Date().toISOString() })
+    }).catch(() => {});
+  }
 }
 
 /* ══════════════════════════════════════════
    TOAST
 ══════════════════════════════════════════ */
 function showToast(msg, type = 'ok') {
-  const t  = document.getElementById('toast');
+  const t = document.getElementById('toast');
   const ic = document.getElementById('toastIcon');
   const ms = document.getElementById('toastMsg');
   ms.textContent = msg;
   t.className = 'toast t-' + type + ' show';
-  ic.className = type === 'ok'   ? 'ti ti-circle-check'
-               : type === 'warn' ? 'ti ti-alert-triangle'
-               :                   'ti ti-alert-circle';
+  ic.className = type === 'ok' ? 'ti ti-circle-check'
+    : type === 'warn' ? 'ti ti-alert-triangle' : 'ti ti-alert-circle';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3600);
 }
@@ -1740,15 +1900,13 @@ document.addEventListener('keydown', e => {
    INIT
 ══════════════════════════════════════════ */
 (function init() {
-  // Set live date/time in topbar
   const now = new Date();
   const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const dateStr = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
   const el = document.getElementById('topbarDate');
-  if (el) el.textContent = dateStr + ' · 4 sessions today';
-
-  renderTable();
+  if (el) el.textContent = dateStr;
+  loadDashboard();
 })();
 </script>
 </body>

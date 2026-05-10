@@ -75,6 +75,7 @@ body { font-family: 'Quicksand', sans-serif; background: var(--cream); color: va
 .sb-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#f4a982,#f7c5a0); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #2d4a38; }
 .sb-uname { font-size: 13px; font-weight: 700; color: #fff; }
 .sb-role { font-size: 11px; color: rgba(255,255,255,.35); }
+.nav-badge { display: none !important; }
 
 /* ── MAIN ── */
 .main { margin-left: 240px; flex: 1; }
@@ -351,13 +352,13 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
       <div class="nav-section">Account</div>
       <a href="patient_profile.html"      class="nav-item active"><i class="ti ti-user-circle"></i>My Profile</a>
       <a href="patient_settings.html"     class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-      <a href="1_login_register.html"     class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
+      <a href="1_login_register.html"     class="nav-item" onclick="localStorage.clear()"><i class="ti ti-logout"></i>Sign Out</a>
     </div>
     <div class="sb-foot">
       <a href="patient_profile.html" class="sb-user">
-        <div class="sb-avatar" id="sbAvatarInitials">SA</div>
+        <div class="sb-avatar" id="sbAvatarInitials">?</div>
         <div>
-          <div class="sb-uname" id="sbDisplayName">Sara Ahmed</div>
+          <div class="sb-uname" id="sbDisplayName"><span id="sbUname">Loading...</span></div>
           <div class="sb-role">Patient · Week 12</div>
         </div>
       </a>
@@ -385,15 +386,15 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
       <!-- ── HERO ── -->
       <div class="profile-hero">
         <div class="hero-avatar">
-          <span id="heroInitials">SA</span>
+          <span id="heroInitials">?</span>
           <div class="avatar-edit" title="Change photo"><i class="ti ti-pencil"></i></div>
         </div>
         <div class="hero-info">
-          <div class="hero-name" id="heroName">Sara Ahmed</div>
+          <div class="hero-name" id="heroName">Loading...</div>
           <div class="hero-meta">
             <span class="hero-tag"><i class="ti ti-id-badge"></i> Patient #P-0042</span>
-            <span class="hero-tag"><i class="ti ti-calendar"></i> Member since Jan 2024</span>
-            <span class="hero-tag"><i class="ti ti-map-pin"></i><span id="heroLocation">Seattle, WA</span></span>
+            <span class="hero-tag"><i class="ti ti-calendar"></i> Member since <span id="memberSince">—</span></span>
+            <span class="hero-tag"><i class="ti ti-map-pin"></i><span id="heroLocation"></span></span>
           </div>
         </div>
         <div class="wellness-score">
@@ -413,35 +414,35 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
             <div class="field-row">
               <div class="field">
                 <label>First Name</label>
-                <input type="text" id="firstName" value="Sara" oninput="markUnsaved()"/>
+                <input type="text" id="firstName" id="firstName" value="" oninput="markUnsaved()"/>
               </div>
               <div class="field">
                 <label>Last Name</label>
-                <input type="text" id="lastName" value="Ahmed" oninput="markUnsaved()"/>
+                <input type="text" id="lastName" value="" oninput="markUnsaved()"/>
               </div>
             </div>
             <div class="field">
               <label>Email Address</label>
-              <input type="email" id="email" value="sara.ahmed@email.com" oninput="markUnsaved()"/>
+              <input type="email" id="email" value="" id="emailField" oninput="markUnsaved()"/>
             </div>
             <div class="field-row">
               <div class="field">
                 <label>Phone</label>
-                <input type="tel" id="phone" value="+1 (206) 555-0182" oninput="markUnsaved()"/>
+                <input type="tel" id="phone" value="" oninput="markUnsaved()"/>
               </div>
               <div class="field">
                 <label>Date of Birth</label>
-                <input type="date" value="1994-07-15" onchange="markUnsaved()"/>
+                <input type="date" id="dobField" value="" onchange="markUnsaved()"/>
               </div>
             </div>
             <div class="field-row">
               <div class="field">
                 <label>Gender Identity</label>
-                <select onchange="markUnsaved()">
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option selected>Non-binary</option>
-                  <option>Prefer not to say</option>
+                <select id="genderField" onchange="markUnsaved()">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Non-binary">Non-binary</option>
+                  <option value="Prefer not to say">Prefer not to say</option>
                 </select>
               </div>
               <div class="field">
@@ -456,22 +457,22 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
             <div class="field-row">
               <div class="field">
                 <label>City</label>
-                <input type="text" id="city" value="Seattle" oninput="markUnsaved()"/>
+                <input type="text" id="city" value="" oninput="markUnsaved()"/>
               </div>
               <div class="field">
                 <label>State / Region</label>
-                <input type="text" id="state" value="WA" oninput="markUnsaved()"/>
+                <input type="text" id="state" value="" id="state" oninput="markUnsaved()"/>
               </div>
             </div>
             <div class="field">
               <label>About Me (optional)</label>
-              <textarea id="bio" rows="3" oninput="markUnsaved()">I'm navigating anxiety related to work transitions and seeking tools for daily mindfulness.</textarea>
+              <textarea id="bio" rows="3" oninput="markUnsaved()"></textarea>
             </div>
           </div>
         </div>
 
         <div>
-          <div class="card" style="margin-bottom:18px">
+          <div class="card" id="therapistCard" style="margin-bottom:18px">
             <div class="card-header">
               <div class="card-title"><i class="ti ti-stethoscope"></i> My Assigned Therapist</div>
             </div>
@@ -519,7 +520,7 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
       </div>
 
       <!-- ── EMERGENCY CONTACTS ── -->
-      <div class="card section-full">
+      <div class="card section-full" id="emergencyContactsCard">
         <div class="card-header">
           <div class="card-title">
             <i class="ti ti-urgent"></i> Emergency Contacts
@@ -722,10 +723,117 @@ function saveProfile() {
 //  CONTACT HELPERS
 // ═══════════════════════════════════════
 function editContacts() {
-  showToast('Edit contacts', 'Contact editor would open in a modal here.', 'ti-pencil');
+  showToast('Edit contacts', 'Click the pencil icon on each contact to edit.', 'ti-pencil');
 }
+
+// ── CONTACT MODAL ──────────────────────────────────────────
 function addContact() {
-  showToast('Add contact', 'New emergency contact dialog coming soon.', 'ti-user-plus');
+  // Remove any existing modal
+  const existing = document.getElementById('contactModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'contactModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px';
+  modal.innerHTML = `
+    <div style="background:var(--warm-white);border-radius:18px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div style="font-size:16px;font-weight:700;color:var(--text-1)"><i class="ti ti-user-heart" style="color:var(--peach-d);margin-right:6px"></i>Add Emergency Contact</div>
+        <button onclick="document.getElementById('contactModal').remove()" style="width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text-2)">×</button>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Full Name</label>
+        <input id="cc_name" type="text" placeholder="e.g. Ali Khan" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-1);background:var(--cream);outline:none"/>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Relationship</label>
+        <select id="cc_rel" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-1);background:var(--cream);outline:none;appearance:none">
+          <option>Parent</option><option>Spouse / Partner</option><option>Sibling</option>
+          <option>Friend</option><option>Guardian</option><option>Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Phone Number</label>
+        <input id="cc_phone" type="tel" placeholder="e.g. +92 300 123 4567" style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Quicksand',sans-serif;font-weight:600;color:var(--text-1);background:var(--cream);outline:none"/>
+      </div>
+      <button onclick="saveContact()" style="width:100%;padding:11px;background:var(--peach-d);color:#fff;border:none;border-radius:10px;font-size:14px;font-family:'Quicksand',sans-serif;font-weight:700;cursor:pointer">
+        <i class="ti ti-plus"></i> Save Contact
+      </button>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  setTimeout(() => document.getElementById('cc_name').focus(), 100);
+}
+
+function saveContact() {
+  const name  = document.getElementById('cc_name').value.trim();
+  const rel   = document.getElementById('cc_rel').value;
+  const phone = document.getElementById('cc_phone').value.trim();
+  if (!name || !phone) { alert('Please enter both name and phone number.'); return; }
+
+  // Save to localStorage
+  const contacts = JSON.parse(localStorage.getItem('emergency_contacts') || '[]');
+  contacts.push({ name, rel, phone });
+  localStorage.setItem('emergency_contacts', JSON.stringify(contacts));
+
+  document.getElementById('contactModal').remove();
+  renderContactsList();
+  showToast('Contact saved!', `${name} added as emergency contact.`, 'ti-circle-check');
+}
+
+function deleteContact(index) {
+  const contacts = JSON.parse(localStorage.getItem('emergency_contacts') || '[]');
+  contacts.splice(index, 1);
+  localStorage.setItem('emergency_contacts', JSON.stringify(contacts));
+  renderContactsList();
+  showToast('Contact removed', '', 'ti-trash');
+}
+
+function renderContactsList() {
+  const card = document.getElementById('emergencyContactsCard');
+  if (!card) return;
+  const contacts = JSON.parse(localStorage.getItem('emergency_contacts') || '[]');
+
+  let contactsHTML = '';
+  if (contacts.length === 0) {
+    contactsHTML = `
+      <div style="text-align:center;padding:20px 0;color:var(--text-3)">
+        <i class="ti ti-user-off" style="font-size:28px;display:block;margin-bottom:8px;opacity:.4"></i>
+        <div style="font-size:13px;font-weight:600">No emergency contacts added yet</div>
+        <div style="font-size:12px;margin-top:4px;line-height:1.5">Add someone who should be contacted in a mental health crisis.</div>
+      </div>`;
+  } else {
+    contacts.forEach((c, i) => {
+      contactsHTML += `
+        <div class="contact-card">
+          <div class="cc-icon"><i class="ti ti-user-heart"></i></div>
+          <div>
+            <div class="cc-name">${c.name}</div>
+            <div class="cc-rel">${c.rel}</div>
+            <div class="cc-phone"><i class="ti ti-phone"></i> ${c.phone}</div>
+          </div>
+          <div class="cc-actions">
+            <button class="cc-btn" title="Remove" onclick="deleteContact(${i})" style="color:#dc2626;border-color:#fca5a5"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>`;
+    });
+  }
+
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-title">
+        <i class="ti ti-urgent"></i> Emergency Contacts
+        <span style="font-size:11px;background:#fee2e2;color:#dc2626;padding:2px 9px;border-radius:20px;font-weight:700">Critical for Crisis</span>
+      </div>
+    </div>
+    <div class="card-body">
+      ${contactsHTML}
+      <button class="add-contact-btn" onclick="addContact()"><i class="ti ti-plus"></i> Add Emergency Contact</button>
+      <p style="font-size:11px;color:var(--text-3);margin-top:10px;padding:8px 12px;background:var(--peach-soft);border-radius:8px;line-height:1.6">
+        <i class="ti ti-info-circle" style="font-size:13px;vertical-align:middle;color:var(--peach-d)"></i>
+        Your emergency contacts will only be reached during a crisis situation as determined by your care team.
+      </p>
+    </div>`;
 }
 
 // ═══════════════════════════════════════
@@ -754,6 +862,213 @@ function showToast(title, sub, icon = 'ti-circle-check') {
 window.addEventListener('beforeunload', e => {
   if (_unsaved) { e.preventDefault(); e.returnValue = ''; }
 });
+</script>
+
+<script>
+(function() {
+  try {
+    const SUPABASE_URL = "https://pjernwhcerujrfczodpq.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU";
+
+    const raw = localStorage.getItem('mh_user');
+    if (!raw) { window.location.href = '1_login_register.html'; return; }
+    const user = JSON.parse(raw);
+    const isDemoAccount = ['sara@mhjournal.com','admin@mhjournal.com','imran@mhjournal.com','ali@mhjournal.com'].includes((user.email||'').toLowerCase());
+
+    const name = user.full_name || 'User';
+    const parts = name.trim().split(' ');
+    const firstName = parts[0] || '';
+    const lastName = parts.slice(1).join(' ') || '';
+    const initials = ((firstName[0]||'') + (lastName[0]||'')).toUpperCase() || '?';
+
+    // Sidebar name & initials
+    const sbUname = document.getElementById('sbUname');
+    if (sbUname) sbUname.textContent = name;
+    const sbAvi = document.getElementById('sbAvatarInitials');
+    if (sbAvi) sbAvi.textContent = initials;
+
+    // Hero name & initials
+    const heroName = document.getElementById('heroName');
+    if (heroName) heroName.textContent = name;
+    const heroInit = document.getElementById('heroInitials');
+    if (heroInit) heroInit.textContent = initials;
+
+    // Helper: format "Jan 2024" from ISO date string
+    function formatMemberSince(isoDate) {
+      if (!isoDate) return null;
+      const d = new Date(isoDate);
+      if (isNaN(d)) return null;
+      return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+    }
+
+    // Helper: fill all form fields from a data object
+    function fillFields(data) {
+      const fn = document.getElementById('firstName');       if (fn) fn.value = data.firstName || '';
+      const ln = document.getElementById('lastName');        if (ln) ln.value = data.lastName  || '';
+      const ef = document.getElementById('emailField') || document.getElementById('email');
+                                                             if (ef) ef.value = data.email     || '';
+      const ph = document.getElementById('phone');          if (ph) ph.value = data.phone     || '';
+      const db = document.getElementById('dobField');
+      if (db && data.dob) db.value = data.dob; // expects YYYY-MM-DD
+      const gf = document.getElementById('genderField');
+      if (gf && data.gender) {
+        // match option value case-insensitively
+        Array.from(gf.options).forEach(opt => {
+          if (opt.value.toLowerCase() === data.gender.toLowerCase()) opt.selected = true;
+        });
+      }
+      const ci = document.getElementById('city');           if (ci && data.city)  ci.value = data.city;
+      const st = document.getElementById('state');          if (st && data.state) st.value = data.state;
+      const bi = document.getElementById('bio');            if (bi && data.bio)   bi.value = data.bio;
+      const loc = document.getElementById('heroLocation');
+      if (loc) loc.textContent = [data.city, data.state].filter(Boolean).join(', ');
+      const ms = document.getElementById('memberSince');
+      if (ms && data.createdAt) ms.textContent = formatMemberSince(data.createdAt) || '—';
+    }
+
+    if (isDemoAccount) {
+      // Demo — show Sara's full data
+      if (heroName) heroName.textContent = 'Sara Ahmed';
+      if (heroInit) heroInit.textContent = 'SA';
+      if (sbUname) sbUname.textContent = 'Sara Ahmed';
+      if (sbAvi) sbAvi.textContent = 'SA';
+      fillFields({
+        firstName: 'Sara', lastName: 'Ahmed',
+        email: user.email,
+        phone: '+92 300 555-0182',
+        dob: '1994-07-15',
+        gender: 'Female',
+        city: 'Islamabad', state: 'ICT',
+        bio: "I'm navigating anxiety related to work transitions and seeking tools for daily mindfulness.",
+        createdAt: '2024-01-10'
+      });
+      const ms = document.getElementById('memberSince');
+      if (ms) ms.textContent = 'Jan 2024';
+
+      // Demo: show Sara's hardcoded emergency contacts
+      const ecCard = document.getElementById('emergencyContactsCard');
+      if (ecCard) {
+        ecCard.innerHTML = `
+          <div class="card-header">
+            <div class="card-title">
+              <i class="ti ti-urgent"></i> Emergency Contacts
+              <span style="font-size:11px;background:#fee2e2;color:#dc2626;padding:2px 9px;border-radius:20px;font-weight:700">Critical for Crisis</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="contact-card">
+              <div class="cc-icon"><i class="ti ti-user-heart"></i></div>
+              <div>
+                <div class="cc-name">Jordan Ahmed</div>
+                <div class="cc-rel">Spouse · Primary Contact</div>
+                <div class="cc-phone"><i class="ti ti-phone"></i> +92 300 555-0291</div>
+              </div>
+              <div class="cc-actions">
+                <button class="cc-btn" title="Call"><i class="ti ti-phone"></i></button>
+                <button class="cc-btn" title="Edit"><i class="ti ti-pencil"></i></button>
+                <button class="cc-btn" title="Remove" style="color:#dc2626;border-color:#fca5a5"><i class="ti ti-trash"></i></button>
+              </div>
+            </div>
+            <div class="contact-card">
+              <div class="cc-icon"><i class="ti ti-user-heart"></i></div>
+              <div>
+                <div class="cc-name">Fatima Ahmed</div>
+                <div class="cc-rel">Mother · Secondary Contact</div>
+                <div class="cc-phone"><i class="ti ti-phone"></i> +92 300 555-0143</div>
+              </div>
+              <div class="cc-actions">
+                <button class="cc-btn" title="Call"><i class="ti ti-phone"></i></button>
+                <button class="cc-btn" title="Edit"><i class="ti ti-pencil"></i></button>
+                <button class="cc-btn" title="Remove" style="color:#dc2626;border-color:#fca5a5"><i class="ti ti-trash"></i></button>
+              </div>
+            </div>
+            <button class="add-contact-btn" onclick="addContact()"><i class="ti ti-plus"></i> Add Emergency Contact</button>
+          </div>`;
+      }
+
+    } else {
+      // New user — fill what we have from localStorage first
+      fillFields({
+        firstName,
+        lastName,
+        email:    user.email || '',
+        dob:      user.date_of_birth || '',
+        gender:   user.gender || '',
+        createdAt: user.created_at || ''
+      });
+
+      // Show "Complete your profile" badge if no DOB yet
+      if (!user.date_of_birth) {
+        if (heroName) heroName.innerHTML = name + ' <span style="font-size:13px;background:rgba(244,169,130,.2);color:#f4a982;padding:2px 10px;border-radius:20px;font-weight:600;vertical-align:middle">Complete your profile ✨</span>';
+      }
+
+      // Hide therapist card — new user has no assigned therapist yet
+      const therapistCard = document.getElementById('therapistCard');
+      if (therapistCard) {
+        therapistCard.innerHTML = `
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-stethoscope"></i> My Assigned Therapist</div>
+          </div>
+          <div class="card-body">
+            <div style="text-align:center;padding:20px 16px">
+              <div style="width:48px;height:48px;border-radius:50%;background:var(--sage-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+                <i class="ti ti-user-off" style="font-size:22px;color:var(--sage-d)"></i>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:6px">No therapist assigned yet</div>
+              <div style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:14px">Book your first appointment to be matched with a therapist.</div>
+              <a href="5_appointments.html" style="display:inline-flex;align-items:center;gap:6px;background:var(--sage-d);color:#fff;text-decoration:none;padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;font-family:'Quicksand',sans-serif">
+                <i class="ti ti-calendar-plus"></i> Book Appointment
+              </a>
+            </div>
+          </div>`;
+      }
+
+      // New user: load contacts from localStorage (their own saved ones)
+      renderContactsList();
+
+      // Then fetch fresh data from Supabase to get created_at, DOB, gender
+      if (user.email) {
+        fetch(`${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(user.email)}&select=user_id,full_name,date_of_birth,gender,created_at`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (!data || data.length === 0) return;
+          const row = data[0];
+
+          // Update localStorage with fresh data
+          const updated = { ...user,
+            user_id:       row.user_id       || user.user_id,
+            date_of_birth: row.date_of_birth || user.date_of_birth,
+            gender:        row.gender        || user.gender,
+            created_at:    row.created_at    || user.created_at
+          };
+          localStorage.setItem('mh_user', JSON.stringify(updated));
+
+          // Fill DOB
+          const db = document.getElementById('dobField');
+          if (db && row.date_of_birth) db.value = row.date_of_birth;
+
+          // Fill gender
+          const gf = document.getElementById('genderField');
+          if (gf && row.gender) {
+            Array.from(gf.options).forEach(opt => {
+              if (opt.value.toLowerCase() === row.gender.toLowerCase()) opt.selected = true;
+            });
+          }
+
+          // Fill member since from created_at
+          const ms = document.getElementById('memberSince');
+          if (ms && row.created_at) {
+            ms.textContent = formatMemberSince(row.created_at) || '—';
+          }
+        })
+        .catch(err => console.warn('Supabase fetch error:', err));
+      }
+    }
+
+  } catch(e) { console.error('User load error:', e); }
+})();
 </script>
 </body>
 </html>

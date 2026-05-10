@@ -55,7 +55,7 @@
   .icon-btn:hover{background:#edeae3}
   .icon-btn i{font-size:18px}
   .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:1.5px solid var(--surface)}
-
+  .nav-badge { display: none !important; }
   /* HERO BANNER */
   .hero{background:linear-gradient(135deg,var(--accent-d),var(--accent));border-radius:16px;padding:28px 32px;color:#fff;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;overflow:hidden;position:relative}
   .hero::after{content:'🌿';position:absolute;right:100px;top:10px;font-size:80px;opacity:.15;pointer-events:none}
@@ -286,12 +286,12 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
     <div class="nav-section">Account</div>
     <a href="#" class="nav-item"><i class="ti ti-user-circle"></i>My Profile</a>
     <a href="#" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-    <a href="1_login_register.html" class="nav-item"><i class="ti ti-logout"></i>Sign Out</a>
+    <a href="1_login_register.html" class="nav-item" onclick="localStorage.clear()"><i class="ti ti-logout"></i>Sign Out</a>
   </nav>
   <div class="sb-foot">
     <div class="sb-user">
       <div class="sb-avatar">SA</div>
-      <div><div class="sb-uname">Sara Ahmed</div><div class="sb-role">Patient · Week 12</div></div>
+      <div><div class="sb-uname"><span id="sbUname">Loading...</span></div><div class="sb-role">Patient · Week 12</div></div>
     </div>
   </div>
 </aside>
@@ -536,6 +536,26 @@ function playAudio(btn,idx){
   let pct=parseFloat(fill.style.width)||0;
   audioStates[idx]=setInterval(()=>{pct+=0.3;fill.style.width=pct+'%';if(pct>=100){clearInterval(audioStates[idx]);audioStates[idx]=null;btn.innerHTML='<i class="ti ti-player-play-filled"></i>';fill.style.width='0%'}},100);
 }
+</script>
+
+<script>
+(function() {
+  try {
+    const raw = localStorage.getItem('mh_user');
+    if (!raw) { window.location.href = '1_login_register.html'; return; }
+    const user = JSON.parse(raw);
+    const name = user.full_name || 'User';
+    const parts = name.trim().split(' ');
+    const initials = ((parts[0]||'')[0]||'').toUpperCase() + ((parts[1]||'')[0]||'').toUpperCase() || '?';
+
+    const sbUname = document.getElementById('sbUname');
+    if (sbUname) sbUname.textContent = name;
+    ['sbAvatarInitials','sbInitials'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = initials;
+    });
+  } catch(e) { console.error('User load error:', e); }
+})();
 </script>
 </body>
 </html>

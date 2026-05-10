@@ -293,13 +293,13 @@ html.dark code{background:rgba(124,58,237,.15)!important;color:#c4b5fd!important
 
     <div class="sb-foot">
       <div class="sb-user">
-        <div class="sb-avatar">AD</div>
-        <div><div class="sb-uname">Admin User</div><div class="sb-role">Super Administrator</div></div>
+        <div class="sb-avatar" id="sbAvatarInitials">AD</div>
+        <div><div class="sb-uname" id="sbUname">Admin User</div><div class="sb-role">Super Administrator</div></div>
       </div>
       <div class="sb-foot-links">
         <a href="admin_profile.html" class="sb-foot-link"><i class="ti ti-user-circle"></i>Profile</a>
         <a href="admin_settings.html" class="sb-foot-link active-link"><i class="ti ti-settings"></i>Settings</a>
-        <a href="1_login_register.html" class="sb-foot-link"><i class="ti ti-logout"></i>Sign Out</a>
+        <button class="sb-foot-link" data-action="signout"><i class="ti ti-logout"></i>Sign Out</button>
       </div>
     </div>
   </aside>
@@ -1219,6 +1219,28 @@ window.addEventListener('beforeunload', e => {
 //  INIT — sync all range slider gradients on load
 // ═══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  // AUTH
+  (function initAuth() {
+    const session = JSON.parse(localStorage.getItem('mh_user') || 'null');
+    if (!session || session.role !== 'admin') {
+      localStorage.removeItem('mh_user');
+      window.location.href = '1_login_register.html';
+      return;
+    }
+    const initials = session.full_name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const sbAv = document.getElementById('sbAvatarInitials');
+    const sbUn = document.getElementById('sbUname');
+    if (sbAv) sbAv.textContent = initials;
+    if (sbUn) sbUn.textContent = session.full_name;
+  })();
+
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-action="signout"]')) {
+      localStorage.removeItem('mh_user');
+      window.location.href = '1_login_register.html';
+    }
+  });
+
   // Sync dark mode toggle state from localStorage
   const isDark = localStorage.getItem('theme') === 'dark';
   const toggle = document.getElementById('darkModeToggle');

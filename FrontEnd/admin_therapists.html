@@ -238,12 +238,12 @@ html.dark .icon-btn:hover{background:#1e293b}
     <div class="nav-section">Account</div>
     <a href="admin_profile.html" class="nav-item"><i class="ti ti-user-circle"></i>Admin Profile</a>
     <a href="admin_settings.html" class="nav-item"><i class="ti ti-settings"></i>Settings</a>
-    <a href="1_login_register.html" class="nav-item" style="margin-top:auto"><i class="ti ti-logout"></i>Sign Out</a>
+    <a href="1_login_register.html" class="nav-item" style="margin-top:auto" data-action="signout"><i class="ti ti-logout"></i>Sign Out</a>
   </nav>
   <div class="sb-foot">
     <div class="sb-user">
-      <div class="sb-avatar">SA</div>
-      <div><div class="sb-uname">System Admin</div><div class="sb-role">Super Administrator</div></div>
+      <div class="sb-avatar" id="sbAvatarInitials">AD</div>
+      <div><div class="sb-uname" id="sbUname">Admin User</div><div class="sb-role">Super Administrator</div></div>
     </div>
   </div>
 </aside>
@@ -433,7 +433,88 @@ html.dark .icon-btn:hover{background:#1e293b}
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="t-icon"></i><span id="t-msg">Done</span></div>
 
 <script>
-function filterTable(q){document.querySelectorAll('#therapist-body tr').forEach(r=>{r.style.display=r.dataset.name.toLowerCase().includes(q.toLowerCase())?'':'none'})}
+// =====================================================================
+// SUPABASE CONFIG
+// =====================================================================
+const SUPABASE_URL = 'https://pjernwhcerujrfczodpq.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU';
+async function supaFetch(endpoint, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+    ...options,
+    headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,...options.headers }
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`${res.status}: ${t}`); }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+// AUTH
+(function initAuth() {
+  const session = JSON.parse(localStorage.getItem('mh_user') || 'null');
+  if (!session || session.role !== 'admin') { localStorage.removeItem('mh_user'); window.location.href = '1_login_register.html'; return; }
+  const initials = session.full_name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+  const sbAv = document.getElementById('sbAvatarInitials'); if (sbAv) sbAv.textContent = initials;
+  const sbUn = document.getElementById('sbUname'); if (sbUn) sbUn.textContent = session.full_name;
+})();
+
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-action="signout"]')) { localStorage.removeItem('mh_user'); window.location.href = '1_login_register.html'; }
+});
+
+// =====================================================================
+// LOAD THERAPISTS FROM SUPABASE
+// =====================================================================
+async function loadTherapists() {
+  try {
+    const therapists = await supaFetch('users?role=eq.therapist&select=user_id,full_name,email,created_at&order=created_at.desc');
+    const tbody = document.getElementById('therapist-body');
+    if (!tbody) return;
+
+    // Update stat cards
+    const totalEl = document.querySelector('.sc-val');
+    const allStatVals = document.querySelectorAll('.sc-val');
+    if (allStatVals[0]) allStatVals[0].textContent = therapists.length;
+    // Active count (all in users table treated as active)
+    if (allStatVals[1]) allStatVals[1].textContent = therapists.length;
+    if (allStatVals[2]) allStatVals[2].textContent = '0';
+    if (allStatVals[3]) allStatVals[3].textContent = '0';
+
+    // Get patient counts per therapist
+    let linkCounts = {};
+    try {
+      const links = await supaFetch('therapist_patient_link?select=therapist_id,patient_id&is_active=eq.true');
+      links.forEach(l => { linkCounts[l.therapist_id] = (linkCounts[l.therapist_id] || 0) + 1; });
+    } catch(e) { /* ignore if table empty */ }
+
+    tbody.innerHTML = therapists.map(t => {
+      const initials = (t.full_name||t.email).split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+      const uid = t.user_id;
+      const patients = linkCounts[uid] || 0;
+      const joined = t.created_at ? new Date(t.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+      return `<tr data-status="active" data-name="${(t.full_name||'').toLowerCase()} ${(t.email||'').toLowerCase()}">
+        <td><div class="doc-cell"><div class="doc-av" style="background:#dcfce7;color:#15803d">${initials}</div><div><div class="doc-name">${t.full_name||'—'}</div><div class="doc-id">${t.email}</div></div></div></td>
+        <td><div class="tag-wrap"><span class="spec-tag st-cbt">Therapist</span></div></td>
+        <td style="font-size:12px;color:var(--text-2);font-family:monospace">Joined ${joined}</td>
+        <td><strong>${patients}</strong> <span style="font-size:11px;color:var(--text-3)">active</span></td>
+        <td><span class="lic-badge lic-active"><i class="ti ti-circle-check"></i>Active</span></td>
+        <td>
+          <button class="act-btn" onclick="openDrawer('${(t.full_name||'').replace(/'/g,'\\'')}','${uid}','General','—','Active',${patients})"><i class="ti ti-eye"></i>View</button>
+          <button class="act-btn revoke" onclick="showToast('Suspension would be implemented here.','warn')"><i class="ti ti-ban"></i>Suspend</button>
+        </td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-3)">No therapists found.</td></tr>';
+
+    // Update pg row count
+    const pgRow = document.querySelector('.pg-row span');
+    if (pgRow) pgRow.textContent = `Showing ${therapists.length} therapist${therapists.length !== 1 ? 's' : ''}`;
+
+  } catch(err) {
+    showToast('Could not load therapists: ' + err.message, 'warn');
+    console.error(err);
+  }
+}
+
+function filterTable(q){document.querySelectorAll('#therapist-body tr').forEach(r=>{r.style.display=r.dataset.name?.toLowerCase().includes(q.toLowerCase())?'':'none'})}
 function filterByStatus(v){document.querySelectorAll('#therapist-body tr').forEach(r=>{r.style.display=(v==='all'||r.dataset.status===v)?'':'none'})}
 
 function approveLicense(btn,name){
@@ -472,6 +553,8 @@ function showToast(msg,type){
   t.className='toast t-'+type+' show';
   clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),3400);
 }
+
+loadTherapists();
 </script>
 </body>
 </html>
