@@ -371,158 +371,172 @@ const MSG_COLORS = [
 function msgColor(i){return MSG_COLORS[i%MSG_COLORS.length];}
 function msgInitials(name){return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
 
+/* ── INIT ── */
+const _mu = localStorage.getItem('mh_user');
+const _therapistUser = _mu ? JSON.parse(_mu) : {};
+const therapistId = _therapistUser.user_id;
+const therapistInitials = (_therapistUser.full_name||'T').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+let activeThread = null;  // stores numeric patient_id
+let pollInterval  = null;
+let toastTimer;
+
 /* ── LOAD THREADS FROM SUPABASE ── */
 async function loadThreads() {
-  const raw = localStorage.getItem('mh_user');
-  if (!raw) return;
-  const user = JSON.parse(raw);
-  const therapistId = user.user_id;
+  const list = document.getElementById('threadList');
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">Loading…</div>';
 
   try {
-    // Get linked patients
-    const links = await supaFetch(`therapist_patient_link?therapist_id=eq.${therapistId}&is_active=eq.true&select=patient_id`);
-    const patientIds = links.map(l => l.patient_id);
+    // 1. Linked patients for THIS therapist
+    const links = await supaFetch(
+      `therapist_patient_link?therapist_id=eq.${therapistId}&is_active=eq.true&select=patient_id`
+    );
+    const patientIds = (links || []).map(l => Number(l.patient_id));
 
     if (patientIds.length === 0) {
-      document.getElementById('threadList').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3)">No patients linked.</div>';
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3)">No patients linked yet.</div>';
       return;
     }
 
-    // Get patient names
-    const users = await supaFetch(`users?user_id=in.(${patientIds.join(',')})&select=user_id,full_name`);
+    // 2. Patient names
+    const usersData = await supaFetch(
+      `users?user_id=in.(${patientIds.join(',')})&select=user_id,full_name`
+    );
     const nameMap = {};
-    users.forEach(u => { nameMap[u.user_id] = u.full_name; });
+    (usersData || []).forEach(u => { nameMap[Number(u.user_id)] = u.full_name; });
 
-    // Get crisis flags
-    const crisisLogs = await supaFetch(`trigger_logs?user_id=in.(${patientIds.join(',')})&mood_score=lte.3&order=log_date.desc&select=user_id`);
-    const crisisSet = new Set(crisisLogs.map(l => l.user_id));
+    // 3. Crisis flags (low mood score)
+    let crisisSet = new Set();
+    try {
+      const crisisLogs = await supaFetch(
+        `trigger_logs?user_id=in.(${patientIds.join(',')})&mood_score=lte.3&select=user_id`
+      );
+      (crisisLogs || []).forEach(l => crisisSet.add(Number(l.user_id)));
+    } catch(e) { /* non-fatal */ }
 
-    // Get all messages involving these patients (sent or received)
+    // 4. Messages ONLY between this therapist and his/her patients
+    //    Use two separate simple queries to avoid complex OR syntax issues
     let allMsgs = [];
     try {
-      allMsgs = await supaFetch(
-        `messages?or=(sender_id.in.(${patientIds.join(',')}),receiver_id.in.(${patientIds.join(',')}))&order=created_at.asc&limit=500&select=id,sender_id,receiver_id,content,is_read,created_at`
+      // Messages sent BY the therapist TO any of his patients
+      const sent = await supaFetch(
+        `messages?sender_id=eq.${therapistId}&receiver_id=in.(${patientIds.join(',')})&order=created_at.asc&select=sender_id,receiver_id,content,is_read,created_at`
+      );
+      // Messages sent BY any patient TO the therapist
+      const received = await supaFetch(
+        `messages?receiver_id=eq.${therapistId}&sender_id=in.(${patientIds.join(',')})&order=created_at.asc&select=sender_id,receiver_id,content,is_read,created_at`
+      );
+      allMsgs = [...(sent || []), ...(received || [])].sort(
+        (a, b) => new Date(a.created_at) - new Date(b.created_at)
       );
     } catch(e) {
-      console.warn('messages fetch failed, showing threads without messages:', e);
-      allMsgs = [];
+      console.warn('messages fetch error (threads will show, no previews):', e);
     }
 
-    // Group messages by patient
+    // 5. Group messages by patient id
     const byPatient = {};
     allMsgs.forEach(m => {
-      const patientId = patientIds.includes(m.sender_id) ? m.sender_id : m.receiver_id;
-      if (!byPatient[patientId]) byPatient[patientId] = [];
-      byPatient[patientId].push(m);
+      // The patient is whichever side is NOT the therapist
+      const pid = Number(m.sender_id) === therapistId ? Number(m.receiver_id) : Number(m.sender_id);
+      if (!patientIds.includes(pid)) return;
+      if (!byPatient[pid]) byPatient[pid] = [];
+      byPatient[pid].push(m);
     });
 
-    // Build THREADS
-    THREADS = [];
-    patientIds.forEach((pid, i) => {
-      const msgs = (byPatient[pid] || []).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
-      const name = nameMap[pid] || 'Patient';
-      const col = msgColor(i);
-      const ini = msgInitials(name);
-      const isCrisis = crisisSet.has(pid);
-      const lastMsg = msgs.length > 0 ? msgs[msgs.length-1] : null;
-      const unread = msgs.filter(m => m.sender_id === pid && !m.is_read).length;
-
-      THREADS.push({
-        id: pid,
+    // 6. Build THREADS array
+    THREADS = patientIds.map((pid, i) => {
+      const msgs    = byPatient[pid] || [];
+      const name    = nameMap[pid] || 'Patient';
+      const col     = msgColor(i);
+      const ini     = msgInitials(name);
+      const crisis  = crisisSet.has(pid);
+      const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
+      const unread  = msgs.filter(m => Number(m.sender_id) === pid && !m.is_read).length;
+      return {
+        id:       pid,           // numeric — NEVER stringify
         patientId: pid,
-        name,
-        initials: ini,
-        avBg: col.bg,
-        avColor: col.fg,
-        crisis: isCrisis,
-        unread,
-        lastMsg: lastMsg ? (lastMsg.content || '').slice(0,60) : 'No messages yet',
+        name, initials: ini,
+        avBg: col.bg, avColor: col.fg,
+        crisis, unread,
+        lastMsg:  lastMsg ? (lastMsg.content || '').slice(0, 60) : 'No messages yet',
         lastTime: lastMsg ? new Date(lastMsg.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '',
-        status: isCrisis ? 'Crisis patient' : 'Active patient',
-        messages: msgs.map(m => ({
-          id: m.id,
-          from: m.sender_id === pid ? 'patient' : 'therapist',
-          text: m.content || '',
-          time: new Date(m.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
-        }))
-      });
+        status:   crisis ? 'Crisis patient' : 'Active patient',
+      };
     });
 
-    // Sort: crisis first, then by unread, then by last message
-    THREADS.sort((a,b) => {
+    THREADS.sort((a, b) => {
       if (a.crisis && !b.crisis) return -1;
-      if (!a.crisis && b.crisis) return 1;
+      if (!a.crisis && b.crisis) return  1;
       return b.unread - a.unread;
     });
 
     renderThreads();
-    if (THREADS.length > 0) setTimeout(() => openThread(THREADS[0].id), 100);
+    if (THREADS.length > 0) openThread(THREADS[0].id);
 
   } catch(err) {
-    document.getElementById('threadList').innerHTML = `<div style="padding:20px;color:var(--danger)">Error: ${err.message}</div>`;
+    list.innerHTML = `<div style="padding:20px;color:var(--danger);font-size:13px">Error loading threads: ${err.message}</div>`;
     console.error('loadThreads error:', err);
   }
 }
 
-let activeThread = null;
-let toastTimer;
-
-/* ── RENDER THREADS ── */
-function renderThreads(filter='') {
+/* ── RENDER THREAD LIST ── */
+function renderThreads(filter) {
+  filter = (filter || '').toLowerCase();
   const list = document.getElementById('threadList');
-  const lc = filter.toLowerCase();
-  list.innerHTML = THREADS
-    .filter(t => t.name.toLowerCase().includes(lc) || t.lastMsg.toLowerCase().includes(lc))
-    .map(t => `
-      <div class="thread-item ${t.unread ? 'unread' : ''} ${activeThread===t.id ? 'active' : ''}"
-           onclick="openThread('${t.id}')" data-id="${t.id}">
-        <div class="t-av" style="background:${t.avBg};color:${t.avColor}">
-          ${t.initials}
-          ${t.unread ? '<div class="t-unread-dot"></div>' : ''}
-        </div>
-        <div class="ti-body">
-          <div class="ti-row">
-            <span class="ti-name">${t.name}${t.crisis ? '<span class="ti-crisis">CRISIS</span>' : ''}</span>
-            <span class="ti-time">${t.lastTime}</span>
-          </div>
-          <div class="ti-preview ${t.unread ? 'unread-preview' : ''}">${t.lastMsg}</div>
-        </div>
+  const visible = THREADS.filter(t =>
+    t.name.toLowerCase().includes(filter) || t.lastMsg.toLowerCase().includes(filter)
+  );
+  if (visible.length === 0) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-3);font-size:13px">No conversations found.</div>';
+    return;
+  }
+  list.innerHTML = visible.map(t => `
+    <div class="thread-item ${t.unread ? 'unread' : ''} ${activeThread === t.id ? 'active' : ''}"
+         onclick="openThread(${t.id})" data-id="${t.id}">
+      <div class="t-av" style="background:${t.avBg};color:${t.avColor}">
+        ${t.initials}
+        ${t.unread ? '<div class="t-unread-dot"></div>' : ''}
       </div>
-    `).join('');
+      <div class="ti-body">
+        <div class="ti-row">
+          <span class="ti-name">${t.name}${t.crisis ? '<span class="ti-crisis">CRISIS</span>' : ''}</span>
+          <span class="ti-time">${t.lastTime}</span>
+        </div>
+        <div class="ti-preview ${t.unread ? 'unread-preview' : ''}">${t.lastMsg}</div>
+      </div>
+    </div>`).join('');
 }
 
 function filterThreads(val) { renderThreads(val); }
 
-/* ── OPEN THREAD ── */
+/* ── OPEN THREAD & START POLLING ── */
 function openThread(id) {
+  id = Number(id);  // always numeric
   activeThread = id;
   const thread = THREADS.find(t => t.id === id);
-  if(!thread) return;
+  if (!thread) return;
 
-  // Mark as read locally
   thread.unread = 0;
   renderThreads(document.getElementById('threadSearch').value);
 
-  // Mark as read in Supabase (async, non-blocking)
-  const raw = localStorage.getItem('mh_user');
-  const user = JSON.parse(raw);
-  supaFetch(`messages?sender_id=eq.${thread.patientId}&receiver_id=eq.${user.user_id}&is_read=eq.false`, {
-    method: 'PATCH',
-    headers: { 'Prefer': 'return=minimal' },
-    body: JSON.stringify({ is_read: true })
-  }).catch(e => console.warn('mark-read error:', e));
+  // Mark received messages as read (non-blocking)
+  supaFetch(
+    `messages?sender_id=eq.${thread.patientId}&receiver_id=eq.${therapistId}&is_read=eq.false`,
+    { method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify({is_read:true}) }
+  ).catch(() => {});
 
-  // Show chat area — hide placeholder, show main
+  // Show chat pane
   document.getElementById('chatPlaceholder').style.display = 'none';
   const cm = document.getElementById('chatMain');
   cm.style.cssText = 'display:flex;flex-direction:column;overflow:hidden;flex:1';
 
   // Crisis banner
   document.getElementById('crisisbanner').innerHTML = thread.crisis
-    ? `<div class="crisis-banner"><i class="ti ti-alert-triangle"></i>Crisis patient — review entry and activate protocol if necessary<button onclick="showToast('Emergency protocol initiated. Supervisor notified.','err')">Activate Protocol</button></div>`
+    ? `<div class="crisis-banner"><i class="ti ti-alert-triangle"></i>Crisis patient — review and activate protocol if needed
+       <button onclick="showToast('Emergency protocol initiated.','err')">Activate Protocol</button></div>`
     : '';
 
-  // Header
+  // Chat header
   document.getElementById('chatHeader').innerHTML = `
     <div class="ch-av" style="background:${thread.avBg};color:${thread.avColor}">${thread.initials}</div>
     <div>
@@ -530,85 +544,136 @@ function openThread(id) {
       <div class="ch-status">${thread.status}</div>
     </div>
     <div class="ch-actions">
-      <button class="ch-btn" onclick="showToast('Launching video session with ${thread.name}…','ok')"><i class="ti ti-video"></i>Video Call</button>
+      <button class="ch-btn" onclick="showToast('Launching video session…','ok')"><i class="ti ti-video"></i>Video Call</button>
       <button class="ch-btn" onclick="window.location.href='therapist_reviews.html'"><i class="ti ti-notebook"></i>Journal</button>
-      ${thread.crisis ? `<button class="ch-btn danger" onclick="showToast('Crisis protocol activated for ${thread.name}. Notifications sent.','err')"><i class="ti ti-alert-triangle"></i>Crisis</button>` : ''}
-    </div>
-  `;
+      ${thread.crisis ? `<button class="ch-btn danger" onclick="showToast('Crisis protocol activated.','err')"><i class="ti ti-alert-triangle"></i>Crisis</button>` : ''}
+    </div>`;
 
-  renderMessages(thread);
+  // Start live polling for this thread
+  if (pollInterval) clearInterval(pollInterval);
+  loadLiveMessages(thread);
+  pollInterval = setInterval(() => loadLiveMessages(thread), 5000);
 }
 
-/* ── RENDER MESSAGES ── */
-function renderMessages(thread) {
+/* ── LOAD LIVE MESSAGES FROM SUPABASE ── */
+async function loadLiveMessages(thread) {
   const container = document.getElementById('chatMessages');
-  const now = new Date();
-  container.innerHTML = `<div class="sys-msg">Conversation started — ${now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>`;
-  thread.messages.forEach(m => {
-    const isOut = m.from === 'therapist';
-    container.innerHTML += `
-      <div class="bubble-wrap ${isOut ? 'out' : ''}">
-        ${!isOut ? `<div class="b-av" style="background:${thread.avBg};color:${thread.avColor}">${thread.initials}</div>` : ''}
-        <div>
-          <div class="bubble ${isOut ? 'bubble-out' : 'bubble-in'}">${m.text}</div>
-          <div class="b-time">${m.time}</div>
-        </div>
-        ${isOut ? `<div class="b-av" style="background:linear-gradient(135deg,#a5b4fc,#818cf8);color:#1e1b4b">${therapistInitials}</div>` : ''}
-      </div>
-    `;
-  });
-  container.scrollTop = container.scrollHeight;
+  if (!container) return;
+
+  try {
+    // Two simple queries — same approach as loadThreads
+    const sent = await supaFetch(
+      `messages?sender_id=eq.${therapistId}&receiver_id=eq.${thread.patientId}&order=created_at.asc&select=sender_id,receiver_id,content,is_read,created_at`
+    );
+    const received = await supaFetch(
+      `messages?sender_id=eq.${thread.patientId}&receiver_id=eq.${therapistId}&order=created_at.asc&select=sender_id,receiver_id,content,is_read,created_at`
+    );
+    const msgs = [...(sent || []), ...(received || [])].sort(
+      (a, b) => new Date(a.created_at) - new Date(b.created_at)
+    );
+
+    // Avoid scroll-jump re-render when nothing changed
+    const prevCount = container.querySelectorAll('.bubble-wrap').length;
+    if (msgs.length === prevCount) return;
+
+    const wasAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 80;
+
+    container.innerHTML = '';
+
+    if (msgs.length === 0) {
+      container.innerHTML = '<div class="sys-msg" style="margin-top:40px">No messages yet — send the first one!</div>';
+    } else {
+      let lastDate = '';
+      msgs.forEach(m => {
+        const isOut = Number(m.sender_id) === therapistId;
+        const d     = new Date(m.created_at);
+        const dateStr = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+        if (dateStr !== lastDate) {
+          lastDate = dateStr;
+          container.innerHTML += `<div class="sys-msg">${dateStr}</div>`;
+        }
+        const time = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+        container.innerHTML += `
+          <div class="bubble-wrap ${isOut ? 'out' : ''}">
+            ${!isOut ? `<div class="b-av" style="background:${thread.avBg};color:${thread.avColor}">${thread.initials}</div>` : ''}
+            <div>
+              <div class="bubble ${isOut ? 'bubble-out' : 'bubble-in'}">${(m.content||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+              <div class="b-time">${time}</div>
+            </div>
+            ${isOut ? `<div class="b-av" style="background:linear-gradient(135deg,#a5b4fc,#818cf8);color:#1e1b4b">${therapistInitials}</div>` : ''}
+          </div>`;
+      });
+    }
+
+    if (wasAtBottom) container.scrollTop = container.scrollHeight;
+
+    // Update thread preview
+    const last = msgs[msgs.length - 1];
+    if (last) {
+      thread.lastMsg  = (last.content || '').slice(0, 60);
+      thread.lastTime = new Date(last.created_at).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    }
+
+    // Mark patient messages as read
+    supaFetch(
+      `messages?sender_id=eq.${thread.patientId}&receiver_id=eq.${therapistId}&is_read=eq.false`,
+      { method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify({is_read:true}) }
+    ).catch(() => {});
+
+  } catch(e) { console.error('loadLiveMessages error:', e); }
 }
 
 /* ── SEND MESSAGE ── */
-const AUTO_REPLIES = [
-  'Thank you for sharing that with me. I hear you.',
-  'That takes real courage to express. Let\'s explore this further in our next session.',
-  'I understand. Your feelings are valid. Have you tried the grounding exercises we discussed?',
-  'I\'m reviewing your recent journal entries alongside this. I\'ll have resources ready for you.',
-  'Please remember your coping toolkit for tonight. I\'ll follow up first thing tomorrow.',
-];
-
 async function sendMessage() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if(!text || !activeThread) return;
+  const input  = document.getElementById('chatInput');
+  const text   = (input.value || '').trim();
+  if (!text || !activeThread) return;
 
   const thread = THREADS.find(t => t.id === activeThread);
   if (!thread) return;
 
-  const raw = localStorage.getItem('mh_user');
-  const user = JSON.parse(raw);
-  const timeStr = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-
-  // Optimistic update
-  thread.messages.push({from:'therapist', text, time:timeStr});
-  thread.lastMsg = text.length > 48 ? text.slice(0,48)+'…' : text;
-  thread.lastTime = 'Just now';
   input.value = '';
   input.style.height = 'auto';
-  renderMessages(thread);
+
+  // Optimistic bubble
+  const container = document.getElementById('chatMessages');
+  if (container) {
+    const time = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    container.innerHTML += `
+      <div class="bubble-wrap out">
+        <div>
+          <div class="bubble bubble-out">${text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+          <div class="b-time">${time}</div>
+        </div>
+        <div class="b-av" style="background:linear-gradient(135deg,#a5b4fc,#818cf8);color:#1e1b4b">${therapistInitials}</div>
+      </div>`;
+    container.scrollTop = container.scrollHeight;
+  }
+
+  thread.lastMsg  = text.slice(0, 60);
+  thread.lastTime = 'Just now';
   renderThreads(document.getElementById('threadSearch').value);
 
-  // Save to Supabase
   try {
     await supaFetch('messages', {
       method: 'POST',
       headers: { 'Prefer': 'return=minimal' },
       body: JSON.stringify({
-        sender_id: user.user_id,
+        sender_id:   therapistId,
         receiver_id: thread.patientId,
-        content: text,
-        is_read: false
+        content:     text,
+        is_read:     false
       })
     });
+    setTimeout(() => loadLiveMessages(thread), 400);
   } catch(e) {
-    console.error('sendMessage save error:', e);
+    showToast('Failed to send. Please try again.', 'err');
+    console.error('sendMessage error:', e);
   }
 }
 
 function handleKey(e) {
-  if(e.key === 'Enter' && !e.shiftKey){e.preventDefault();sendMessage();}
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 function autoResize(el) {
   el.style.height = 'auto';
@@ -618,15 +683,12 @@ function autoResize(el) {
 function showToast(msg, type='ok') {
   const t = document.getElementById('toast');
   document.getElementById('toastMsg').textContent = msg;
-  document.getElementById('toastIcon').className = type==='ok' ? 'ti ti-circle-check' : 'ti ti-alert-circle';
+  document.getElementById('toastIcon').className  = type === 'ok' ? 'ti ti-circle-check' : 'ti ti-alert-circle';
   t.className = 'toast t-' + type + ' show';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
 }
 
-/* ── INIT ── */
-const _mu = localStorage.getItem('mh_user');
-const therapistInitials = _mu ? (function(n){const p=n.trim().split(/\s+/);return p.map(w=>w[0]).slice(0,2).join('').toUpperCase();})(JSON.parse(_mu).full_name||'T') : 'T';
 loadThreads();
 </script>
 </body>

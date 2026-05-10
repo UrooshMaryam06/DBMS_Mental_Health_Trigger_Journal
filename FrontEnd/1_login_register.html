@@ -302,7 +302,7 @@ window.handleLogin = async function() {
 
     // Step 2 — Supabase fetches full profile including DOB and gender
     const res  = await fetch(
-      `${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email)}&select=user_id,full_name,role,date_of_birth,gender`,
+      `${SUPABASE_URL}/rest/v1/users?email=eq.${encodeURIComponent(email)}&select=user_id,full_name,role,date_of_birth,gender,is_active`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }}
     );
     const data = await res.json();
@@ -319,6 +319,14 @@ window.handleLogin = async function() {
     // Step 3 — Check role matches what user selected
     if (user.role !== loginRole) {
       showAlert('loginAlert','loginAlertText',`This account is registered as a ${user.role}. Please select the correct role.`);
+      btn.innerHTML = '<i class="ti ti-login"></i>Sign In';
+      btn.disabled  = false;
+      return;
+    }
+
+    // Step 3b — Block inactive/pending therapists
+    if (user.role === 'therapist' && user.is_active === false) {
+      showAlert('loginAlert','loginAlertText','Your therapist account is pending admin approval. Please wait for verification before signing in.');
       btn.innerHTML = '<i class="ti ti-login"></i>Sign In';
       btn.disabled  = false;
       return;
@@ -401,7 +409,7 @@ window.handleRegister = async function() {
         role:          regRole,
         date_of_birth: dob,
         gender:        gender || null,
-        is_active:     true
+        is_active:     regRole === 'therapist' ? false : true
       })
     });
 
@@ -420,7 +428,15 @@ window.handleRegister = async function() {
       gender:        gender || ''
     }));
 
-    // Step 4 — Show success and redirect to login tab
+    // Step 4 — If therapist, show pending approval message and stop
+    if (regRole === 'therapist') {
+      document.getElementById('regAlert').className = 'alert success show';
+      document.getElementById('regAlertText').textContent = '✓ Application submitted! Your account is pending admin approval. You will be able to sign in once verified.';
+      btn.innerHTML = '<i class="ti ti-check"></i> Application Submitted';
+      btn.disabled = true;
+      return;
+    }
+
     // Auto-link new patient to first available therapist
 if (regRole === 'patient') {
   try {

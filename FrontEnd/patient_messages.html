@@ -489,12 +489,10 @@ html.dark .toast { background: #2a2420; border-color: var(--border); color: var(
 
 <script type="module">
 // ================================================================
-// PASTE YOUR KEYS HERE
+// CONFIG
 // ================================================================
 const SUPABASE_URL = "https://pjernwhcerujrfczodpq.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqZXJud2hjZXJ1anJmY3pvZHBxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjYwOTEsImV4cCI6MjA5MzkwMjA5MX0.Efw1Kf20W4Lho_Znz2z4vb2qReNxGI0FVDk8D1042nU";
-
-const DEMO_EMAILS = ['sara@mhjournal.com','imran@mhjournal.com','admin@mhjournal.com','ali@mhjournal.com'];
 
 // ── helpers ─────────────────────────────────────────────────
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px'}
@@ -525,7 +523,6 @@ async function db(endpoint, options = {}) {
 const raw = localStorage.getItem('mh_user');
 if (!raw) { window.location.href = '1_login_register.html'; }
 const user    = JSON.parse(raw);
-const isDemo  = DEMO_EMAILS.includes((user.email || '').toLowerCase());
 const name    = user.full_name || 'User';
 const parts   = name.trim().split(' ');
 const initials = ((parts[0]||'')[0]||'').toUpperCase() + ((parts[1]||'')[0]||'').toUpperCase();
@@ -534,182 +531,234 @@ const initials = ((parts[0]||'')[0]||'').toUpperCase() + ((parts[1]||'')[0]||'')
 const sbU = document.getElementById('sbUname');       if(sbU) sbU.textContent = name;
 const sbA = document.getElementById('sbAvatarInitials'); if(sbA) sbA.textContent = initials;
 
-// ── DEMO mode — keep hardcoded UI, fix name ──────────────────
-if (isDemo) {
-  document.querySelectorAll('.msg-bubble,.msg-text,.bubble-mine').forEach(el=>{
-    el.innerHTML = el.innerHTML.replace(/\bSara\b/g, parts[0]);
-  });
-  document.querySelector('.msg-avatar')?.setAttribute('title', name);
-  document.getElementById('msgArea').scrollTop = document.getElementById('msgArea').scrollHeight;
+// Sign out
+document.querySelectorAll('[data-action="signout"]').forEach(el =>
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    localStorage.removeItem('mh_user');
+    window.location.href = '1_login_register.html';
+  })
+);
 
-  window.sendMessage = function(){
-    const inp  = document.getElementById('msgInput');
-    const txt  = inp.value.trim();
-    if(!txt) return;
-    const area   = document.getElementById('msgArea');
-    const typing = document.getElementById('typingInd');
-    const msg = document.createElement('div');
-    msg.className = 'msg mine';
-    msg.innerHTML = `
-      <div class="msg-avatar" style="background:linear-gradient(135deg,#95d5b2,#52b788);color:#1b4332">${initials}</div>
-      <div><div class="bubble bubble-mine">${txt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div><div class="msg-time">Just now</div></div>`;
-    area.insertBefore(msg, typing);
-    inp.value = ''; inp.style.height = 'auto';
-    area.scrollTop = area.scrollHeight;
-    setTimeout(()=>{ typing.style.display='flex'; area.scrollTop=area.scrollHeight; }, 600);
-    const responses = [
-      "That's really insightful. Let's explore that more in our next session.",
-      "I appreciate you sharing that. How did that make you feel in the moment?",
-      "That sounds like a positive step forward. Well done!",
-      "Thank you for being open about this. It's important for our work together."
-    ];
-    setTimeout(()=>{
-      typing.style.display = 'none';
-      const r = document.createElement('div');
-      r.className = 'msg';
-      r.innerHTML = `
-        <div class="msg-avatar" style="background:linear-gradient(135deg,#a5b4fc,#818cf8);color:#1e1b4b">IK</div>
-        <div><div class="bubble bubble-them">${responses[Math.floor(Math.random()*responses.length)]}</div><div class="msg-time">Just now</div></div>`;
-      area.insertBefore(r, typing);
-      area.scrollTop = area.scrollHeight;
-    }, 2400);
-  };
+// ── State ────────────────────────────────────────────────────
+let currentTherapistId   = null;
+let currentTherapistName = 'Your Therapist';
+let currentTherapistInit = 'T';
+let pollInterval         = null;
 
-// ── REAL USER mode — load from Supabase ─────────────────────
-} else {
-  // Hide demo threads
-  document.querySelectorAll('.thread-item').forEach(el => el.style.display = 'none');
+// ── Replace static chat window with a loading state ──────────
+const chatWindow = document.querySelector('.chat-window');
+chatWindow.innerHTML = `
+  <div id="chatPlaceholder" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text-3);padding:40px">
+    <i class="ti ti-loader-2" style="font-size:36px;animation:spin .8s linear infinite"></i>
+    <p style="font-size:13px;font-weight:500">Loading your conversation…</p>
+  </div>`;
 
-  let currentTherapistId   = null;
-  let currentTherapistName = 'Your Therapist';
-  let currentTherapistInit = 'T';
-  let pollInterval         = null;
+// ── Load therapist & bootstrap chat ──────────────────────────
+async function loadTherapist() {
+  const threadList = document.getElementById('threadList');
+  // Hide static demo threads
+  threadList.querySelectorAll('.thread-item').forEach(el => el.style.display = 'none');
 
-  // Load therapist for this patient
-  async function loadTherapist() {
-    const threadList = document.getElementById('threadList');
-    try {
-      const links = await db(`therapist_patient_link?patient_id=eq.${user.user_id}&is_active=eq.true&select=therapist_id`);
-      if (!links || links.length === 0) {
-        threadList.innerHTML = `
-          <div style="padding:40px 16px;text-align:center;color:#9e9891">
-            <i class="ti ti-message-off" style="font-size:32px;display:block;margin-bottom:10px;opacity:.4"></i>
-            <div style="font-size:13px;font-weight:600;margin-bottom:4px">No therapist assigned yet</div>
-            <div style="font-size:12px;line-height:1.5">Contact admin to get a therapist assigned.</div>
-          </div>`;
-        return;
-      }
-
-      const therapistId = links[0].therapist_id;
-      currentTherapistId = therapistId;
-
-      const tData = await db(`users?user_id=eq.${therapistId}&select=full_name`);
-      if (tData && tData.length > 0) {
-        currentTherapistName = tData[0].full_name;
-        const tp = currentTherapistName.split(' ');
-        currentTherapistInit = ((tp[0]||'')[0]||'').toUpperCase() + ((tp[1]||'')[0]||'').toUpperCase();
-      }
-
-      // Show therapist in thread list
-      const lastMsg = await db(`messages?or=(and(sender_id.eq.${user.user_id},receiver_id.eq.${therapistId}),and(sender_id.eq.${therapistId},receiver_id.eq.${user.user_id}))&order=created_at.desc&limit=1`);
-      const preview = (lastMsg && lastMsg.length > 0) ? lastMsg[0].content.substring(0, 40) + '...' : 'No messages yet';
-
+  try {
+    const links = await db(`therapist_patient_link?patient_id=eq.${user.user_id}&is_active=eq.true&select=therapist_id`);
+    if (!links || links.length === 0) {
       threadList.innerHTML = `
-        <div class="thread-item active" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:#f9f5f0;border-left:3px solid #e07d56" onclick="openChat()">
-          <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1e1b4b;flex-shrink:0">${currentTherapistInit}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:700;color:#2d2420">${currentTherapistName}</div>
-            <div style="font-size:12px;color:#9e9891;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${preview}</div>
-          </div>
+        <div style="padding:40px 16px;text-align:center;color:var(--text-3)">
+          <i class="ti ti-message-off" style="font-size:32px;display:block;margin-bottom:10px;opacity:.4"></i>
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">No therapist assigned yet</div>
+          <div style="font-size:12px;line-height:1.5">Contact admin to get a therapist assigned.</div>
         </div>`;
-
-      openChat();
-    } catch(e) {
-      console.error('Load therapist error:', e);
+      chatWindow.innerHTML = `
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text-3);padding:40px;text-align:center">
+          <i class="ti ti-user-off" style="font-size:40px;opacity:.3"></i>
+          <p style="font-size:14px;font-weight:500">No therapist assigned</p>
+          <p style="font-size:12px">Ask your admin to link you with a therapist.</p>
+        </div>`;
+      return;
     }
-  }
 
-  // Open the chat panel
-  window.openChat = function() {
-    if (!currentTherapistId) return;
-    const chatPanel = document.getElementById('msgArea')?.closest('.chat-panel') || document.getElementById('msgArea')?.parentElement;
-    if (chatPanel) {
-      chatPanel.innerHTML = `
-        <div class="chat-header" style="padding:14px 20px;border-bottom:1px solid #ebdcd5;display:flex;align-items:center;gap:12px;background:#fff">
-          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1e1b4b">${currentTherapistInit}</div>
-          <div><div style="font-size:14px;font-weight:700;color:#2d2420">${currentTherapistName}</div><div style="font-size:12px;color:#5a9264">Your therapist</div></div>
+    const therapistId = links[0].therapist_id;
+    currentTherapistId = therapistId;
+
+    const tData = await db(`users?user_id=eq.${therapistId}&select=full_name`);
+    if (tData && tData.length > 0) {
+      currentTherapistName = tData[0].full_name;
+      const tp = currentTherapistName.split(' ');
+      currentTherapistInit = ((tp[0]||'')[0]||'').toUpperCase() + ((tp[1]||'')[0]||'').toUpperCase();
+    }
+
+    // Thread list preview
+    const lastMsgArr = await db(`messages?or=(and(sender_id.eq.${user.user_id},receiver_id.eq.${therapistId}),and(sender_id.eq.${therapistId},receiver_id.eq.${user.user_id}))&order=created_at.desc&limit=1`);
+    const preview = (lastMsgArr && lastMsgArr.length > 0)
+      ? lastMsgArr[0].content.substring(0, 45) + (lastMsgArr[0].content.length > 45 ? '…' : '')
+      : 'No messages yet — say hello! 👋';
+
+    threadList.innerHTML = `
+      <div class="thread-item active" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:var(--accent-l);border-left:3px solid var(--accent)" onclick="openChat()">
+        <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1e1b4b;flex-shrink:0;position:relative">
+          ${currentTherapistInit}
+          <div style="position:absolute;bottom:-1px;right:-1px;width:11px;height:11px;border-radius:50%;background:#22c55e;border:2px solid #fff"></div>
         </div>
-        <div id="msgArea" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:#faf7f2"></div>
-        <div style="padding:12px 16px;border-top:1px solid #ebdcd5;background:#fff;display:flex;gap:10px;align-items:flex-end">
-          <textarea id="msgInput" placeholder="Type a message…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"
-            style="flex:1;border:1.5px solid #ebdcd5;border-radius:11px;padding:10px 14px;font-size:13px;font-family:'Quicksand',sans-serif;resize:none;outline:none;background:#fff;color:#4a3f3a;max-height:100px"></textarea>
-          <button onclick="sendMessage()" style="width:42px;height:42px;border-radius:50%;background:#e07d56;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <i class="ti ti-send" style="color:#fff;font-size:18px"></i>
-          </button>
-        </div>`;
-      loadMessages();
-      if (pollInterval) clearInterval(pollInterval);
-      pollInterval = setInterval(loadMessages, 5000);
-    }
-  };
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--text-1)">${currentTherapistName}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-bottom:2px">Your Therapist</div>
+          <div style="font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${preview}</div>
+        </div>
+      </div>`;
 
-  // Load messages from Supabase
-  async function loadMessages() {
-    if (!currentTherapistId) return;
-    const area = document.getElementById('msgArea');
-    if (!area) return;
-    try {
-      const msgs = await db(
-        `messages?or=(and(sender_id.eq.${user.user_id},receiver_id.eq.${currentTherapistId}),and(sender_id.eq.${currentTherapistId},receiver_id.eq.${user.user_id}))&order=created_at.asc`
-      );
-      if (!msgs) return;
-      area.innerHTML = '';
-      if (msgs.length === 0) {
-        area.innerHTML = `<div style="text-align:center;color:#9e9891;font-size:13px;padding:40px 0">No messages yet. Say hello! 👋</div>`;
-        return;
-      }
-      msgs.forEach(m => {
-        const isMine = m.sender_id === user.user_id;
+    openChat();
+  } catch(e) {
+    console.error('Load therapist error:', e);
+    chatWindow.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--danger);font-size:13px;padding:20px">Failed to load. Check your connection.</div>`;
+  }
+}
+
+// ── Open / build the chat panel ───────────────────────────────
+window.openChat = function() {
+  if (!currentTherapistId) return;
+  chatWindow.innerHTML = `
+    <div class="chat-header" style="background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#a5b4fc,#818cf8);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1e1b4b;position:relative">
+        ${currentTherapistInit}
+        <div style="position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;border-radius:50%;background:#22c55e;border:2px solid #fff"></div>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text-1)">${currentTherapistName}</div>
+        <div style="font-size:12px;color:#22c55e;font-weight:500">● Your Therapist</div>
+      </div>
+      <div class="ch-actions" style="margin-left:auto;display:flex;gap:8px">
+        <div class="ch-btn" title="Video call"><i class="ti ti-video"></i></div>
+        <div class="ch-btn" title="Voice call"><i class="ti ti-phone"></i></div>
+      </div>
+    </div>
+    <div id="msgArea" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:#faf9f5"></div>
+    <div class="input-bar" style="background:var(--surface);border-top:0.5px solid var(--border);padding:14px 20px;display:flex;align-items:flex-end;gap:10px;flex-shrink:0">
+      <div class="input-area" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:8px">
+        <textarea class="msg-input" id="msgInput" placeholder="Type a message to ${currentTherapistName}…" rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"
+          style="border:none;background:transparent;outline:none;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text-1);width:100%;resize:none;min-height:22px;max-height:100px;line-height:1.5"></textarea>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:6px">
+            <button class="ia-btn" title="Attach file"><i class="ti ti-paperclip"></i></button>
+            <button class="ia-btn" title="Share journal entry"><i class="ti ti-notebook"></i></button>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-3)"><i class="ti ti-lock" style="font-size:13px;color:#22c55e"></i>End-to-end encrypted</div>
+        </div>
+      </div>
+      <button class="send-btn" onclick="sendMessage()" title="Send"><i class="ti ti-send"></i></button>
+    </div>`;
+
+  loadMessages();
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(loadMessages, 5000);
+};
+
+// ── Load messages from Supabase ───────────────────────────────
+async function loadMessages() {
+  if (!currentTherapistId) return;
+  const area = document.getElementById('msgArea');
+  if (!area) return;
+
+  try {
+    const msgs = await db(
+      `messages?or=(and(sender_id.eq.${user.user_id},receiver_id.eq.${currentTherapistId}),and(sender_id.eq.${currentTherapistId},receiver_id.eq.${user.user_id}))&order=created_at.asc`
+    );
+    if (!msgs) return;
+
+    // Don't re-render if nothing changed (avoid scroll jump)
+    const currentCount = area.querySelectorAll('.msg-row').length;
+    if (msgs.length === currentCount) return;
+
+    const wasAtBottom = area.scrollHeight - area.scrollTop - area.clientHeight < 60;
+
+    area.innerHTML = '';
+    if (msgs.length === 0) {
+      area.innerHTML = `<div style="text-align:center;color:var(--text-3);font-size:13px;padding:40px 0">No messages yet. Say hello! 👋</div>`;
+      return;
+    }
+
+    let lastDate = '';
+    msgs.forEach(m => {
+      const isMine = m.sender_id === user.user_id;
+      const msgDate = new Date(m.created_at).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+      if (msgDate !== lastDate) {
+        lastDate = msgDate;
         const div = document.createElement('div');
-        div.className = isMine ? 'msg mine' : 'msg';
-        div.style.cssText = `display:flex;gap:8px;align-items:flex-end;${isMine?'flex-direction:row-reverse':''}`;
-        const time = new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-        div.innerHTML = `
-          <div style="width:32px;height:32px;border-radius:50%;background:${isMine?'linear-gradient(135deg,#95d5b2,#52b788)':'linear-gradient(135deg,#a5b4fc,#818cf8)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${isMine?'#1b4332':'#1e1b4b'};flex-shrink:0">${isMine?initials:currentTherapistInit}</div>
-          <div>
-            <div style="max-width:280px;padding:10px 14px;border-radius:${isMine?'14px 14px 4px 14px':'14px 14px 14px 4px'};background:${isMine?'#e07d56':'#fff'};color:${isMine?'#fff':'#2d2420'};font-size:13px;line-height:1.5;box-shadow:0 1px 4px rgba(0,0,0,.06)">${m.content}</div>
-            <div style="font-size:11px;color:#9e9891;margin-top:3px;${isMine?'text-align:right':''}">${time}</div>
-          </div>`;
+        div.className = 'date-divider';
+        div.textContent = msgDate;
         area.appendChild(div);
-      });
-      area.scrollTop = area.scrollHeight;
-    } catch(e) { console.error('Load messages error:', e); }
+      }
+      const time = new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      const row = document.createElement('div');
+      row.className = 'msg-row';
+      row.style.cssText = `display:flex;gap:8px;align-items:flex-end;${isMine?'flex-direction:row-reverse':''}`;
+      row.innerHTML = `
+        <div style="width:32px;height:32px;border-radius:50%;background:${isMine?'linear-gradient(135deg,#95d5b2,#52b788)':'linear-gradient(135deg,#a5b4fc,#818cf8)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${isMine?'#1b4332':'#1e1b4b'};flex-shrink:0">${isMine?initials:currentTherapistInit}</div>
+        <div style="max-width:68%">
+          <div style="padding:10px 14px;border-radius:${isMine?'14px 14px 4px 14px':'14px 14px 14px 4px'};background:${isMine?'var(--accent)':'var(--surface)'};color:${isMine?'#fff':'var(--text-1)'};font-size:13px;line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,.06);border:${isMine?'none':'0.5px solid var(--border)'}">
+            ${m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+          </div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:3px;${isMine?'text-align:right':''}">${time}</div>
+        </div>`;
+      area.appendChild(row);
+    });
+
+    if (wasAtBottom) area.scrollTop = area.scrollHeight;
+
+    // Mark therapist messages as read
+    db(`messages?sender_id=eq.${currentTherapistId}&receiver_id=eq.${user.user_id}&is_read=eq.false`, {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ is_read: true })
+    }).catch(() => {});
+
+  } catch(e) { console.error('Load messages error:', e); }
+}
+
+// ── Send message ──────────────────────────────────────────────
+window.sendMessage = async function() {
+  const inp = document.getElementById('msgInput');
+  if (!inp) return;
+  const txt = inp.value.trim();
+  if (!txt || !currentTherapistId) return;
+  inp.value = ''; inp.style.height = 'auto';
+
+  // Optimistic: add to UI immediately
+  const area = document.getElementById('msgArea');
+  if (area) {
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    row.style.cssText = 'display:flex;gap:8px;align-items:flex-end;flex-direction:row-reverse';
+    row.innerHTML = `
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#95d5b2,#52b788);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1b4332;flex-shrink:0">${initials}</div>
+      <div style="max-width:68%">
+        <div style="padding:10px 14px;border-radius:14px 14px 4px 14px;background:var(--accent);color:#fff;font-size:13px;line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+          ${txt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+        </div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:3px;text-align:right">Just now</div>
+      </div>`;
+    area.appendChild(row);
+    area.scrollTop = area.scrollHeight;
   }
 
-  // Send message to Supabase
-  window.sendMessage = async function() {
-    const inp = document.getElementById('msgInput');
-    if (!inp) return;
-    const txt = inp.value.trim();
-    if (!txt || !currentTherapistId) return;
-    inp.value = ''; inp.style.height = 'auto';
-    try {
-      await db('messages', {
-        method: 'POST',
-        headers: { 'Prefer': 'return=minimal' },
-        body: JSON.stringify({
-          sender_id:   user.user_id,
-          receiver_id: currentTherapistId,
-          content:     txt,
-          is_read:     false
-        })
-      });
-      loadMessages();
-    } catch(e) { console.error('Send error:', e); }
-  };
+  try {
+    await db('messages', {
+      method: 'POST',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        sender_id:   user.user_id,
+        receiver_id: currentTherapistId,
+        content:     txt,
+        is_read:     false
+      })
+    });
+    // Reload to get server timestamp and sync count
+    setTimeout(loadMessages, 500);
+  } catch(e) { console.error('Send error:', e); }
+};
 
-  loadTherapist();
-}
+loadTherapist();
 </script>
 </body>
 </html>
